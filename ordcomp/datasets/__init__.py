@@ -1,0 +1,1 @@
+from ._musician_similarity import fetch_musician_similarity

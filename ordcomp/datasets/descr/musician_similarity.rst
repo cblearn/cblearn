@@ -1,0 +1,29 @@
+.. _musician_similarity_dataset:
+
+The Musician Similarity dataset
+-------------------------------
+
+`This dataset contains triplets`_ gathered during the `MusicSeer similarity survey`_ in October 2002.
+
+In a web-based survey or game, the user was presented multiple musicians
+and selected the most similar. From this selection the triplets were created.
+
+.. _This dataset contains triplets: https://labrosa.ee.columbia.edu/projects/musicsim/musicseer.org/results/
+.. _MusicSeer similarity survey: http://musicseer.com
+
+**Data Set Characteristics:**
+
+    ===================   =====================
+    Triplets                             224793
+    Objects (Musicians)                     413
+    Dimensionality                      unknown
+    ===================   =====================
+
+This dataset can be downloaded using the :func:`ordcomp.datasets.fetch_musician_similarity`.
+
+When using these triplets, please give credit to the original authors.
+
+.. topic:: References
+
+    - Ellis, D. P., Whitman, B., Berenzweig, A., & Lawrence, S. (2002).
+      The quest for ground truth in musical artist similarity.
