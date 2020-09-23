@@ -14,17 +14,16 @@ ARCHIVE = _base.RemoteFileMetadata(
     url='https://labrosa.ee.columbia.edu/projects/musicsim/musicseer.org/results/musicseer-results-2002-10-15.txt',
     checksum=('149bc77d872d35cbd139833d29b788545873c4d1160a57a59f5ad8b9507bbad0'))
 
-
 logger = logging.getLogger(__name__)
 
-# todo: own datahome
+
 def fetch_musician_similarity(data_home: Optional[os.PathLike] = None, download_if_missing: bool = True,
                               shuffle: bool = True, random_state: Optional[np.random.RandomState] = None,
                               return_triplets: bool = False) -> Union[Bunch, np.ndarray]:
     """ Load the MusicSeer musician similarity dataset (triplets).
 
     ===================   =====================
-    Triplets                             224793
+    Triplets                             213629
     Objects (Musicians)                     413
     Dimensionality                      unknown
     ===================   =====================
@@ -47,12 +46,14 @@ def fetch_musician_similarity(data_home: Optional[os.PathLike] = None, download_
             data : ndarray, shape (n_triplets, 3)
                 Each row corresponding a triplet constraint.
                 The columns represent the target, choosen and other musician index.
-            judgement_id : np.ndarray, shape (n_triplets, 1)
+            judgement_id : np.ndarray, shape (n_triplets, )
                 Id of survey questions.
-            survey_or_game : np.ndarray, shape (n_triplets, 1)
+            survey_or_game : np.ndarray, shape (n_triplets,)
                 Letter 'S' or 'G' indicating if comparison origins from survey or game.
-            user : np.ndarray, shape (n_triplets, 1)
+            user : np.ndarray, shape (n_triplets, )
                 Array of the user ids, answering the triplet question
+            artists : np.ndarray, shape (413,)
+                Names of artists, corresponding to the triplet indices.
             DESCR : string
                 Description of the dataset.
         triplets : numpy array (n_triplets, 3)
@@ -87,12 +88,15 @@ def fetch_musician_similarity(data_home: Optional[os.PathLike] = None, download_
         random_state = check_random_state(random_state)
         musicians_data = random_state.permutation(musicians_data)
 
-    triplets = np.empty((len(musicians_data), 3), dtype=np.int32)
-    triplets[:, 0] = musicians_data['target']
-    triplets[:, 1] = musicians_data['chosen']
-    triplets[:, 2] = musicians_data['other']
-
     module_path = Path(__file__).parent
+    artists = np.genfromtxt(module_path.joinpath('data', 'musician_names.txt'), dtype=None, delimiter=' ')
+
+    triplets = np.empty((len(musicians_data), 3), dtype=np.int32)
+    for index, id in enumerate(artists['f1']):
+        np.place(triplets[:, 0], musicians_data['target'] == id, index)
+        np.place(triplets[:, 1], musicians_data['chosen'] == id, index)
+        np.place(triplets[:, 2], musicians_data['other'] == id, index)
+
     with module_path.joinpath('descr', 'musician_similarity.rst').open() as rst_file:
         fdescr = rst_file.read()
 
@@ -103,6 +107,7 @@ def fetch_musician_similarity(data_home: Optional[os.PathLike] = None, download_
                  judgement_id=musicians_data['judgement'],
                  survey_or_game=musicians_data['survey'],
                  user=musicians_data['user'],
+                 artists=artists['f0'],
                  DESCR=fdescr)
 
 

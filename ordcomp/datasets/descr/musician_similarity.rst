@@ -14,7 +14,7 @@ and selected the most similar. From this selection the triplets were created.
 **Data Set Characteristics:**
 
     ===================   =====================
-    Triplets                             224793
+    Triplets                             213629
     Objects (Musicians)                     413
     Dimensionality                      unknown
     ===================   =====================

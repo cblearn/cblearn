@@ -10,6 +10,7 @@ def test_fetch_musician_similarity():
     assert bunch.judgement_id.shape == (213629, )
     assert bunch.user.shape == (213629, )
     assert bunch.survey_or_game.shape == (213629, )
+    assert bunch.artists.shape == (413, )
 
     triplets = fetch_musician_similarity(shuffle=False, return_triplets=True)
     np.testing.assert_equal(bunch.data, triplets)
