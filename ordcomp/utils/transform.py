@@ -57,6 +57,15 @@ def _triplet_array_by_response_type(triplets: np.ndarray, responses: np.ndarray,
     return triplets, responses
 
 
+def check_size(size, n_items):
+    if size is None:
+        return n_items
+    elif isinstance(size, int) or size > 1:
+        return int(size)
+    elif isinstance(size, float):
+        return int(size * n_items)
+
+
 def check_triplet_array(triplets: np.ndarray, responses: Optional[np.ndarray] = None,
                         response_type: ResponseType = ResponseType.IMPLICIT, sort_jk: bool = True
                         ) -> Tuple[np.ndarray, np.ndarray]:
