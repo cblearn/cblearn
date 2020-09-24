@@ -28,7 +28,7 @@ def fetch_musician_similarity(data_home: Optional[os.PathLike] = None, download_
     Dimensionality                      unknown
     ===================   =====================
 
-    See the returned DESCR field for a detailed description.
+    See :ref:`musician_similarity_dataset` for a detailed description.
 
     Args:
         data_home : optional, default: None
@@ -45,6 +45,7 @@ def fetch_musician_similarity(data_home: Optional[os.PathLike] = None, download_
     Returns:
         dataset : :class:`~sklearn.utils.Bunch`
             Dictionary-like object, with the following attributes.
+
             data : ndarray, shape (n_triplets, 3)
                 Each row corresponding a triplet constraint.
                 The columns represent the target, choosen and other musician index.
@@ -62,7 +63,7 @@ def fetch_musician_similarity(data_home: Optional[os.PathLike] = None, download_
             Only present when `return_triplets=True`.
 
     Raises:
-        IOError: If the data is not locally available, but downlaod_if_missing=False
+        IOError: If the data is not locally available, but download_if_missing=False
     """
 
     data_home = Path(_base.get_data_home(data_home=data_home))

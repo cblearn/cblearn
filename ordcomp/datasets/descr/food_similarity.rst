@@ -1,15 +1,15 @@
-.. _musician_similarity_dataset:
+.. _food_similarity_dataset:
 
-The Food Similarity dataset
--------------------------------
+Food Similarity dataset
+-----------------------
 
-`This dataset contains triplets`_ collected from Amazon Mechanical Turk in 2014.
+`The food dataset contains triplets`_ collected from Amazon Mechanical Turk in 2014.
 
 The crowd workers were presented a target and multiple other of the 100 food images.
 They selected a fixed number of other images, which taste more similar to the target than the remaining.
 Per user selection, multiple triplet constraints were created.
 
-.. _This dataset contains triplets: https://vision.cornell.edu/se3/projects/cost-effective-hits/
+.. _The food dataset contains triplets: https://vision.cornell.edu/se3/projects/cost-effective-hits/
 
 **Data Set Characteristics:**
 
@@ -28,5 +28,6 @@ This dataset can be downloaded using the :func:`ordcomp.datasets.fetch_food_simi
 When using this data, please consider the fair use statement above and give credit to the original authors.
 
 .. topic:: References
+
     - Wilber, M. J., Kwak, I. S., & Belongie, S. J. (2014).
       Cost-effective hits for relative similarity comparisons. arXiv preprint arXiv:1404.3291.

@@ -1,7 +1,7 @@
 .. _musician_similarity_dataset:
 
-The Musician Similarity dataset
--------------------------------
+Musician Similarity dataset
+---------------------------
 
 `This dataset contains triplets`_ gathered during the `MusicSeer similarity survey`_ in October 2002.
 
@@ -21,8 +21,8 @@ Such, for each user judgement multiple triplets were created with the remaining 
     ===================   =====================
 
 .. Note:
-The original dataset, published 2002-10-15, contains 224793 triplets.
-We omit in this dataset the triplets with missing values for the last triplet index.
+    The original dataset, published 2002-10-15, contains 224793 triplets.
+    We omit in this dataset the triplets with missing values for the last triplet index.
 
 This dataset can be downloaded using the :func:`ordcomp.datasets.fetch_musician_similarity`.
 

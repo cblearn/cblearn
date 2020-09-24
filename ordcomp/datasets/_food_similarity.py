@@ -29,7 +29,7 @@ def fetch_food_similarity(data_home: Optional[os.PathLike] = None, download_if_m
     Dimensionality                      unknown
     ===================   =====================
 
-    See the returned DESCR field for a detailed description.
+    See :ref:`food_similarity_dataset` for a detailed description.
 
     Args:
         data_home : optional, default: None
@@ -46,7 +46,8 @@ def fetch_food_similarity(data_home: Optional[os.PathLike] = None, download_if_m
     Returns:
         dataset : :class:`~sklearn.utils.Bunch`
             Dictionary-like object, with the following attributes.
-            data : ndarray, shape (n_triplets, 3)
+
+            data: ndarray, shape (n_triplets, 3)
                 Each row corresponding a triplet constraint.
                 The columns represent the target, more similar and more distant food index.
             image_names : ndarray, shape (n_objects,)
