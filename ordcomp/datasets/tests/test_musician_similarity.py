@@ -1,7 +1,7 @@
-import pytest
-
 import numpy as np
+
 from ordcomp.datasets import fetch_musician_similarity
+
 
 def test_fetch_musician_similarity():
     bunch = fetch_musician_similarity(shuffle=False)
@@ -11,6 +11,7 @@ def test_fetch_musician_similarity():
     assert bunch.user.shape == (213629, )
     assert bunch.survey_or_game.shape == (213629, )
     assert bunch.artists.shape == (413, )
+    assert bunch.artists[bunch.data[0, 0]] == 'queen'
 
     triplets = fetch_musician_similarity(shuffle=False, return_triplets=True)
     np.testing.assert_equal(bunch.data, triplets)

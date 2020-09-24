@@ -28,6 +28,8 @@ def fetch_musician_similarity(data_home: Optional[os.PathLike] = None, download_
     Dimensionality                      unknown
     ===================   =====================
 
+    See the returned DESCR field for a detailed description.
+
     Args:
         data_home : optional, default: None
             Specify another download and cache folder for the datasets. By default
@@ -76,7 +78,7 @@ def fetch_musician_similarity(data_home: Optional[os.PathLike] = None, download_
 
         archive_path = _base._fetch_remote(ARCHIVE, dirname=data_home)
         data_dtype = {'names': ('judgement', 'survey', 'user', 'target', 'chosen', 'other'),
-                      'formats': ('<u4', 'S1', 'S5', '<u4', '<u4', '<u4', '<u4')}
+                      'formats': ('<u4', 'U1', 'U5', '<u4', '<u4', '<u4', '<u4')}
         musicians_data = np.genfromtxt(archive_path, dtype=data_dtype, delimiter=' ', invalid_raise=False)
 
         joblib.dump(musicians_data, filepath, compress=6)
@@ -89,25 +91,22 @@ def fetch_musician_similarity(data_home: Optional[os.PathLike] = None, download_
         musicians_data = random_state.permutation(musicians_data)
 
     module_path = Path(__file__).parent
-    artists = np.genfromtxt(module_path.joinpath('data', 'musician_names.txt'), dtype=None, delimiter=' ')
+    artists = np.genfromtxt(module_path.joinpath('data', 'musician_names.txt'), delimiter=' ',
+                            dtype={'names': ('name', 'id'), 'formats': ('U29', '<i8')})
 
-    triplets = np.empty((len(musicians_data), 3), dtype=np.int32)
-    for index, id in enumerate(artists['f1']):
-        np.place(triplets[:, 0], musicians_data['target'] == id, index)
-        np.place(triplets[:, 1], musicians_data['chosen'] == id, index)
-        np.place(triplets[:, 2], musicians_data['other'] == id, index)
-
-    with module_path.joinpath('descr', 'musician_similarity.rst').open() as rst_file:
-        fdescr = rst_file.read()
+    triplets = np.c_[musicians_data['target'], musicians_data['chosen'], musicians_data['other']]
+    artists.sort(order=['id'], axis=0)
+    triplets = np.searchsorted(artists['id'], triplets)
 
     if return_triplets:
         return triplets
+
+    with module_path.joinpath('descr', 'musician_similarity.rst').open() as rst_file:
+        fdescr = rst_file.read()
 
     return Bunch(data=triplets,
                  judgement_id=musicians_data['judgement'],
                  survey_or_game=musicians_data['survey'],
                  user=musicians_data['user'],
-                 artists=artists['f0'],
+                 artists=artists['name'],
                  DESCR=fdescr)
-
-
