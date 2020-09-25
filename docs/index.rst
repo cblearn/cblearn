@@ -13,6 +13,7 @@ Welcome to OrdComp's documentation!
    datasets/index
    references/index
 
+.. include:: generated_examples/index.rst
 
 Indices and tables
 ==================
