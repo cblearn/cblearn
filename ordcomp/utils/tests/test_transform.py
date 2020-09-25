@@ -66,3 +66,15 @@ def test_check_triplet_array_response_undecided():
                                                     response_type='numeric')
     np.testing.assert_equal(triplets, triplets_numeric_undecided)
     np.testing.assert_equal(responses, responses_numeric_undecided)
+
+
+def test_check_size():
+    assert 6 == utils.check_size(None, 6)
+    assert 3 == utils.check_size(3, 6)
+    assert 3 == utils.check_size(3., 6)
+    assert 3 == utils.check_size(.5, 6)
+
+    with pytest.raises(ValueError):
+        utils.check_size(-1, 6)
+    with pytest.raises(ValueError):
+        utils.check_size(7, 6)
