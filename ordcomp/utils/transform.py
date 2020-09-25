@@ -7,6 +7,9 @@ import scipy
 from sklearn.utils import check_X_y, check_array
 
 
+IndexTriplets = Union[np.ndarray, sparse.COO, scipy.sparse.spmatrix]
+
+
 class ResponseType(enum.Enum):
     IMPLICIT = 'implicit'
     BOOLEAN = 'boolean'
@@ -57,17 +60,8 @@ def _triplet_array_by_response_type(triplets: np.ndarray, responses: np.ndarray,
     return triplets, responses
 
 
-def check_size(size, n_items):
-    if size is None:
-        return n_items
-    elif isinstance(size, int) or size > 1:
-        return int(size)
-    elif isinstance(size, float):
-        return int(size * n_items)
-
-
 def check_triplet_array(triplets: np.ndarray, responses: Optional[np.ndarray] = None,
-                        response_type: ResponseType = ResponseType.IMPLICIT, sort_jk: bool = True
+                        response_type: Union[ResponseType, str] = ResponseType.IMPLICIT, sort_jk: bool = True
                         ) -> Tuple[np.ndarray, np.ndarray]:
     """ Input validation for the array-like triplet format.
 
@@ -111,9 +105,9 @@ def check_triplet_spmatrix(triplets: Union[sparse.COO, scipy.sparse.spmatrix], n
     return triplets
 
 
-def check_triplets(triplets: Union[np.ndarray, sparse.COO, scipy.sparse.spmatrix],
-                   responses: Optional[np.ndarray] = None, format: TripletFormat = None,
-                   response_type: ResponseType = None, n_objects: Optional[int] = None
+def check_triplets(triplets: IndexTriplets,
+                   responses: Optional[np.ndarray] = None, format: Optional[Union[str, ResponseType]] = None,
+                   response_type: Optional[Union[str, ResponseType]] = None, n_objects: Optional[int] = None
                    ) -> Union[Tuple[np.ndarray, np.ndarray], np.ndarray]:
     """ Input validation for triplet formats.
 

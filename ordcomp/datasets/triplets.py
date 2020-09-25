@@ -10,7 +10,6 @@ import scipy
 from ..utils import check_size
 
 
-
 def create_triplets():
     pass
 
@@ -28,6 +27,7 @@ def _make_all_triplets(n_objects):
 
 def _sort_triplets(X):
     return X[np.lexsort((X[:, 2], X[:, 1], X[:, 0]))]
+
 
 def choose_triplets(objects, size=None, ordered=False, random_state=None):
     if isinstance(objects, int):
@@ -65,13 +65,16 @@ def make_noisy_triplets(y, size=None, noise=None, options={}, return_responses=F
     y: array-like, shape (n_objects, n_input_dim)
         Input data as the individual object values.
     size: int, float or None, default=None
-        The number of returned triplets. If float, should be between 0.0 and 1.0 and represent the proportion of the available triplets.
+        The number of returned triplets.
+         If float, should be between 0.0 and 1.0 and represent the proportion of the available triplets.
          If int, represents the absolute number of triplets.
          If None, all possible triplets are returned..
     noise: str, callable or None, default=None
         The noise added independently on the y values before triplet comparison.
         If string, the corresponding distribution method of a RandomState instance is chosen. If callable,
-        it will be called with named arguments *size* (tuple) and is expected to return array-like noise with shape *size*.
+        it will be called with named arguments *size* (tuple)
+
+        and is expected to return array-like noise with shape *size*.
     options: dict, default={}
         The additional keyword arguments passed to the *noise* function.
     return_responses: boolean, default=False
@@ -86,11 +89,14 @@ def make_noisy_triplets(y, size=None, noise=None, options={}, return_responses=F
     -------
     T: array-like, shape (n_triplets, 3)
         The triplets, where the column order reflects the simulated response.
-        For any row ``i` in `T``, the corresponding object of ``T[i, 0]`` is closer to the object of ``T[i, 1]`` than to the object of ``T[i, 2]``.
+        For any row ``i` in `T``, the corresponding object of ``T[i, 0]``
+          is closer to the object of ``T[i, 1]`` than to the object of ``T[i, 2]``.
     (T, r): tuple if `return_responses` is True
         r is an boolean array-like with shape (n_triplets, 1) with the response.
-        For any ``r[i]`` which is *True*, the corresponding object of ``T[i, 0]`` is closer to the object of ``T[i, 1]`` than to the object of ``T[i, 2]``.
-        If ``r[i]` is *False*, then the corresponding object of `T[i, 0]`` is closer to the object of ``T[i, 2]`` than to the object of ``T[i, 1]``.
+        For any ``r[i]`` which is *True*, the corresponding object of ``T[i, 0]``
+          is closer to the object of ``T[i, 1]`` than to the object of ``T[i, 2]``.
+        If ``r[i]` is *False*, then the corresponding object of `T[i, 0]``
+          is closer to the object of ``T[i, 2]`` than to the object of ``T[i, 1]``.
     """
     random_state = check_random_state(random_state)
     triplets = choose_triplets(y, size=size, ordered=ordered, random_state=random_state)
