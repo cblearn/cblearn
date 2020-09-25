@@ -6,7 +6,7 @@ Machine Learning Toolkit for Comparison-based Learning in Python
 [![Documentation](https://readthedocs.org/projects/ordcomp/badge/?version=latest)](https://ordcomp.readthedocs.io/en/latest/?badge=latest)
 
 Comparison-based Learning are the Machine Learning algorithms to use, when training data
-are ordinal comparisons instead Euclidean points. 
+are ordinal comparisons instead of Euclidean points. 
 Triplet comparisons can be gathered e.g. from human studies with questions like 
 "Which of the following bands is most similar to Queen?".
 
@@ -31,4 +31,4 @@ Please see our [Contributor Guide](https://ordcomp.readthedocs.io/en/latest/cont
 
 ## License
 
-This library is free to use under to [LGPL-2.1 License](https://ordcomp.readthedocs.io/en/latest/contributor_guide/index.html) conditions.
+This library is free to use under the [LGPL-2.1 License](https://ordcomp.readthedocs.io/en/latest/contributor_guide/index.html) conditions.
