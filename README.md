@@ -3,7 +3,7 @@ Machine Learning Toolkit for Comparison-based Learning in Python
 
 ![Unit tests](https://github.com/dekuenstle/ordcomp/workflows/Python%20package/badge.svg)
 ![Test coverage](https://codecov.io/gh/dekuenstle/ordcomp/branch/master/graph/badge.svg?token=P9JRT6OK6O)
-![Docs](https://readthedocs.org/projects/ordcomp/badge/)
+[![Documentation](https://readthedocs.org/projects/ordcomp/badge/?version=latest)](https://ordcomp.readthedocs.io/en/latest/?badge=latest)
 
 Comparison-based Learning are the Machine Learning algorithms to use, when training data
 are ordinal comparisons instead Euclidean points. 
