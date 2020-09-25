@@ -33,6 +33,7 @@ extensions = [
     'sphinx.ext.autodoc.typehints',
     'sphinx.ext.autosummary',
     'sphinx.ext.intersphinx',
+    'sphinx.ext.mathjax',
     'sphinx.ext.napoleon',
     'sphinx_rtd_theme',
     'sphinx_gallery.gen_gallery',

@@ -6,14 +6,20 @@
 Welcome to OrdComp's documentation!
 ===================================
 
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-   datasets/index
+   install
+   user_guide/index
+   generated_examples/index.rst
    references/index
+   contributor_guide/index
 
-.. include:: generated_examples/index.rst
+
+
+
 
 Indices and tables
 ==================
