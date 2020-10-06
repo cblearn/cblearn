@@ -152,7 +152,7 @@ def check_triplets(triplets: IndexTriplets,
     if isinstance(triplets, (scipy.sparse.spmatrix, sparse.SparseArray)):
         triplets = check_triplet_spmatrix(triplets, n_objects=n_objects)
         if format is TripletFormat.ARRAY:
-            triplets, responses = check_triplet_array(triplets.coords.T, triplets.data, response_type=response_type)
+            triplets, responses = check_triplet_array(triplets.coords, triplets.data, response_type=response_type)
     else:
         if format is TripletFormat.SPARSE_MATRIX:
             triplets, responses = check_triplet_array(triplets, responses, response_type=ResponseType.NUMERIC)
