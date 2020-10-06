@@ -23,7 +23,15 @@ Loaders
     datasets.fetch_musician_similarity
     datasets.fetch_food_similarity
 
+Generators
+----------
 
+.. currentmodule:: ordcomp
+
+.. autosummary::
+    :toctree: generated/
+
+    datasets.make_triplets
 
 :mod:`ordcomp.utils` Utility
 ============================

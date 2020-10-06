@@ -1,2 +1,3 @@
 from ._musician_similarity import fetch_musician_similarity
 from ._food_similarity import fetch_food_similarity
+from ._triplet_generation import make_triplets
