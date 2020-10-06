@@ -7,20 +7,23 @@ from ordcomp import utils
 
 triplets_numeric_undecided = [[0, 1, 2],
                               [0, 1, 2],
+                              [0, 1, 2],
                               [3, 0, 2],
                               [1, 2, 2]]
-responses_numeric_undecided = [1, 1, -1, 0]
+responses_numeric_undecided = [1, 1, 1, -1, 0]
 
 triplets_explicit = [[0, 1, 2],
                      [0, 1, 2],
+                     [0, 1, 2],
                      [3, 0, 2]]
-responses_numeric = [1, 1, -1]
-responses_binary = [True, True, False]
+responses_numeric = [1, 1, 1, -1]
+responses_binary = [True, True, True, False]
 triplets_implicit = [[0, 1, 2],
+                     [0, 1, 2],
                      [0, 1, 2],
                      [3, 2, 0]]
 
-triplets_spmatrix = sparse.COO(triplets_explicit, responses_numeric, shape=(4, 4, 4))
+triplets_spmatrix = sparse.COO(np.transpose(triplets_explicit), responses_numeric, shape=(4, 4, 4))
 
 
 def test_check_triplets():
@@ -35,8 +38,12 @@ def test_check_triplets():
     triplets = utils.check_triplets(triplets_implicit, format='spmatrix')
     np.testing.assert_equal(triplets, triplets_spmatrix)
 
-    triplets = utils.check_triplets(triplets_spmatrix, format='array', response_type='implicit')
-    np.testing.assert_equal(triplets, triplets_implicit)
+    # spmatrix contains duplicates, which currently cannot be converted to implicit array
+    with pytest.raises(ValueError):
+        utils.check_triplets(triplets_spmatrix, format='array', response_type='implicit')
+    # conversation works, if duplicates are dropped.
+    triplets = utils.check_triplets(triplets_spmatrix.clip(-1, 1), format='array', response_type='implicit')
+    np.testing.assert_equal(triplets, np.unique(triplets_implicit, axis=0))
 
     triplets = utils.check_triplets(triplets_spmatrix.reshape((4, 16)).tocsr(), format='spmatrix')
     np.testing.assert_equal(triplets, triplets_spmatrix)

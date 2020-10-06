@@ -37,8 +37,8 @@ def _triplet_array_by_response_type(triplets: np.ndarray, responses: np.ndarray,
     if output_response_type is ResponseType.IMPLICIT:
         if input_response_type is ResponseType.NUMERIC:
             unique_responses = np.unique(responses)
-            if len(unique_responses) != 2 or unique_responses[0] != -1 or unique_responses[1] != 1:
-                raise ValueError(f"Expects response -1 or 1 to convert to boolean, got {unique_responses}.")
+            if np.any(np.isin(unique_responses, [-1, 1], assume_unique=True, invert=True)):
+                raise ValueError(f"Expects response -1 or 1 to convert to implicit, got {unique_responses}.")
             filter = responses == 1
         elif input_response_type is ResponseType.BOOLEAN:
             filter = responses
@@ -47,7 +47,7 @@ def _triplet_array_by_response_type(triplets: np.ndarray, responses: np.ndarray,
     elif output_response_type is ResponseType.BOOLEAN:
         if input_response_type is ResponseType.NUMERIC:
             unique_responses = np.unique(responses)
-            if len(unique_responses) != 2 or unique_responses[0] != -1 or unique_responses[1] != 1:
+            if np.any(np.isin(unique_responses, [-1, 1], assume_unique=True, invert=True)):
                 raise ValueError(f"Expects response -1 or 1 to convert to boolean, got {unique_responses}.")
             responses = ((responses + 1) / 2).astype(bool)
         elif input_response_type is ResponseType.IMPLICIT:
@@ -57,6 +57,7 @@ def _triplet_array_by_response_type(triplets: np.ndarray, responses: np.ndarray,
             responses = responses.astype(int) * 2 - 1
         elif input_response_type is ResponseType.IMPLICIT:
             responses = np.full((triplets.shape[0],), 1)
+
     return triplets, responses
 
 
@@ -97,7 +98,7 @@ def check_triplet_spmatrix(triplets: Union[sparse.COO, scipy.sparse.spmatrix], n
         triplets = sparse.COO.from_scipy_sparse(triplets)
 
     if n_objects is None:
-        n_objects = int(np.ceil(np.cbrt(np.product(triplets.shape))))
+        n_objects = int(np.cbrt(np.product(triplets.shape)))
     expected_shape = (n_objects, n_objects, n_objects)
     if len(triplets.shape) != 3 or np.any(np.not_equal(triplets.shape, expected_shape)):
         triplets = triplets.reshape(expected_shape)
@@ -151,11 +152,12 @@ def check_triplets(triplets: IndexTriplets,
     if isinstance(triplets, (scipy.sparse.spmatrix, sparse.SparseArray)):
         triplets = check_triplet_spmatrix(triplets, n_objects=n_objects)
         if format is TripletFormat.ARRAY:
-            triplets, responses = check_triplet_array(triplets.coords, triplets.data, response_type=response_type)
+            triplets, responses = check_triplet_array(triplets.coords.T, triplets.data, response_type=response_type)
     else:
         if format is TripletFormat.SPARSE_MATRIX:
             triplets, responses = check_triplet_array(triplets, responses, response_type=ResponseType.NUMERIC)
-            triplets = sparse.COO(triplets, responses)
+            n_entries = int(triplets.max() + 1)
+            triplets = sparse.COO(triplets.T, responses, shape=(n_entries, n_entries, n_entries))
             responses = None
         else:
             triplets, responses = check_triplet_array(triplets, responses, response_type=response_type)
