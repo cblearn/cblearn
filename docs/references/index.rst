@@ -33,6 +33,51 @@ Generators
 
     datasets.make_triplets
 
+Simulations
+-----------
+
+.. currentmodule:: ordcomp
+
+.. autosummary::
+    :toctree: generated/
+
+    datasets.triplet_responses
+
+
+
+:mod:`ordcomp.datasets` Embedding
+=================================
+
+.. automodule:: ordcomp.embedding
+
+.. currentmodule:: ordcomp
+
+.. autosummary::
+    :toctree: generated/
+
+Wrapper
+-------
+
+.. currentmodule:: ordcomp
+
+.. autosummary::
+    :toctree: generated/
+
+
+:mod:`ordcomp.datasets` Metrics
+================================
+
+.. automodule:: ordcomp.metrics
+
+.. currentmodule:: ordcomp
+
+.. autosummary::
+    :toctree: generated/
+
+    metrics.triplet_error
+    metrics.procrustes_distance
+    metrics.TripletScorer
+
 :mod:`ordcomp.utils` Utility
 ============================
 
