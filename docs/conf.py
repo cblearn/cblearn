@@ -19,9 +19,8 @@ import sys
 # -- Project information -----------------------------------------------------
 
 project = 'OrdComp'
-copyright = '2020, Debarghya Ghoshdastidari, Siyavash Haghiri, David-Elias Künstle, Michael Perrot, Leena Suresh'
-author = 'Debarghya Ghoshdastidari, Siyavash Haghiri, David-Elias Künstle, Michael Perrot, Leena Suresh'
-
+author = 'David-Elias Künstle, Leena Suresh, Siyavash Haghiri, Michael Perrot, Debarghya Ghoshdastidari, Ulrike von Luxburg'
+copyright = f'2020, {author}' 
 
 # -- General configuration ---------------------------------------------------
 
