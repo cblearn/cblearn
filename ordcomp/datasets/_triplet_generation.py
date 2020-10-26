@@ -12,11 +12,11 @@ from ..utils import check_size
 
 
 def _make_all_triplets(n_objects: int, monotonic: bool) -> np.ndarray:
-    """ Generate all triplets.
+    """ Make all triplet indices for a number of objects.
 
     Args:
         n_objects: Number of objects to represent in triplets
-        monotonic: Generate only triplets (i, j, k), such that i < j < k.
+        monotonic: Generate only triplets (i, j, k), such that j < i < k.
     Returns:
         Numpy array (n_triplets, 3) of triplet indices.
         n_triplets can become quite large by
@@ -34,17 +34,23 @@ def _make_all_triplets(n_objects: int, monotonic: bool) -> np.ndarray:
 
 def make_random_triplets(n_objects: int, size=1., random_state: Union[None, int, np.random.RandomState] = None,
                          repeat: bool = True, monotonic: bool = False, make_all: int = 10000) -> np.ndarray:
-    r""" Generate a uniform triplet sample.
+    r""" Sample random triplet indices.
 
     If (almost) all triplets are requested, chooses directly from all possible triplets.
     Otherwise in an iterative approach candidates for triplets are generated to allow sampling for large ``n_objects``.
+
+    >>> triplets = make_random_triplets(n_objects=12, size=1000)
+    >>> triplets.shape
+    (1000, 3)
+    >>> np.unique(triplets)
+    array([ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11])
 
     Args:
         n_objects: Number of objects to represent in triplets.
         size: Either absolute or relative number of triplets to generate.
         random_state: Seed for random sampling.
         repeat: Sample with repetitions
-        monotonic: Sample triplets (i, j, k), such that i < j < k.
+        monotonic: Sample triplets (j, i, k), such that j < i < k.
         make_all: Choose from all triplets instead of iterative sampling,
                   if the difference between all triplets to the requested number is smaller than this value.
     Returns:
