@@ -173,7 +173,7 @@ def check_size(size: Union[None, int, float], max_objects: int) -> int:
 
     Args:
         size: The ommited, relative, or absolute number of objects.
-        max_objects: The maximum size.
+        max_objects: The maximum number of objects for relative size.
 
     Returns:
         The absolute size, corresponding to
@@ -188,11 +188,9 @@ def check_size(size: Union[None, int, float], max_objects: int) -> int:
     """
     if size is None:
         return max_objects
+    elif size < 0:
+        raise ValueError(f'Expects size above 0, got {size}.')
     elif isinstance(size, int) or size > 1:
-        if size < 0 or size > max_objects:
-            raise ValueError(f'Expects size within 0 and {max_objects}, got {size}.')
         return int(size)
     elif isinstance(size, float):
-        if size < 0 or size > 1:
-            raise ValueError(f'Expects size within 0 and 1, got {size}.')
         return int(size * max_objects)
