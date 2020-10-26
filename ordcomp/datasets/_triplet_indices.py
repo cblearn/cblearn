@@ -1,3 +1,5 @@
+""" Functions in this file generate triplet indices without responses.
+"""
 import itertools
 from typing import Union
 
@@ -94,38 +96,3 @@ def make_random_triplets(n_objects: int, size=1., random_state: Union[None, int,
             triplets = np.unique(triplets, axis=0)
 
     return triplets.astype(np.uint)
-
-
-def noisy_distances(y, noise=None, options={}, clip=False, symmetrize=True, random_state=None, **kwargs):
-    random_state = check_random_state(random_state)
-    if clip is True:
-        clip = (y.min(), y.max())
-    if noise and False:
-        # TODO: fix this or remove funciton
-        pass
-        # y1 = _add_noise(y, noise, options, clip, random_state)
-        # y2 = _add_noise(y, noise, options, clip, random_state)
-    else:
-        y1, y2 = y, y
-    distances = sklearn.metric.pairwise.pairwise_distances(y1, y2, **kwargs)
-    if symmetrize:
-        distances = np.triu(distances, k=0) + np.triu(distances, k=1).T
-    return distances
-
-
-class ChoiceTransformer(BaseEstimator, TransformerMixin):
-    def __init__(self, size=1, replace=True, random_state=None):
-        self.size = size
-        self.replace = replace
-        self.random_state = random_state
-
-    def fit(self, X, y=None):
-        random_state = check_random_state(self.random_state)
-        n_items = X.shape[0]
-        size = check_size(self.size, n_items)
-
-        self.indices_ = random_state.choice(n_items, size, self.replace)
-        return self
-
-    def transform(self, X, y=None):
-        return X[self.indices_]
