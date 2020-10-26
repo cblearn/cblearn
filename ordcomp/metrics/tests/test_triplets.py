@@ -16,7 +16,7 @@ class DummyOrdinalEmbedding():
 
 
 def test_triplet_error():
-    triplets = datasets.make_triplets(10)
+    triplets = datasets.make_random_triplets(10)
     embedding = np.random.random((10, 2))
     responses = datasets.triplet_responses(triplets, embedding=embedding, noise=None)
     assert metrics.triplet_error(triplets, embedding, responses=responses) == 0
@@ -26,7 +26,7 @@ def test_triplet_error():
 
 
 def test_triplet_scorer():
-    triplets = datasets.make_triplets(10)
+    triplets = datasets.make_random_triplets(10)
     embedding = np.random.random((10, 2))
     responses = datasets.triplet_responses(triplets, embedding=embedding)
 

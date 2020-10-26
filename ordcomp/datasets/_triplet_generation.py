@@ -32,8 +32,8 @@ def _make_all_triplets(n_objects: int, monotonic: bool) -> np.ndarray:
         return np.r_[triplets[:, [1, 0, 2]], triplets, triplets[:, [2, 0, 1]]]
 
 
-def make_triplets(n_objects: int, size=1., random_state: Union[None, int, np.random.RandomState] = None,
-                  repeat: bool = True, monotonic: bool = False, make_all: int = 10000) -> np.ndarray:
+def make_random_triplets(n_objects: int, size=1., random_state: Union[None, int, np.random.RandomState] = None,
+                         repeat: bool = True, monotonic: bool = False, make_all: int = 10000) -> np.ndarray:
     r""" Generate a uniform triplet sample.
 
     If (almost) all triplets are requested, chooses directly from all possible triplets.
