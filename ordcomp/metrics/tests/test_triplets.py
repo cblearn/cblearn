@@ -12,13 +12,13 @@ class DummyOrdinalEmbedding():
         return self.embedding
 
     def predict(self, triplets):
-        return datasets.triplet_responses(triplets, embedding=self.embedding, noise=None)
+        return datasets.triplet_responses(triplets, embedding=self.embedding)
 
 
 def test_triplet_error():
-    triplets = datasets.make_random_triplets(10)
+    triplets = datasets.make_random_triplet_indices(10)
     embedding = np.random.random((10, 2))
-    responses = datasets.triplet_responses(triplets, embedding=embedding, noise=None)
+    responses = datasets.triplet_responses(triplets, embedding=embedding)
     assert metrics.triplet_error(triplets, embedding, responses=responses) == 0
 
     triplets = triplets[:, [0, 2, 1]]
@@ -26,7 +26,7 @@ def test_triplet_error():
 
 
 def test_triplet_scorer():
-    triplets = datasets.make_random_triplets(10)
+    triplets = datasets.make_random_triplet_indices(10)
     embedding = np.random.random((10, 2))
     responses = datasets.triplet_responses(triplets, embedding=embedding)
 

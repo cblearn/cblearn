@@ -1,40 +1,71 @@
 """ Function in this file judge triplets, based on ground-truth embedding and possible noise patterns. """
+import enum
+from typing import Dict, Callable, Union
 
-from sklearn.utils import check_random_state
+from sklearn.utils import check_random_state, check_array
+from sklearn.metrics import pairwise
 import numpy as np
 
 from ordcomp import utils
 
 
-def triplet_responses(triplets, responses=None, embedding=None, noise=None, noise_options={}, random_state=None):
+class NoiseTarget(enum.Enum):
+    POINTS = 'points'
+    DIFFERENCES = 'differences'
+
+
+def noisy_triplet_responses(triplets: utils.IndexTriplets, embedding: np.ndarray,
+                            noise: Union[None, str, Callable] = None,
+                            noise_options: Dict = {}, noise_target: str = 'points',
+                            random_state: Union[None, int, np.random.RandomState] = None) -> np.ndarray:
+    """ Triplet responses for an embedding with noise.
+
+    Args:
+        triplets: Numpy array or sparse matrix of triplet indices
+        embedding: Numpy array of object coordinates, (n_objects, n_components)
+        noise: Noise distribution.
+               Can be the name of a distribution function from :class:`numpy.random.RandomState`
+               or a function accepting the same arguments.
+               If None, no noise will be applied.
+        noise_options: Additional arguments passed to the noise function as keyword arguments.
+        noise_target: 'points' if noise should be added to triplet coordinates or
+                      'differences' if noise should be added to distance difference.
+        random_state: State or seed for noise sampling.
+    Returns:
+        Numpy array of boolean responses, (n_triplets,)
+    """
+    noise_target = NoiseTarget(noise_target)
+    triplets: np.ndarray = utils.check_triplets(triplets, format='array', response_type='implicit')
+    embedding = check_array(embedding)
     input_dim = embedding.shape[1]
-    triplets = utils.check_triplets(triplets, responses, format='array', response_type='implicit')
 
     y_triplets = embedding[triplets.ravel()].reshape(-1, 3 * input_dim)
     if isinstance(noise, str):
         random_state = check_random_state(random_state)
-        noise = getattr(random_state, noise)
-    if noise:
-        y_triplets += noise(size=y_triplets.shape, **noise_options)
+        noise_fun: Callable = getattr(random_state, noise)
+    elif callable(noise):
+        noise_fun = noise
+    if noise is not None and NoiseTarget is NoiseTarget.POINTS:
+        y_triplets += noise_fun(size=y_triplets.shape, **noise_options)
 
-    pivot, left, right = (y_triplets[:, 0:input_dim],
-                          y_triplets[:, input_dim:(2 * input_dim)],
-                          y_triplets[:, (2 * input_dim):])
-    return np.linalg.norm(pivot - left, axis=1) < np.linalg.norm(pivot - right, axis=1)
+    pivot = y_triplets[:, 0:input_dim]
+    differences = (pairwise.paired_euclidean_distances(pivot, y_triplets[:, input_dim:(2 * input_dim)])
+                   - pairwise.paired_euclidean_distances(pivot, y_triplets[:, (2 * input_dim):]))
+    if noise is not None and noise_target is NoiseTarget.DIFFERENCES:
+        differences += noise_fun(size=differences.shape, **noise_options)
+    return differences < 0
 
 
-def noisy_distances(y, noise=None, options={}, clip=False, symmetrize=True, random_state=None, **kwargs):
-    random_state = check_random_state(random_state)
-    if clip is True:
-        clip = (y.min(), y.max())
-    if noise and False:
-        # TODO: fix this or remove funciton
-        pass
-        # y1 = _add_noise(y, noise, options, clip, random_state)
-        # y2 = _add_noise(y, noise, options, clip, random_state)
-    else:
-        y1, y2 = y, y
-    distances = sklearn.metric.pairwise.pairwise_distances(y1, y2, **kwargs)
-    if symmetrize:
-        distances = np.triu(distances, k=0) + np.triu(distances, k=1).T
-    return distances
+def triplet_responses(triplets: utils.IndexTriplets, embedding: np.ndarray) -> np.ndarray:
+    """ Triplet responses for an embedding.
+
+    >>> triplet_responses([[1, 0, 2], [1, 2, 0]], [[0], [4], [5]])
+    array([False,  True])
+
+    Args:
+        triplets: Numpy array or sparse matrix of triplet indices
+        embedding: Numpy array of object coordinates, (n_objects, n_components)
+    Returns:
+        Numpy array of boolean responses, (n_triplets,)
+    """
+    return noisy_triplet_responses(triplets, embedding, noise=None)

@@ -1,4 +1,9 @@
 from ._musician_similarity import fetch_musician_similarity
 from ._food_similarity import fetch_food_similarity
-from ._triplet_indices import make_random_triplets
+
+from ._triplet_simulation import make_random_triplets
+
+from ._triplet_indices import make_all_triplet_indices
+from ._triplet_indices import make_random_triplet_indices
 from ._triplet_responses import triplet_responses
+from ._triplet_responses import noisy_triplet_responses

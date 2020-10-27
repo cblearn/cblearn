@@ -4,16 +4,13 @@ import itertools
 from typing import Union
 
 from sklearn.utils import check_random_state
-from sklearn.base import BaseEstimator
-from sklearn.base import TransformerMixin
 import numpy as np
-import sklearn
 import scipy
 
 from ..utils import check_size
 
 
-def _make_all_triplets(n_objects: int, monotonic: bool) -> np.ndarray:
+def make_all_triplet_indices(n_objects: int, monotonic: bool) -> np.ndarray:
     """ Make all triplet indices for a number of objects.
 
     Args:
@@ -34,14 +31,15 @@ def _make_all_triplets(n_objects: int, monotonic: bool) -> np.ndarray:
         return np.r_[triplets[:, [1, 0, 2]], triplets, triplets[:, [2, 0, 1]]]
 
 
-def make_random_triplets(n_objects: int, size=1., random_state: Union[None, int, np.random.RandomState] = None,
-                         repeat: bool = True, monotonic: bool = False, make_all: int = 10000) -> np.ndarray:
+def make_random_triplet_indices(n_objects: int, size: Union[int, float] = 1.,
+                                random_state: Union[None, int, np.random.RandomState] = None,
+                                repeat: bool = True, monotonic: bool = False, make_all: int = 10000) -> np.ndarray:
     r""" Sample random triplet indices.
 
     If (almost) all triplets are requested, chooses directly from all possible triplets.
     Otherwise in an iterative approach candidates for triplets are generated to allow sampling for large ``n_objects``.
 
-    >>> triplets = make_random_triplets(n_objects=12, size=1000)
+    >>> triplets = make_random_triplet_indices(n_objects=12, size=1000)
     >>> triplets.shape
     (1000, 3)
     >>> np.unique(triplets)
@@ -76,7 +74,7 @@ def make_random_triplets(n_objects: int, size=1., random_state: Union[None, int,
     if not repeat and size > n_triplets:
         raise ValueError(f"Cannot sample {n_choose} from {n_triplets} without repetitions.")
     if n_triplets - n_choose < make_all:
-        triplets = _make_all_triplets(n_objects, monotonic)
+        triplets = make_all_triplet_indices(n_objects, monotonic)
         ix = random_state.choice(len(triplets), n_choose, replace=repeat)
         return triplets[ix]
 

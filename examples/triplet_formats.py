@@ -11,7 +11,7 @@ import time
 from ordcomp import datasets
 from ordcomp.utils import check_triplets
 
-triplets_implicit = datasets.make_random_triplets(n_objects=1000, size=1000000, repeat=False)
+triplets_implicit = datasets.make_random_triplet_indices(n_objects=1000, size=1000000, repeat=False)
 print(f"'triplets_implicit' is a numpy array of shape {triplets_implicit.shape}.")
 
 # %%
