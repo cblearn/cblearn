@@ -80,8 +80,7 @@ def test_check_size():
     assert 3 == utils.check_size(3, 6)
     assert 3 == utils.check_size(3., 6)
     assert 3 == utils.check_size(.5, 6)
+    assert 15 == utils.check_size(15, 6)
 
     with pytest.raises(ValueError):
         utils.check_size(-1, 6)
-    with pytest.raises(ValueError):
-        utils.check_size(7, 6)
