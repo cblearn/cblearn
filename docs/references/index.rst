@@ -41,7 +41,21 @@ Simulations
 .. autosummary::
     :toctree: generated/
 
+    datasets.make_random_triplets
+
+
+Low-level Dataset Utility
+-------------------------
+
+.. currentmodule:: ordcomp
+
+.. autosummary::
+    :toctree: generated/
+
+    datasets.make_all_triplet_indices
+    datasets.make_random_triplet_indices
     datasets.triplet_responses
+    datasets.noisy_triplet_responses
 
 
 
