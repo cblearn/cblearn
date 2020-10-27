@@ -36,7 +36,7 @@ Simulations
 
 
 :mod:`ordcomp.embedding` Embedding
-=================================
+==================================
 
 .. automodule:: ordcomp.embedding
 
@@ -55,7 +55,7 @@ Wrapper
 
 
 :mod:`ordcomp.metrics` Metrics
-================================
+==============================
 
 .. automodule:: ordcomp.metrics
 
