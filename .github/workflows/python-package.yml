@@ -34,7 +34,7 @@ jobs:
         flake8 . --count --statistics
     - name: Test with pytest and measure coverage
       run: |
-        pytest --cov=ordcomp --cov-report=xml
+        pytest ordcomp --cov=ordcomp --cov-report=xml
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
       with:

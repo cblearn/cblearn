@@ -3,3 +3,4 @@ requires = ["setuptools", "wheel"]
 
 [tool.pytest.ini_options]
 addopts = "--doctest-modules -ra -v"
+doctest_optionflags = "NORMALIZE_WHITESPACE IGNORE_EXCEPTION_DETAIL"
