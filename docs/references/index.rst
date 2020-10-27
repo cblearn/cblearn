@@ -23,15 +23,6 @@ Loaders
     datasets.fetch_musician_similarity
     datasets.fetch_food_similarity
 
-Generators
-----------
-
-.. currentmodule:: ordcomp
-
-.. autosummary::
-    :toctree: generated/
-
-    datasets.make_triplets
 
 Simulations
 -----------
@@ -58,8 +49,7 @@ Low-level Dataset Utility
     datasets.noisy_triplet_responses
 
 
-
-:mod:`ordcomp.datasets` Embedding
+:mod:`ordcomp.embedding` Embedding
 =================================
 
 .. automodule:: ordcomp.embedding
@@ -78,7 +68,7 @@ Wrapper
     :toctree: generated/
 
 
-:mod:`ordcomp.datasets` Metrics
+:mod:`ordcomp.metrics` Metrics
 ================================
 
 .. automodule:: ordcomp.metrics
