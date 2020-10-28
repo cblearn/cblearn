@@ -63,10 +63,12 @@ Low-level Dataset Utility
 Wrapper
 -------
 
-.. currentmodule:: ordcomp
+.. currentmodule:: ordcomp.embedding
 
 .. autosummary::
     :toctree: generated/
+
+    wrapper.MLDS
 
 
 :mod:`ordcomp.metrics` Metrics
