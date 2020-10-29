@@ -12,26 +12,24 @@ class MLDS(BaseEstimator, TransformerMixin, RWrapper):
     """ A maximum-likelihood difference scaling (MLDS) estimator, wrapping the R implementation.
 
     Requires the R programming language and installed R package `MLDS <https://cran.r-project.org/web/packages/MLDS/index.html>`_.
-    The wrapped R package is the reference implementation of MLDS [1] using generalized linear models.
+    The wrapped R package is the reference implementation of MLDS [1]_ using generalized linear models.
 
     Attributes:
         embedding_: array-likeThe final embedding, shape (n_objects, 1)
         log_likelihood_: The final log-likelihood of the embedding.
 
-    >>> from ordem.datasets import make_toy_function_triplets
-    >>> from ordem.embedding.bridge import MLDSR
-    >>> import numpy as np
-    >>> __, X = make_toy_function_triplets(size=400, n_objects=15, ordered=True)
-    >>> X.shape, np.unique(X).shape
+    >>> from ordcomp import datasets
+    >>> triplets = datasets.make_random_triplets(np.arange(15).reshape(-1, 1), 400, response_type='implicit')
+    >>> triplets.shape, np.unique(triplets).shape
     ((400, 3), (15,))
-    >>> estimator = MLDSR()
-    >>> X_transformed = estimator.fit_transform(X)
-    >>> X_transformed.shape
+    >>> estimator = MLDS()
+    >>> embedding = estimator.fit_transform(triplets)
+    >>> embedding.shape
     (15, 1)
 
     References
     ----------
-    .. _`M Knoblauch, K., & Maloney, L. T. (2012). Modeling Psychophysical Data in R. Springer New York. https://doi.org/10.1007/978-1-4614-4475-6
+    .. [1] M Knoblauch, K., & Maloney, L. T. (2012). Modeling Psychophysical Data in R. Springer New York. https://doi.org/10.1007/978-1-4614-4475-6
     """
 
     def __init__(self, random_state: Union[None, int, np.random.RandomState] = None):
@@ -63,14 +61,15 @@ class MLDS(BaseEstimator, TransformerMixin, RWrapper):
             Returns self.
         """
         random_state = check_random_state(self.random_state)
-        self.robjects.r(f'set.seed({random_state.tomaxint()})')
+        self.seed_r(random_state)
 
         triplets, response = utils.check_triplets(X, y, format='array', response_type='boolean')
+        triplets = triplets.astype(np.int32) + 1
         r_df = self.robjects.vectors.DataFrame({
             'resp': response,
-            's1': triplets[:, 1] + 1,
-            's2': triplets[:, 0] + 1,
-            's3': triplets[:, 2] + 1,
+            's1': triplets[:, 1],
+            's2': triplets[:, 0],
+            's3': triplets[:, 2],
         })
 
         self.r_estimator_ = self.MLDS.mlds(r_df, method='glm')

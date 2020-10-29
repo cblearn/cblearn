@@ -65,10 +65,12 @@ Wrapper
 
 .. currentmodule:: ordcomp.embedding
 
+
 .. autosummary::
     :toctree: generated/
 
     wrapper.MLDS
+    wrapper.SOE
 
 
 :mod:`ordcomp.metrics` Metrics
