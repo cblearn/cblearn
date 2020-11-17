@@ -22,10 +22,12 @@ jobs:
     runs-on: ${{ matrix.platform }}
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Setup Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Setup R
+      uses: r-lib/actions/setup-R@v1
     - name: Install package with dependencies
       run: |
         python -m pip install --upgrade pip
