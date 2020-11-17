@@ -7,11 +7,9 @@ class RWrapperMixin:
             from rpy2 import robjects
             from rpy2.robjects import numpy2ri
             from rpy2.robjects import packages
-            from rpy2.robjects import vectors
 
             cls.robjects = robjects
             cls.rpackages = packages
-            cls.vectors = vectors
 
             numpy2ri.activate()
         except ImportError:
@@ -29,7 +27,7 @@ class RWrapperMixin:
                 if install_if_missing:
                     utils = cls.rpackages.importr('utils')
                     utils.chooseCRANmirror(ind=1)
-                    utils.install_packages(cls.rvectors.StrVector([package_name]))
+                    utils.install_packages(cls.robjects.vectors.StrVector([package_name]))
                 else:
                     raise ImportError(f"Expects installed R package '{package_name}', could not find it.")
 
