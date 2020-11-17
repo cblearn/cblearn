@@ -31,6 +31,7 @@ extensions = [
     'sphinx.ext.autodoc.typehints',
     'sphinx.ext.autosummary',
     'sphinx.ext.intersphinx',
+    'sphinx.ext.viewcode',
     'sphinx.ext.mathjax',
     'sphinx.ext.napoleon',
     'sphinx_rtd_theme',
@@ -46,7 +47,7 @@ autodoc_typehints = 'description'
 
 sphinx_gallery_conf = {
      'examples_dirs': '../examples',   # path to your example scripts
-     'filename_pattern': r'.\.py',
+     #'filename_pattern': r'.\.py',
      'gallery_dirs': 'generated_examples',  # path to where to save gallery generated output
 }
 
