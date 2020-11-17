@@ -1,14 +1,15 @@
-from typing import Union
+from typing import Optional, Union
 
-from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.base import BaseEstimator
 from sklearn.utils import check_random_state
 import numpy as np
 
 from ordcomp import utils
-from ordcomp.embedding.wrapper._r_base import RWrapper
+from .._base import TripletEmbeddingMixin
+from ordcomp.embedding.wrapper._r_base import RWrapperMixin
 
 
-class SOE(BaseEstimator, TransformerMixin, RWrapper):
+class SOE(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
     """ A soft ordinal embedding estimator, wrapping an R implementation.
 
         The wrapped R package is the reference implementation of SOE [1]_.
@@ -19,20 +20,18 @@ class SOE(BaseEstimator, TransformerMixin, RWrapper):
 
         Examples:
         >>> from ordcomp import datasets
-        >>> triplets = datasets.make_random_triplets(np.random.rand(15, 2), 1000, response_type='implicit')
+        >>> triplets = datasets.make_random_triplets(np.random.rand(15, 2),1000,answer_format='order')
         >>> triplets.shape, np.unique(triplets).shape
         ((1000, 3), (15,))
         >>> estimator = SOE(verbose=False)
-        >>> embedding = estimator.fit_transform(triplets) # doctest:+ELLIPSIS
-        initial  value ...
-        final  value ...
-        converged
+        >>> embedding = estimator.fit_transform(triplets)
         >>> embedding.shape
         (15, 2)
 
         References
         ----------
-        .. [1] Terada, Y., & Luxburg, U. (2014). Local ordinal embedding. International Conference on Machine Learning, 847–855.
+        .. [1] Terada, Y., & Luxburg, U. (2014). Local ordinal embedding.
+               International Conference on Machine Learning, 847–855.
         """
 
     def __init__(self, n_components=2, n_init=10, C=.1, max_iter=1000, verbose=False,
@@ -62,24 +61,16 @@ class SOE(BaseEstimator, TransformerMixin, RWrapper):
 
         self.import_r_package('loe')
 
-    def _more_tags(self):
-        return {
-            'requires_positive_X': True,
-            'requires_positive_y': True,
-            'X_types': ['categorical'],
-        }
-
-    def fit(self, X, y=None, init=None, n_objects=None):
+    def fit(self, X: utils.Triplets, y: np.ndarray = None, init: np.ndarray = None,
+            n_objects: Optional[int] = None) -> 'SOE':
         """Computes the embedding.
-        Parameters
-        ----------
-        X : array-like, shape (n_samples, 3 or 4)
-            The training input samples.
-        y : Ignored
-        Returns
-        -------
-        self : object
-            Returns self.
+
+        Args:
+            X: The training input samples, shape (n_samples, 3)
+            y: Ignored
+            init: Initial embedding for optimization
+        Returns:
+            self.
         """
         random_state = check_random_state(self.random_state)
         self.seed_r(random_state)
@@ -87,9 +78,12 @@ class SOE(BaseEstimator, TransformerMixin, RWrapper):
         if self.verbose:
             report_every = 100
         else:
+            import rpy2.rinterface_lib
+
+            rpy2.rinterface_lib.callbacks.consolewrite_print = lambda prompt: None
             report_every = self.max_iter
 
-        triplets = utils.check_triplets(X, y, format='array', response_type='implicit')
+        triplets = utils.check_triplet_answers(X, y, question_format='list', answer_format='order')
         quadruplets = triplets[:, [1, 0, 0, 2]].astype(np.int32) + 1  # R is 1-indexed, int32
 
         if not init:
@@ -112,13 +106,10 @@ class SOE(BaseEstimator, TransformerMixin, RWrapper):
 
         return self
 
-    def transform(self, X=None):
-        """ Returns the embedded coordinates.
-        Refer parameters to :meth:`~.fit`.
-        Returns
-        -------
-        X_new : array-like, shape (n_object, 1)
-            Embedding coordinates of objects.
-        """
-        return self.embedding_
-
+    def _more_tags(self):
+        return {
+            **TripletEmbeddingMixin._more_tags(self),
+            'Xfail': [
+                'check_transformer_n_iter',  # the R package does not return n_iter
+            ]
+        }
