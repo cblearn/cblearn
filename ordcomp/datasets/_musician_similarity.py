@@ -3,6 +3,7 @@ import logging
 import joblib
 import os
 from typing import Optional, Union
+import warnings
 
 import numpy as np
 from sklearn.datasets import _base
@@ -80,7 +81,10 @@ def fetch_musician_similarity(data_home: Optional[os.PathLike] = None, download_
         archive_path = _base._fetch_remote(ARCHIVE, dirname=data_home)
         data_dtype = {'names': ('judgement', 'survey', 'user', 'target', 'chosen', 'other'),
                       'formats': ('<u4', 'U1', 'U5', '<u4', '<u4', '<u4', '<u4')}
-        musicians_data = np.genfromtxt(archive_path, dtype=data_dtype, delimiter=' ', invalid_raise=False)
+        with warnings.catch_warnings():
+            # some rows lack the second other index, we ignore those lines.
+            warnings.filterwarnings('ignore', message=r'^some errors were detected !\n.*got 5 columns instead of 6.*')
+            musicians_data = np.genfromtxt(archive_path, dtype=data_dtype, delimiter=' ', invalid_raise=False)
 
         joblib.dump(musicians_data, filepath, compress=6)
         os.remove(archive_path)
