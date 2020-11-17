@@ -38,6 +38,11 @@ def test_check_triplet_questions():
     triplets = utils.check_triplet_questions(triplets_spmatrix, format='list')
     np.testing.assert_equal(triplets, triplets_ordered)
 
+    with pytest.raises(TypeError):  # not an array/matrix
+        utils.check_triplet_questions(13)
+    with pytest.raises(ValueError):  # wrong array data type
+        utils.check_triplet_questions(np.asarray(['str']))
+
 
 def test_check_triplet_answers():
     """ Test the conversation between array and matrix format for question+answers. """
@@ -61,6 +66,11 @@ def test_check_triplet_answers():
 
     triplets = utils.check_triplet_answers(triplets_spmatrix.reshape((4, 16)).tocsr())
     np.testing.assert_equal(triplets, triplets_spmatrix)
+
+    with pytest.raises(TypeError):  # not an array/matrix
+        utils.check_triplet_answers(13)
+    with pytest.raises(ValueError):  # wrong array data type
+        utils.check_triplet_answers(np.asarray(['str']))
 
 
 def test_check_triplet_answers_sort_others():

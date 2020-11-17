@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 
 from ordcomp import metrics
 from ordcomp import datasets
@@ -23,6 +24,10 @@ def test_triplet_error():
     assert metrics.triplet_error((triplets, ~answers), embedding) == 1
     assert metrics.triplet_error((triplets, answers), (triplets, answers)) == 0
     assert metrics.triplet_error((triplets, answers), (triplets, answers)) == 0
+    assert metrics.triplet_error(answers, answers) == 0
+
+    with pytest.raises(ValueError):
+        metrics.triplet_error((triplets, answers), (triplets + 1, answers))
 
 
 def test_triplet_scorer():
