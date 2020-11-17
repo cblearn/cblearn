@@ -73,7 +73,7 @@ If it is not yet so, you have to `install docker`_ and, optionally, make it acce
 
 .. _act: https://github.com/nektos/act
 .. _`install docker`: https://docs-stage.docker.com/engine/install/
-.. _`accessible for nonroot user`:https://docs.docker.com/engine/install/linux-postinstall/
+.. _`accessible for nonroot user`: https://docs.docker.com/engine/install/linux-postinstall/
 
 ------------------
 Publish Changes
