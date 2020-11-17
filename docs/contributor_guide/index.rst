@@ -55,6 +55,26 @@ The documentation is structured in multiple folders and written as `reStructured
 
 .. _reStructuredText: https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html
 
+-----------------------------------
+Excursion: Run Github Tests Locally
+-----------------------------------
+
+Instead of running the different tests above independently, it is also possible
+to run the whole testing workflow, which is used on Github, locally.
+
+Install nektos' `act`_ and then run `act -P ubuntu-latest=nektos/act-environments-ubuntu:18.04-full`
+
+`act` is using docker images with preinstalled software to provide almost the same test environment as Github.
+If it is not yet so, you have to `install docker`_ and, optionally, make it accessible for nonroot user.
+
+.. note::
+    The docker image requires about 18 GB disk space. The first start of act might take some time,
+    because it downloads about 12 GB of image files.
+
+.. _act: https://github.com/nektos/act
+.. _`install docker`: https://docs-stage.docker.com/engine/install/
+.. _`accessible for nonroot user`:https://docs.docker.com/engine/install/linux-postinstall/
+
 ------------------
 Publish Changes
 ------------------
