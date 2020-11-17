@@ -5,5 +5,5 @@ from ._triplet_simulation import make_random_triplets
 
 from ._triplet_indices import make_all_triplet_indices
 from ._triplet_indices import make_random_triplet_indices
-from ._triplet_responses import triplet_responses
-from ._triplet_responses import noisy_triplet_responses
+from ._triplet_answers import triplet_answers
+from ._triplet_answers import noisy_triplet_answers

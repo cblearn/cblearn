@@ -1,4 +1,4 @@
-""" Functions in this file generate triplet indices without responses.
+""" Functions in this file generate triplet indices without answers.
 """
 import itertools
 from typing import Union
