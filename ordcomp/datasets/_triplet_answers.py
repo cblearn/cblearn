@@ -57,7 +57,7 @@ def noisy_triplet_answers(triplets: utils.Triplets, embedding: np.ndarray,
         noise_fun: Callable = getattr(random_state, noise)
     elif callable(noise):
         noise_fun = noise
-    if noise is not None and NoiseTarget is NoiseTarget.POINTS:
+    if noise is not None and noise_target is NoiseTarget.POINTS:
         y_triplets += noise_fun(size=y_triplets.shape, **noise_options)
 
     pivot = y_triplets[:, 0:input_dim]

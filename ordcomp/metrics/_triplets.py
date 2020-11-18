@@ -34,7 +34,7 @@ def triplet_error(true_answers: A, embedding_or_pred_answers: Union[np.ndarray, 
 
     if not isinstance(embedding_or_pred_answers, tuple) and np.asarray(embedding_or_pred_answers).ndim == 1:
         # Assume only a sequence of answers was passed
-        pred_triplets, pred_answers = None, true_answers.astype(np.int)
+        pred_triplets, pred_answers = None, embedding_or_pred_answers.astype(np.int)
     elif isinstance(embedding_or_pred_answers, (np.ndarray, list)) and len(embedding_or_pred_answers) != len(triplets):
         # Assume an embedding was passed
         embedding = check_array(embedding_or_pred_answers, ensure_2d=True)

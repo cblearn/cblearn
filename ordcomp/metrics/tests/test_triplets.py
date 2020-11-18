@@ -26,6 +26,10 @@ def test_triplet_error():
     assert metrics.triplet_error((triplets, answers), (triplets, answers)) == 0
     assert metrics.triplet_error(answers, answers) == 0
 
+    order_answers = datasets.triplet_answers(triplets, embedding, question_format='list', answer_format='order')
+    assert metrics.triplet_error(order_answers, answers) == 0
+    assert metrics.triplet_error(order_answers, ~answers) == 1
+
     with pytest.raises(ValueError):
         metrics.triplet_error((triplets, answers), (triplets + 1, answers))
 
