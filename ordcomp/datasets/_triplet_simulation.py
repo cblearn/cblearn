@@ -9,7 +9,6 @@ from typing import Union, Callable, Dict
 
 from ._triplet_indices import make_all_triplet_indices
 from ._triplet_indices import make_random_triplet_indices
-from ._triplet_answers import triplet_answers
 from ._triplet_answers import noisy_triplet_answers
 from .. import utils
 

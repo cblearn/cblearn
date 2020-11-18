@@ -59,6 +59,6 @@ error_2d = 1 - transformer_2d.score(triplets)
 error_3d = 1 - transformer_3d.score(triplets)
 print(f"Training triplet error: {error_2d:.3f} in 2d vs {error_3d:.3f} in 3d.")
 
-cv_error_2d = 1 - cross_val_score(transformer_2d, triplets, cv=5).mean()
-cv_error_3d = 1 - cross_val_score(transformer_3d, triplets, cv=5).mean()
+cv_error_2d = 1 - cross_val_score(transformer_3d, triplets, cv=5, n_jobs=-1).mean()
+cv_error_3d = 1 - cross_val_score(transformer_3d, triplets, cv=5, n_jobs=-1).mean()
 print(f"CV triplet error: {cv_error_2d:.3f} in 2d vs {cv_error_3d:.3f} in 3d.")

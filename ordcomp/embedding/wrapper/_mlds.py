@@ -51,7 +51,6 @@ class MLDS(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
         self.n_components = n_components
         self.random_state = random_state
         self.method = method
-        self.import_r_package('MLDS', robject_translations={"logLik.mlds": "logLik_mlds"})
 
     def fit(self, X: utils.Triplets, y: np.ndarray = None) -> 'MLDS':
         """Computes the embedding.
@@ -63,6 +62,7 @@ class MLDS(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
         Returns:
             This estimator
         """
+        mlds = self.import_r_package('MLDS', robject_translations={"logLik.mlds": "logLik_mlds"})
         random_state = check_random_state(self.random_state)
         self.seed_r(random_state)
 
@@ -75,8 +75,8 @@ class MLDS(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
             's3': triplets[:, 2],
         })
 
-        self.r_estimator_ = self.MLDS.mlds(r_df, method=self.method)
-        self.log_likelihood_ = self.MLDS.logLik_mlds(self.r_estimator_)[0]
+        self.r_estimator_ = mlds.mlds(r_df, method=self.method)
+        self.log_likelihood_ = mlds.logLik_mlds(self.r_estimator_)[0]
         self.embedding_ = np.asarray(self.r_estimator_.rx2("pscale")).reshape(-1, 1)
 
         return self

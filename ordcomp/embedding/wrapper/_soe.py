@@ -59,8 +59,6 @@ class SOE(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
         self.verbose = verbose
         self.random_state = random_state
 
-        self.import_r_package('loe')
-
     def fit(self, X: utils.Triplets, y: np.ndarray = None, init: np.ndarray = None,
             n_objects: Optional[int] = None) -> 'SOE':
         """Computes the embedding.
@@ -72,6 +70,7 @@ class SOE(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
         Returns:
             self.
         """
+        loe = self.import_r_package('loe')
         random_state = check_random_state(self.random_state)
         self.seed_r(random_state)
 
@@ -96,9 +95,9 @@ class SOE(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
 
         self.stress_ = np.infty
         for i_init in range(n_init):
-            soe_result = self.loe.SOE(CM=quadruplets, N=n_objects, p=self.n_components, c=self.C,
-                                      maxit=self.max_iter, report=report_every, iniX=init,
-                                      rnd=quadruplets.shape[0])
+            soe_result = loe.SOE(CM=quadruplets, N=n_objects, p=self.n_components, c=self.C,
+                                 maxit=self.max_iter, report=report_every, iniX=init,
+                                 rnd=quadruplets.shape[0])
             i_stress = soe_result.rx2("str")[0]
             if i_stress < self.stress_:
                 self.stress_ = i_stress

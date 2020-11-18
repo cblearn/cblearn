@@ -2,7 +2,7 @@ class RWrapperMixin:
     imported_packages = {}
 
     @classmethod
-    def _init_r(cls):
+    def init_r(cls):
         try:
             from rpy2 import robjects
             from rpy2.robjects import numpy2ri
@@ -20,7 +20,7 @@ class RWrapperMixin:
     @classmethod
     def import_r_package(cls, package_name, install_if_missing=True, **kwargs):
         if not hasattr(RWrapperMixin, 'robjects'):
-            cls._init_r()
+            cls.init_r()
 
         if package_name not in RWrapperMixin.imported_packages:
             if not cls.rpackages.isinstalled(package_name):
@@ -34,8 +34,12 @@ class RWrapperMixin:
             RWrapperMixin.imported_packages[package_name] = cls.rpackages.importr(package_name, **kwargs)
 
         setattr(cls, package_name, RWrapperMixin.imported_packages[package_name])
+        return RWrapperMixin.imported_packages[package_name]
 
     @classmethod
     def seed_r(cls, random_state):
+        if not hasattr(RWrapperMixin, 'rpackages'):
+            cls.init_r()
+
         base = cls.rpackages.importr('base')
         base.set_seed(random_state.randint(-1e9, 1e9))
