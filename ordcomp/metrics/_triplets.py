@@ -1,11 +1,17 @@
+from typing import Union, TypeVar
+
 import numpy as np
 from sklearn.utils import check_array
 from sklearn import metrics
 
-from ..utils import check_triplets, IndexTriplets
+from ordcomp import utils
+from .. import datasets
 
 
-def triplet_error(triplets: IndexTriplets, embedding: np.ndarray, responses: np.ndarray = None) -> float:
+A = TypeVar('A', utils.TripletAnswers, np.ndarray)
+
+
+def triplet_error(true_answers: A, embedding_or_pred_answers: Union[np.ndarray, A]) -> float:
     """Fraction of violated triplet constraints.
 
     For all triplets (i, j, k), count R * (||O(j) - O(i)|| - ||O(k) - O(i)||) > 0
@@ -13,23 +19,35 @@ def triplet_error(triplets: IndexTriplets, embedding: np.ndarray, responses: np.
 
     Args:
         triplets: Triplet constraints either in array or sparse matrix format
-        embedding: True object coordinates, (n_objects, n_features)
-        responses: Optional, explicit responses to triplet constraints
-
+        embedding_or_pred_answers: Either object coordinates, shape (n_objects, n_features),
+                                    or predicted triplet answers.
     Returns:
-        Number between 0 and 1, indicating the fraction of triplet constraints
-        which are violated.
+        Number between 0 and 1, indicating the fraction of triplet constraints which are violated.
     """
-    print(embedding.shape)
-    embedding = check_array(embedding, ensure_2d=True)
-    triplets, responses = check_triplets(triplets, responses, format='array', response_type='numeric')
+    if not isinstance(true_answers, tuple) and np.asarray(true_answers).ndim == 1:
+        # Assume only a sequence of answers was passed
+        triplets, true_answers = None, true_answers.astype(np.int)
+    else:
+        # Assume a complete triplet question+answer was passed
+        triplets, true_answers = utils.check_triplet_answers(true_answers,
+                                                             question_format='list', answer_format='boolean')
 
-    input_dim = embedding.shape[1]
-    triplet_features = embedding[triplets.ravel()].reshape(-1, 3 * input_dim)
-    pivot = triplet_features[:, 0:input_dim]
-    distances = (np.linalg.norm(pivot - triplet_features[:, input_dim:(2 * input_dim)], axis=1)
-                 - np.linalg.norm(pivot - triplet_features[:, (2 * input_dim):], axis=1))
-    return np.mean(distances * responses > 0)
+    if not isinstance(embedding_or_pred_answers, tuple) and np.asarray(embedding_or_pred_answers).ndim == 1:
+        # Assume only a sequence of answers was passed
+        pred_triplets, pred_answers = None, true_answers.astype(np.int)
+    elif isinstance(embedding_or_pred_answers, (np.ndarray, list)) and len(embedding_or_pred_answers) != len(triplets):
+        # Assume an embedding was passed
+        embedding = check_array(embedding_or_pred_answers, ensure_2d=True)
+        pred_triplets, pred_answers = datasets.triplet_answers(triplets, embedding,
+                                                               question_format='list', answer_format='boolean')
+    else:
+        # Assume a complete triplet question+answer was passed
+        pred_triplets, pred_answers = utils.check_triplet_answers(embedding_or_pred_answers,
+                                                                  question_format='list', answer_format='boolean')
+
+    if pred_triplets is not None and np.any(triplets != pred_triplets):
+        raise ValueError("Expects identical questions for true and predicted triplets.")
+    return 1 - metrics.accuracy_score(true_answers, pred_answers)
 
 
-TripletScorer = metrics.make_scorer(lambda *args: 1 - metrics.zero_one_loss(*args))
+TripletScorer = metrics.make_scorer(lambda y_true, y_pred: 1 - triplet_error(y_true, y_pred))

@@ -1,0 +1,115 @@
+from typing import Optional, Union
+
+from sklearn.base import BaseEstimator
+from sklearn.utils import check_random_state
+import numpy as np
+
+from ordcomp import utils
+from ordcomp.embedding._base import TripletEmbeddingMixin
+from ordcomp.embedding.wrapper._r_base import RWrapperMixin
+
+
+class SOE(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
+    """ A soft ordinal embedding estimator, wrapping an R implementation.
+
+        The wrapped R package is the reference implementation of SOE [1]_.
+
+        Attributes:
+            embedding_: Final embedding, shape (n_objects, n_components)
+            stress_: Final value of the SOE stress corresponding to the embedding.
+
+        Examples:
+        >>> from ordcomp import datasets
+        >>> triplets = datasets.make_random_triplets(np.random.rand(15, 2),1000,answer_format='order')
+        >>> triplets.shape, np.unique(triplets).shape
+        ((1000, 3), (15,))
+        >>> estimator = SOE(verbose=False)
+        >>> embedding = estimator.fit_transform(triplets)
+        >>> embedding.shape
+        (15, 2)
+
+        References
+        ----------
+        .. [1] Terada, Y., & Luxburg, U. (2014). Local ordinal embedding.
+               International Conference on Machine Learning, 847–855.
+        """
+
+    def __init__(self, n_components=2, n_init=10, C=.1, max_iter=1000, verbose=False,
+                 random_state: Union[None, int, np.random.RandomState] = None):
+        """
+        Args:
+            n_components : int, default=2
+                The dimension of the embedding.
+            n_init: int, default=10
+                Number of times the BFGS algorithm will be run with different initializations.
+                The final result will be the output of the run with the smallest final stress.
+            C: float, default=.1
+                Scale parameter which only takes strictly positive value.
+            max_iter: int, default=1000
+                Maximum number of optimization iterations.
+            verbose: boolean, default=False
+                Enable verbose output.
+            random_state: int, RandomState instance or None, default=None
+                The seed of the pseudo random number generator used to initialize the optimization.
+        """
+        self.n_components = n_components
+        self.n_init = n_init
+        self.C = C
+        self.max_iter = max_iter
+        self.verbose = verbose
+        self.random_state = random_state
+
+        self.import_r_package('loe')
+
+    def fit(self, X: utils.Triplets, y: np.ndarray = None, init: np.ndarray = None,
+            n_objects: Optional[int] = None) -> 'SOE':
+        """Computes the embedding.
+
+        Args:
+            X: The training input samples, shape (n_samples, 3)
+            y: Ignored
+            init: Initial embedding for optimization
+        Returns:
+            self.
+        """
+        random_state = check_random_state(self.random_state)
+        self.seed_r(random_state)
+
+        if self.verbose:
+            report_every = 100
+        else:
+            import rpy2.rinterface_lib
+
+            rpy2.rinterface_lib.callbacks.consolewrite_print = lambda prompt: None
+            report_every = self.max_iter
+
+        triplets = utils.check_triplet_answers(X, y, question_format='list', answer_format='order')
+        quadruplets = triplets[:, [1, 0, 0, 2]].astype(np.int32) + 1  # R is 1-indexed, int32
+
+        if not init:
+            init = 'rand'
+            n_init = self.n_init
+        else:
+            n_init = 1
+        if not n_objects:
+            n_objects = len(np.unique(quadruplets))
+
+        self.stress_ = np.infty
+        for i_init in range(n_init):
+            soe_result = self.loe.SOE(CM=quadruplets, N=n_objects, p=self.n_components, c=self.C,
+                                      maxit=self.max_iter, report=report_every, iniX=init,
+                                      rnd=quadruplets.shape[0])
+            i_stress = soe_result.rx2("str")[0]
+            if i_stress < self.stress_:
+                self.stress_ = i_stress
+                self.embedding_ = np.asarray(soe_result.rx2("X"))
+
+        return self
+
+    def _more_tags(self):
+        return {
+            **TripletEmbeddingMixin._more_tags(self),
+            'Xfail': [
+                'check_transformer_n_iter',  # the R package does not return n_iter
+            ]
+        }

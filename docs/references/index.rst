@@ -46,8 +46,8 @@ Low-level Dataset Utility
 
     datasets.make_all_triplet_indices
     datasets.make_random_triplet_indices
-    datasets.triplet_responses
-    datasets.noisy_triplet_responses
+    datasets.triplet_answers
+    datasets.noisy_triplet_answers
 
 
 :mod:`ordcomp.embedding` Embedding
@@ -63,10 +63,14 @@ Low-level Dataset Utility
 Wrapper
 -------
 
-.. currentmodule:: ordcomp
+.. currentmodule:: ordcomp.embedding
+
 
 .. autosummary::
     :toctree: generated/
+
+    wrapper.MLDS
+    wrapper.SOE
 
 
 :mod:`ordcomp.metrics` Metrics
@@ -93,4 +97,7 @@ Wrapper
 .. autosummary::
     :toctree: generated/
 
-    utils.check_triplets
+    utils.triplet_format
+    utils.check_triplet_questions
+    utils.check_triplet_answers
+    utils.check_size
