@@ -7,12 +7,22 @@ import numpy as np
 
 from typing import Union, Callable, Dict
 
+from ._triplet_indices import make_all_triplet_indices
 from ._triplet_indices import make_random_triplet_indices
+from ._triplet_answers import triplet_answers
 from ._triplet_answers import noisy_triplet_answers
 from .. import utils
 
 
-def make_random_triplets(embedding: np.ndarray, size: Union[int, float] = 1., answer_format='boolean',
+def make_all_triplets(embedding: np.ndarray, question_format, answer_format, monotonic: bool = False, **kwargs):
+    n_objects, n_dimension = embedding.shape
+    triplets = make_all_triplet_indices(n_objects, monotonic)
+    return noisy_triplet_answers(triplets, embedding, question_format=question_format, answer_format=answer_format,
+                                 **kwargs)
+
+
+def make_random_triplets(embedding: np.ndarray, size: Union[int, float] = 1.,
+                         question_format='list', answer_format='boolean',
                          noise: Union[None, str, Callable] = None, noise_options: Dict = {},
                          noise_target: str = 'points', random_state: Union[None, int, np.random.RandomState] = None,
                          repeat: bool = True, monotonic: bool = False, make_all: int = 10000) -> utils.Triplets:
@@ -45,6 +55,6 @@ def make_random_triplets(embedding: np.ndarray, size: Union[int, float] = 1., an
     """
     n_objects, n_dimension = embedding.shape
     triplets = make_random_triplet_indices(n_objects, size, random_state, repeat, monotonic, make_all)
-    return noisy_triplet_answers(triplets, embedding, answer_format=answer_format,
+    return noisy_triplet_answers(triplets, embedding, question_format=question_format, answer_format=answer_format,
                                  noise=noise, noise_options=noise_options,
                                  noise_target=noise_target, random_state=random_state)
