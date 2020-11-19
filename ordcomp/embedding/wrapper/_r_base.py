@@ -33,7 +33,6 @@ class RWrapperMixin:
 
             RWrapperMixin.imported_packages[package_name] = cls.rpackages.importr(package_name, **kwargs)
 
-        setattr(cls, package_name, RWrapperMixin.imported_packages[package_name])
         return RWrapperMixin.imported_packages[package_name]
 
     @classmethod

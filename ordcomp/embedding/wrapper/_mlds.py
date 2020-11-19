@@ -4,9 +4,9 @@ from sklearn.base import BaseEstimator
 from sklearn.utils import check_random_state
 import numpy as np
 
-from ... import utils
-from .._base import TripletEmbeddingMixin
-from ._r_base import RWrapperMixin
+from ordcomp import utils
+from ordcomp.embedding._base import TripletEmbeddingMixin
+from ordcomp.embedding.wrapper._r_base import RWrapperMixin
 
 
 class MLDS(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
@@ -25,7 +25,8 @@ class MLDS(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
         log_likelihood_: The final log-likelihood of the embedding.
 
     >>> from ordcomp import datasets
-    >>> triplets = datasets.make_random_triplets(np.arange(15).reshape(-1, 1),400,answer_format='order')
+    >>> triplets = datasets.make_random_triplets(np.arange(15).reshape(-1, 1), 400,
+    ...                                          question_format='list', answer_format='order')
     >>> triplets.shape, np.unique(triplets).shape
     ((400, 3), (15,))
     >>> estimator = MLDS()

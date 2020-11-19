@@ -29,10 +29,13 @@ ALL_TRIPLET_EMBEDDING_ESTIMATORS = [wrapper.SOE(), wrapper.MLDS()]
 def _features_to_triplets(X):
     """ Guess if input are features and sample triplets then. """
     if isinstance(X, np.ndarray) and (
-            not np.issubdtype(X.dtype, np.int) or X.ndim != 2 or X.shape[1] != 3):
-        n = max(10, len(X) ** 2)
-        return make_random_triplets(X, size=n, answer_format='order', random_state=1)
+            not np.issubdtype(X.dtype, np.uint) or X.ndim != 2 or X.shape[1] != 3):
+        n = X.size
+        new_X = make_random_triplets(X, size=n, answer_format='order', random_state=1)
+        print("to triplets", X.shape, X.dtype, new_X.shape, new_X.dtype)
+        return new_X
     else:
+        print("are triplets", np.asarray(X).shape)
         return X
 
 
@@ -66,6 +69,8 @@ SKIP_CHECKS = [
     'check_n_features_in',
     'check_fit2d_1sample',
     'check_fit2d_predict1d',
+    'check_fit_score_takes_y',
+    'check_estimators_empty_data_messages',
 ]
 
 
