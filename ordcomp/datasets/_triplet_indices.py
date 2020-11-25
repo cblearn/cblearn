@@ -93,4 +93,4 @@ def make_random_triplet_indices(n_objects: int, size: Union[int, float] = 1.,
         if not repeat:
             triplets = np.unique(triplets, axis=0)
 
-    return triplets.astype(np.uint)
+    return triplets.astype(np.uint32)

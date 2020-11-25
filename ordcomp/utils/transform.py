@@ -84,9 +84,9 @@ def _check_triplet_array(triplets: np.ndarray,
     """
     __, input_answer_format = triplet_format(triplets, answers)
     if answers is None:
-        triplets = check_array(triplets, dtype=np.uint)
+        triplets = check_array(triplets, dtype=np.uint32)
     else:
-        triplets, answers = check_X_y(triplets, answers, dtype=np.uint)
+        triplets, answers = check_X_y(triplets, answers, dtype=np.uint32)
 
     if triplets.shape[1] != 3:
         raise ValueError(f"Expects triplet array with three columns, got shape {triplets.shape}.")
