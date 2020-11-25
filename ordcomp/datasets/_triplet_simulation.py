@@ -14,8 +14,7 @@ from .. import utils
 
 
 def make_all_triplets(embedding: np.ndarray, question_format, answer_format, monotonic: bool = False, **kwargs):
-    n_objects, n_dimension = embedding.shape
-    triplets = make_all_triplet_indices(n_objects, monotonic)
+    triplets = make_all_triplet_indices(len(embedding), monotonic)
     return noisy_triplet_answers(triplets, embedding, question_format=question_format, answer_format=answer_format,
                                  **kwargs)
 
@@ -52,8 +51,7 @@ def make_random_triplets(embedding: np.ndarray, size: Union[int, float] = 1.,
         Returns:
             The triplets and answers, based on format. See :func:`ordcomp.utils.check_triplets`.
     """
-    n_objects, n_dimension = embedding.shape
-    triplets = make_random_triplet_indices(n_objects, size, random_state, repeat, monotonic, make_all)
+    triplets = make_random_triplet_indices(len(embedding), size, random_state, repeat, monotonic, make_all)
     return noisy_triplet_answers(triplets, embedding, question_format=question_format, answer_format=answer_format,
                                  noise=noise, noise_options=noise_options,
                                  noise_target=noise_target, random_state=random_state)
