@@ -83,7 +83,8 @@ class SOE(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
             report_every = self.max_iter
 
         triplets = utils.check_triplet_answers(X, y, question_format='list', answer_format='order')
-        quadruplets = triplets[:, [1, 0, 0, 2]].astype(np.int32) + 1  # R is 1-indexed, int32
+        quadruplets = triplets[:, [1, 0, 0, 2]]  # type: ignore
+        quadruplets = quadruplets.astype(np.int32) + 1  # R is 1-indexed, int32
 
         if not init:
             init = 'rand'

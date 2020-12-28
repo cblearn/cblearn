@@ -142,7 +142,7 @@ def _check_triplet_spmatrix(triplets: Union[sparse.COO, scipy.sparse.spmatrix],
     return triplets
 
 
-def check_triplet_questions(triplets: Union[Triplets, TripletAnswers],
+def check_triplet_questions(triplets: Triplets,
                             format: Union[str, QuestionFormat, None] = None, n_objects: Optional[int] = None
                             ) -> Triplets:
     """ Input validation for triplet formats.
@@ -175,10 +175,6 @@ def check_triplet_questions(triplets: Union[Triplets, TripletAnswers],
         ValueError: If the array_like input has the wrong shape, or answer types cannot be converted.
                     This happens e.g. if undecided (0) answers, should be converted to ordered or boolean answers.
     """
-    if isinstance(triplets, tuple):
-        # Assume a triplet question+answer pair was passed
-        triplets, __ = triplets
-
     input_format, __ = triplet_format(triplets)
     output_format = QuestionFormat(format or input_format)
     if output_format is QuestionFormat.TENSOR:
@@ -195,7 +191,7 @@ def check_triplet_questions(triplets: Union[Triplets, TripletAnswers],
         return _check_triplet_array(triplets, answers, AnswerFormat.ORDER, sort_others=True)
 
 
-def check_triplet_answers(triplets: Union[Triplets, TripletAnswers], answers: Optional[np.ndarray] = None,
+def check_triplet_answers(triplet_answers: Union[Triplets, TripletAnswers], answers: Optional[np.ndarray] = None,
                           question_format: Optional[Union[str, QuestionFormat]] = None,
                           answer_format: Optional[Union[str, AnswerFormat]] = None,
                           sort_others: bool = True, n_objects: Optional[int] = None
@@ -238,9 +234,10 @@ def check_triplet_answers(triplets: Union[Triplets, TripletAnswers], answers: Op
         ValueError: If the array_like input has the wrong shape, or answer types cannot be converted.
                     This happens e.g. if undecided (0) answers, should be converted to ordered or boolean answers.
     """
-    if isinstance(triplets, tuple) and answers is None:
-        triplets, answers = triplets
-
+    if isinstance(triplet_answers, tuple) and answers is None:
+        triplets, answers = triplet_answers
+    else:
+        triplets = triplet_answers
     input_question_format, input_answer_format = triplet_format(triplets, answers)
     output_answer_format = AnswerFormat(answer_format or input_answer_format)
     output_question_format = QuestionFormat(question_format or input_question_format)

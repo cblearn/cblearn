@@ -1,5 +1,8 @@
+from typing import Dict, Any
+
+
 class RWrapperMixin:
-    imported_packages = {}
+    imported_packages: Dict[str, Any] = {}
 
     @classmethod
     def init_r(cls):
