@@ -105,30 +105,19 @@ def test_check_triplet_array_answer_format(input, answer_format, test_output):
         triplets, answers = input
     else:
         triplets, answers = input, None
-    triplet_answers = utils.transform._check_triplet_array(triplets, answers, sort_others=True,
-                                                           answer_format=utils.AnswerFormat(answer_format))
+    triplet_answers = utils._validate_data._check_triplet_array(triplets, answers, sort_others=True,
+                                                                answer_format=utils.AnswerFormat(answer_format))
     np.testing.assert_equal(triplet_answers, test_output)
 
 
 def test_check_triplet_array_answer_undecided():
     with pytest.raises(ValueError):
-        utils.transform._check_triplet_array(triplets_numeric_undecided, answers_numeric_undecided,
-                                             sort_others=True, answer_format=utils.AnswerFormat.ORDER)
+        utils._validate_data._check_triplet_array(triplets_numeric_undecided, answers_numeric_undecided,
+                                                  sort_others=True, answer_format=utils.AnswerFormat.ORDER)
     with pytest.raises(ValueError):
-        utils.transform._check_triplet_array(triplets_numeric_undecided, answers_numeric_undecided,
-                                             sort_others=True, answer_format=utils.AnswerFormat.BOOLEAN)
-    triplets, answers = utils.transform._check_triplet_array(triplets_numeric_undecided, answers_numeric_undecided,
-                                                             sort_others=True, answer_format=utils.AnswerFormat.COUNT)
+        utils._validate_data._check_triplet_array(triplets_numeric_undecided, answers_numeric_undecided,
+                                                  sort_others=True, answer_format=utils.AnswerFormat.BOOLEAN)
+    triplets, answers = utils._validate_data._check_triplet_array(triplets_numeric_undecided, answers_numeric_undecided,
+                                                                  sort_others=True, answer_format=utils.AnswerFormat.COUNT)
     np.testing.assert_equal(triplets, triplets_numeric_undecided)
     np.testing.assert_equal(answers, answers_numeric_undecided)
-
-
-def test_check_size():
-    assert 6 == utils.check_size(None, 6)
-    assert 3 == utils.check_size(3, 6)
-    assert 3 == utils.check_size(3., 6)
-    assert 3 == utils.check_size(.5, 6)
-    assert 15 == utils.check_size(15, 6)
-
-    with pytest.raises(ValueError):
-        utils.check_size(-1, 6)

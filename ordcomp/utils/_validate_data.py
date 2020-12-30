@@ -1,62 +1,13 @@
-import enum
-from typing import Union, Optional, Tuple, Sequence
+from typing import Union, Optional, Tuple
 
 import numpy as np
 import scipy
 import sparse
 from sklearn.utils import check_X_y, check_array
 
-
-_SPARSE_TYPES = (scipy.sparse.spmatrix, sparse.SparseArray)
-Questions = Union[np.ndarray, sparse.COO, scipy.sparse.spmatrix]
-Answers = Union[Questions, Tuple[Questions, np.ndarray]]
-
-
-class QuestionFormat(enum.Enum):
-    LIST = 'list'
-    TENSOR = 'tensor'
-
-
-class AnswerFormat(enum.Enum):
-    ORDER = 'order'
-    BOOLEAN = 'boolean'
-    COUNT = 'count'
-
-
-Format = Union[str, Tuple[QuestionFormat, AnswerFormat]]
-
-
-def check_format(format: Optional[Format], triplets: Union[Questions, Answers], answers: Optional[np.ndarray]
-                 ) -> Tuple[QuestionFormat, AnswerFormat]:
-    if format:
-        if isinstance(format, str):
-            format_parts = format.split('-')
-            return QuestionFormat(format_parts[0]), AnswerFormat(format_parts[1])
-        elif isinstance(format, tuple):
-            return format
-    else:
-        return data_format(triplets, answers)
-
-
-def data_format(triplets: Union[Questions, Answers], answers: Optional[np.ndarray] = None
-                ) -> Tuple[QuestionFormat, AnswerFormat]:
-    if isinstance(triplets, tuple) and answers is None:
-        triplets, answers = triplets
-
-    if answers is None:
-        if isinstance(triplets, _SPARSE_TYPES):
-            return QuestionFormat.TENSOR, AnswerFormat.COUNT
-        elif isinstance(triplets, (Sequence, np.ndarray)):
-            return QuestionFormat.LIST, AnswerFormat.ORDER
-    elif isinstance(answers, (Sequence, np.ndarray)):
-        answer_type = np.asarray(answers).dtype
-        if answer_type == np.bool:
-            return QuestionFormat.LIST, AnswerFormat.BOOLEAN
-        elif np.issubdtype(answer_type, np.number):
-            return QuestionFormat.LIST, AnswerFormat.COUNT
-        else:
-            raise TypeError(f"Unknown triplet question/answer format for answer.dtype=={answer_type}.")
-    raise TypeError(f"Unknown triplet question/answer format for {type(triplets)}/{type(answers)}.")
+from ._data_format import data_format, check_format
+from ._data_format import QuestionFormat, AnswerFormat, Format
+from ._typing import Questions, Answers
 
 
 def _triplet_array_by_answer_format(triplets: np.ndarray, answers: np.ndarray,
@@ -106,7 +57,7 @@ def _check_triplet_array(triplets: np.ndarray,
     if triplets.shape[1] != 3:
         raise ValueError(f"Expects triplet array with three columns, got shape {triplets.shape}.")
 
-    # repeat triplets with answers >1/<-1
+    # repeat questions with answers >1/<-1
     if input_answer_format is AnswerFormat.COUNT and np.any(np.abs(answers) > 1):
         answer_frequency = np.maximum(1, np.abs(answers.data))
         triplets, answers = (np.repeat(triplets, answer_frequency, axis=0),
@@ -161,24 +112,24 @@ def check_triplet_questions(triplets: Questions, result_format: Union[str, Quest
                             n_objects: Optional[int] = None) -> Questions:
     """ Input validation for triplet formats.
 
-    Checks triplets and answers for shape and datatype.
-    Converts between array (T-STE style) and sparse matrix format for triplets.
+    Checks questions and answers for shape and datatype.
+    Converts between array (T-STE style) and sparse matrix format for questions.
     For array format, also converts between different answer formats.
 
     Args:
-        triplets: Either array_like with index-triplets or sparse matrix.
+        triplets: Either array_like with index-questions or sparse matrix.
         answers: Optional answers per index-triplet.
         result_format: One of 'list', or 'tensor'. If none, format is not changed.
         sort_others: If true, then assures that for every triplet (i, j, k): j < k
                      This is ignored for answer_format='order'.
-        n_objects: The number of individual objects in triplets, optional.
+        n_objects: The number of individual objects in questions, optional.
                    If not provided with format='sparse', value is inferred
                    by the cube-root the shape product.
 
     Returns:
         If answer_format='tensor', a three-dimensional sparse.COO matrix is returned.
         The three dimensions all have size 'n_objects'.
-        The entry triplets[i, j, k] indicates the answer on ij <= jk.
+        The entry questions[i, j, k] indicates the answer on ij <= jk.
         It is -1 if wrong, 0 if undecidable, and 1 if correct.
 
         If answer_format='list',
@@ -210,24 +161,24 @@ def check_triplet_answers(triplet_answers: Union[Questions, Answers], answers: O
                           ) -> Union[Tuple[np.ndarray, np.ndarray], np.ndarray]:
     """ Input validation for triplet formats.
 
-    Checks triplets and answers for shape and datatype.
-    Converts between list (T-STE style) and tensor (sparse matrix) format for triplets.
+    Checks questions and answers for shape and datatype.
+    Converts between list (T-STE style) and tensor (sparse matrix) format for questions.
     For array format, also converts between different answer formats.
 
     Args:
-        triplets: Either array_like with index-triplets or sparse matrix.
+        questions: Either array_like with index-questions or sparse matrix.
         answers: Optional answers per index-triplet.
         result_format: Format of result
         sort_others: If true, then assures that for every triplet (i, j, k): j < k
                      This is ignored for format='list-order'.
-        n_objects: The number of individual objects in triplets, optional.
+        n_objects: The number of individual objects in questions, optional.
                    If not provided with format='tensor-count', value is inferred
                    by the cube-root the shape product.
 
     Returns:
         If format='tensor-count', a three-dimensional sparse.COO matrix is returned.
         The three dimensions all have size 'n_objects'.
-        The entry triplets[i, j, k] indicates the answer on ij <= jk.
+        The entry questions[i, j, k] indicates the answer on ij <= jk.
         It is -1 if wrong, 0 if undecidable, and 1 if correct.
 
         If format='list-order',
@@ -236,7 +187,7 @@ def check_triplet_answers(triplet_answers: Union[Questions, Answers], answers: O
 
         If format='list-count', two numpy arrays are of shape (n_samples, 3)
         and n_samples are returned.
-        The first array contains index-triplets (i, j, k).
+        The first array contains index-questions (i, j, k).
         The second array elements represent the answer as described above for format='tensor-count'.
 
         If answer_format='list-boolean', same as for answer_format='list-count'.
@@ -266,31 +217,3 @@ def check_triplet_answers(triplet_answers: Union[Questions, Answers], answers: O
             triplets, answers = triplets.coords.T, triplets.data
         return _check_triplet_array(triplets, answers, sort_others=sort_others,
                                     answer_format=output_answer_format)
-
-
-def check_size(size: Union[None, int, float], max_objects: int) -> int:
-    """ Convert size argument to the number of objects.
-
-    Args:
-        size: The ommited, relative, or absolute number of objects.
-        max_objects: The maximum number of objects for relative size.
-
-    Returns:
-        The absolute size, corresponding to
-            max_objects, if size is None
-            size, if size is int
-            size * max_objects, if size is float
-
-    Raises
-       ValueError:
-           If size is int and < 0 or > max_objects
-           If size is float and < 0 or > 1.
-    """
-    if size is None:
-        return max_objects
-    elif size < 0:
-        raise ValueError(f'Expects size above 0, got {size}.')
-    elif isinstance(size, int) or size > 1:
-        return int(size)
-    elif isinstance(size, float):
-        return int(size * max_objects)
