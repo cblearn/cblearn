@@ -8,8 +8,8 @@ from sklearn.utils import check_X_y, check_array
 
 
 _SPARSE_TYPES = (scipy.sparse.spmatrix, sparse.SparseArray)
-Triplets = Union[np.ndarray, sparse.COO, scipy.sparse.spmatrix]
-TripletAnswers = Union[Triplets, Tuple[Triplets, np.ndarray]]
+Questions = Union[np.ndarray, sparse.COO, scipy.sparse.spmatrix]
+Answers = Union[Questions, Tuple[Questions, np.ndarray]]
 
 
 class QuestionFormat(enum.Enum):
@@ -23,8 +23,23 @@ class AnswerFormat(enum.Enum):
     COUNT = 'count'
 
 
-def triplet_format(triplets: Union[Triplets, TripletAnswers], answers: Optional[np.ndarray] = None
-                   ) -> Tuple[QuestionFormat, AnswerFormat]:
+Format = Union[str, Tuple[QuestionFormat, AnswerFormat]]
+
+
+def check_format(format: Optional[Format], triplets: Union[Questions, Answers], answers: Optional[np.ndarray]
+                 ) -> Tuple[QuestionFormat, AnswerFormat]:
+    if format:
+        if isinstance(format, str):
+            format_parts = format.split('-')
+            return QuestionFormat(format_parts[0]), AnswerFormat(format_parts[1])
+        elif isinstance(format, tuple):
+            return format
+    else:
+        return data_format(triplets, answers)
+
+
+def data_format(triplets: Union[Questions, Answers], answers: Optional[np.ndarray] = None
+                ) -> Tuple[QuestionFormat, AnswerFormat]:
     if isinstance(triplets, tuple) and answers is None:
         triplets, answers = triplets
 
@@ -82,7 +97,7 @@ def _check_triplet_array(triplets: np.ndarray,
 
         See documentation of check_triplets.
     """
-    __, input_answer_format = triplet_format(triplets, answers)
+    __, input_answer_format = data_format(triplets, answers)
     if answers is None:
         triplets = check_array(triplets, dtype=np.uint32)
     else:
@@ -142,9 +157,8 @@ def _check_triplet_spmatrix(triplets: Union[sparse.COO, scipy.sparse.spmatrix],
     return triplets
 
 
-def check_triplet_questions(triplets: Triplets,
-                            format: Union[str, QuestionFormat, None] = None, n_objects: Optional[int] = None
-                            ) -> Triplets:
+def check_triplet_questions(triplets: Questions, result_format: Union[str, QuestionFormat, None] = None,
+                            n_objects: Optional[int] = None) -> Questions:
     """ Input validation for triplet formats.
 
     Checks triplets and answers for shape and datatype.
@@ -154,7 +168,7 @@ def check_triplet_questions(triplets: Triplets,
     Args:
         triplets: Either array_like with index-triplets or sparse matrix.
         answers: Optional answers per index-triplet.
-        format: One of 'list', or 'tensor'. If none, format is not changed.
+        result_format: One of 'list', or 'tensor'. If none, format is not changed.
         sort_others: If true, then assures that for every triplet (i, j, k): j < k
                      This is ignored for answer_format='order'.
         n_objects: The number of individual objects in triplets, optional.
@@ -175,8 +189,8 @@ def check_triplet_questions(triplets: Triplets,
         ValueError: If the array_like input has the wrong shape, or answer types cannot be converted.
                     This happens e.g. if undecided (0) answers, should be converted to ordered or boolean answers.
     """
-    input_format, __ = triplet_format(triplets)
-    output_format = QuestionFormat(format or input_format)
+    input_format, __ = data_format(triplets)
+    output_format = QuestionFormat(result_format or input_format)
     if output_format is QuestionFormat.TENSOR:
         if input_format is QuestionFormat.LIST:
             triplets = np.asarray(triplets)
@@ -191,43 +205,41 @@ def check_triplet_questions(triplets: Triplets,
         return _check_triplet_array(triplets, answers, AnswerFormat.ORDER, sort_others=True)
 
 
-def check_triplet_answers(triplet_answers: Union[Triplets, TripletAnswers], answers: Optional[np.ndarray] = None,
-                          question_format: Optional[Union[str, QuestionFormat]] = None,
-                          answer_format: Optional[Union[str, AnswerFormat]] = None,
-                          sort_others: bool = True, n_objects: Optional[int] = None
+def check_triplet_answers(triplet_answers: Union[Questions, Answers], answers: Optional[np.ndarray] = None,
+                          result_format: Optional[Format] = None, sort_others: bool = True, n_objects: Optional[int] = None
                           ) -> Union[Tuple[np.ndarray, np.ndarray], np.ndarray]:
     """ Input validation for triplet formats.
 
     Checks triplets and answers for shape and datatype.
-    Converts between array (T-STE style) and sparse matrix format for triplets.
+    Converts between list (T-STE style) and tensor (sparse matrix) format for triplets.
     For array format, also converts between different answer formats.
 
     Args:
         triplets: Either array_like with index-triplets or sparse matrix.
         answers: Optional answers per index-triplet.
-        answer_format: One of 'order', 'boolean', 'numberic', or 'sparse'.
+        result_format: Format of result
         sort_others: If true, then assures that for every triplet (i, j, k): j < k
-                     This is ignored for answer_format='order'.
+                     This is ignored for format='list-order'.
         n_objects: The number of individual objects in triplets, optional.
-                   If not provided with format='sparse', value is inferred
+                   If not provided with format='tensor-count', value is inferred
                    by the cube-root the shape product.
 
     Returns:
-        If answer_format='sparse', a three-dimensional sparse.COO matrix is returned.
+        If format='tensor-count', a three-dimensional sparse.COO matrix is returned.
         The three dimensions all have size 'n_objects'.
         The entry triplets[i, j, k] indicates the answer on ij <= jk.
         It is -1 if wrong, 0 if undecidable, and 1 if correct.
 
-        If answer_format='order',
+        If format='list-order',
         a numpy array of shape (n_samples, 3) is returned.
         Each row (i, j, k) indicates, ij <= ik.
 
-        If answer_format='count', two numpy arrays are of shape (n_samples, 3)
+        If format='list-count', two numpy arrays are of shape (n_samples, 3)
         and n_samples are returned.
         The first array contains index-triplets (i, j, k).
-        The second array elements represent the answer as described above for format='sparse'.
+        The second array elements represent the answer as described above for format='tensor-count'.
 
-        If answer_format='boolean', same as for answer_format='count'.
+        If answer_format='list-boolean', same as for answer_format='list-count'.
         The answers are True/False instead of 1/-1.
 
     Raises:
@@ -238,9 +250,8 @@ def check_triplet_answers(triplet_answers: Union[Triplets, TripletAnswers], answ
         triplets, answers = triplet_answers
     else:
         triplets = triplet_answers
-    input_question_format, input_answer_format = triplet_format(triplets, answers)
-    output_answer_format = AnswerFormat(answer_format or input_answer_format)
-    output_question_format = QuestionFormat(question_format or input_question_format)
+    input_question_format, input_answer_format = data_format(triplets, answers)
+    output_question_format, output_answer_format = check_format(result_format, triplets, answers)
 
     if output_question_format is QuestionFormat.TENSOR:
         if input_question_format is QuestionFormat.LIST:

@@ -16,15 +16,15 @@ class TripletEmbeddingMixin(TransformerMixin):
             'X_types': ['categorical'],
         }
 
-    def transform(self, X: Optional[utils.Triplets] = None, y: Optional[np.ndarray] = None) -> np.ndarray:
+    def transform(self, X: Optional[utils.Questions] = None, y: Optional[np.ndarray] = None) -> np.ndarray:
         check_is_fitted(self, 'embedding_')
         return self.embedding_
 
-    def predict(self, X: utils.Triplets) -> np.ndarray:
+    def predict(self, X: utils.Questions) -> np.ndarray:
         check_is_fitted(self, 'embedding_')
         return datasets.triplet_answers(X, self.embedding_)
 
-    def score(self, X: utils.Triplets, y: Optional[np.ndarray] = None) -> float:
+    def score(self, X: utils.Questions, y: Optional[np.ndarray] = None) -> float:
         """ Triplet score on the estimated embedding.
 
         Args:

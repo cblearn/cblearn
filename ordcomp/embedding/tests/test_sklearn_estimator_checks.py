@@ -31,7 +31,7 @@ def _features_to_triplets(X):
     if isinstance(X, np.ndarray) and (
             not np.issubdtype(X.dtype, np.uint) or X.ndim != 2 or X.shape[1] != 3):
         n = X.size
-        new_X = make_random_triplets(X, size=n, answer_format='order', random_state=1)
+        new_X = make_random_triplets(X, size=n, result_format='list-order', random_state=1)
         print("to triplets", X.shape, X.dtype, new_X.shape, new_X.dtype)
         return new_X
     else:

@@ -24,11 +24,11 @@ print(f"The triplet {triplet} means, that object {triplet[0]} (1st) should be "
 
 # %%
 # Alternatively, the triplet array can be complemented by a answer array.
-triplets_boolean, answers_boolean = check_triplet_answers(triplets_ordered, answer_format='boolean')
+triplets_boolean, answers_boolean = check_triplet_answers(triplets_ordered, result_format='list-boolean')
 print(f"Is object {triplets_boolean[0, 0]} closer to object {triplets_boolean[0, 1]} "
       f"than to object {triplets_boolean[0, 2]}? {answers_boolean[0]}.")
 
-triplets_numeric, answers_numeric = check_triplet_answers(triplets_ordered, answer_format='count')
+triplets_numeric, answers_numeric = check_triplet_answers(triplets_ordered, result_format='list-count')
 print(f"Is object {triplets_numeric[0, 0]} closer to object {triplets_numeric[0, 1]} "
       f"than to object {triplets_numeric[0, 2]}? {answers_numeric[0]}.")
 
@@ -38,7 +38,7 @@ print(f"Is object {triplets_numeric[0, 0]} closer to object {triplets_numeric[0,
 # -------------
 # In the sparse matrix format the object indices of the triplet constraints correspond to the
 # row / column indices of a sparse matrix.
-triplet_spmatrix = check_triplet_answers(triplets_ordered, question_format='tensor', answer_format='count')
+triplet_spmatrix = check_triplet_answers(triplets_ordered, result_format='tensor-count')
 print(f"triplet_spmatrix[i, j, k]="
       f"{triplet_spmatrix[triplets_numeric[0, 0], triplets_numeric[0, 1], triplets_numeric[0, 2]]} "
       f"is the same as answer(i,j,k)={answers_numeric[0]}.")
@@ -51,8 +51,7 @@ print(f"triplet_spmatrix[i, j, k]="
 
 def time_convert_triplet(triplets, to_format):
     time_start = time.process_time()
-    to_question, to_answer = to_format.split('-')
-    check_triplet_answers(triplets, question_format=to_question, answer_format=to_answer)
+    check_triplet_answers(triplets, result_format=to_format)
     return (time.process_time() - time_start)
 
 
