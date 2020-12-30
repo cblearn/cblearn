@@ -53,4 +53,4 @@ Please see our [Contributor Guide](https://ordcomp.readthedocs.io/en/latest/cont
 
 ## License
 
-This library is free to use under the [LGPL-2.1 License](https://github.com/dekuenstle/ordcomp/blob/master/LICENSE) conditions.
+This library is free to use under the [MIT License](https://github.com/dekuenstle/ordcomp/blob/master/LICENSE) conditions.
