@@ -71,6 +71,7 @@ SKIP_CHECKS = [
     'check_fit2d_predict1d',
     'check_fit_score_takes_y',
     'check_estimators_empty_data_messages',
+    'check_methods_sample_order_invariance',
 ]
 
 
