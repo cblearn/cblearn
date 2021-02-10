@@ -46,6 +46,27 @@ def noisy_triplet_answers(triplets: utils.Questions, embedding: np.ndarray, resu
         either numpy array (n_triplets,) or sparse matrix
 
         If return_indices is True, a tuple of indices and answers can be returned
+
+
+    >>> from ordcomp.datasets import noisy_triplet_answers
+    >>> triplets = [[0, 1, 2], [1, 2, 3]]
+    >>> embedding = [[0.1], [0.5], [0.9], [1.]]
+    >>> noisy_triplet_answers(triplets, embedding, result_format='list-order')
+    array([[0, 1, 2],
+           [1, 2, 3]], dtype=uint32)
+
+    >>> noisy_triplet_answers(triplets, embedding, result_format='list-order',
+    ...                       noise='normal', noise_options={'scale': 1}, random_state=42)
+    array([[0, 2, 1],
+           [1, 2, 3]], dtype=uint32)
+
+    >>> from sklearn.metrics.pairwise import euclidean_distances
+    >>> distances = euclidean_distances(embedding)
+    >>> print(distances.shape)
+    (4, 4)
+    >>> noisy_triplet_answers(triplets, distances, result_format='list-order', distance='precomputed')
+    array([[0, 1, 2],
+           [1, 2, 3]], dtype=uint32)
     """
     noise_target = NoiseTarget(noise_target)
     distance = Distance(distance)
