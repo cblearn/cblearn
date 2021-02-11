@@ -97,7 +97,8 @@ Wrapper
 .. autosummary::
     :toctree: generated/
 
-    utils.triplet_format
+    utils.data_format
+    utils.check_format
     utils.check_triplet_questions
     utils.check_triplet_answers
     utils.check_size

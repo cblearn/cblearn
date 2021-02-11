@@ -20,7 +20,7 @@ class SOE(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
 
         Examples:
         >>> from ordcomp import datasets
-        >>> triplets = datasets.make_random_triplets(np.random.rand(15, 2),1000,answer_format='order')
+        >>> triplets = datasets.make_random_triplets(np.random.rand(15, 2), result_format='list-order', size=1000)
         >>> triplets.shape, np.unique(triplets).shape
         ((1000, 3), (15,))
         >>> estimator = SOE(verbose=False)
@@ -59,7 +59,7 @@ class SOE(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
         self.verbose = verbose
         self.random_state = random_state
 
-    def fit(self, X: utils.Triplets, y: np.ndarray = None, init: np.ndarray = None,
+    def fit(self, X: utils.Questions, y: np.ndarray = None, init: np.ndarray = None,
             n_objects: Optional[int] = None) -> 'SOE':
         """Computes the embedding.
 
@@ -82,8 +82,9 @@ class SOE(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
             rpy2.rinterface_lib.callbacks.consolewrite_print = lambda prompt: None
             report_every = self.max_iter
 
-        triplets = utils.check_triplet_answers(X, y, question_format='list', answer_format='order')
-        quadruplets = triplets[:, [1, 0, 0, 2]].astype(np.int32) + 1  # R is 1-indexed, int32
+        triplets = utils.check_triplet_answers(X, y, result_format='list-order')
+        quadruplets = triplets[:, [1, 0, 0, 2]]  # type: ignore
+        quadruplets = quadruplets.astype(np.int32) + 1  # R is 1-indexed, int32
 
         if not init:
             init = 'rand'

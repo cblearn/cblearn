@@ -17,7 +17,7 @@ true_embedding, __ = make_blobs(n_samples=100, n_features=3, centers=1)
 print(f"Embedding: {true_embedding.shape}")
 
 # sample triplet comparisons from
-triplets = make_random_triplets(true_embedding, size=10000, answer_format='order')
+triplets = make_random_triplets(true_embedding, size=10000, result_format='list-order')
 print(f"Triplet comparisons: {triplets.shape}")
 
 # %%

@@ -25,8 +25,7 @@ class MLDS(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
         log_likelihood_: The final log-likelihood of the embedding.
 
     >>> from ordcomp import datasets
-    >>> triplets = datasets.make_random_triplets(np.arange(15).reshape(-1, 1), 400,
-    ...                                          question_format='list', answer_format='order')
+    >>> triplets = datasets.make_random_triplets(np.arange(15).reshape(-1, 1), size=400, result_format='list-order')
     >>> triplets.shape, np.unique(triplets).shape
     ((400, 3), (15,))
     >>> estimator = MLDS()
@@ -53,7 +52,7 @@ class MLDS(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
         self.random_state = random_state
         self.method = method
 
-    def fit(self, X: utils.Triplets, y: np.ndarray = None) -> 'MLDS':
+    def fit(self, X: utils.Questions, y: np.ndarray = None) -> 'MLDS':
         """Computes the embedding.
 
         Args:
@@ -67,7 +66,7 @@ class MLDS(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
         random_state = check_random_state(self.random_state)
         self.seed_r(random_state)
 
-        triplets, answer = utils.check_triplet_answers(X, y, question_format='list', answer_format='boolean')
+        triplets, answer = utils.check_triplet_answers(X, y, result_format='list-boolean')
         triplets = triplets.astype(np.int32) + 1
         r_df = self.robjects.vectors.DataFrame({
             'resp': answer,

@@ -8,7 +8,7 @@ from ordcomp import utils
 from .. import datasets
 
 
-A = TypeVar('A', utils.TripletAnswers, np.ndarray)
+A = TypeVar('A', utils.Answers, np.ndarray)
 
 
 def triplet_error(true_answers: A, embedding_or_pred_answers: Union[np.ndarray, A]) -> float:
@@ -29,8 +29,7 @@ def triplet_error(true_answers: A, embedding_or_pred_answers: Union[np.ndarray, 
         triplets, true_answers = None, true_answers.astype(np.int)
     else:
         # Assume a complete triplet question+answer was passed
-        triplets, true_answers = utils.check_triplet_answers(true_answers,
-                                                             question_format='list', answer_format='boolean')
+        triplets, true_answers = utils.check_triplet_answers(true_answers, result_format='list-boolean')
 
     if not isinstance(embedding_or_pred_answers, tuple) and np.asarray(embedding_or_pred_answers).ndim == 1:
         # Assume only a sequence of answers was passed
@@ -38,12 +37,10 @@ def triplet_error(true_answers: A, embedding_or_pred_answers: Union[np.ndarray, 
     elif isinstance(embedding_or_pred_answers, (np.ndarray, list)) and len(embedding_or_pred_answers) != len(triplets):
         # Assume an embedding was passed
         embedding = check_array(embedding_or_pred_answers, ensure_2d=True)
-        pred_triplets, pred_answers = datasets.triplet_answers(triplets, embedding,
-                                                               question_format='list', answer_format='boolean')
+        pred_triplets, pred_answers = datasets.triplet_answers(triplets, embedding, result_format='list-boolean')
     else:
         # Assume a complete triplet question+answer was passed
-        pred_triplets, pred_answers = utils.check_triplet_answers(embedding_or_pred_answers,
-                                                                  question_format='list', answer_format='boolean')
+        pred_triplets, pred_answers = utils.check_triplet_answers(embedding_or_pred_answers, result_format='list-boolean')
 
     if pred_triplets is not None and np.any(triplets != pred_triplets):
         raise ValueError("Expects identical questions for true and predicted triplets.")

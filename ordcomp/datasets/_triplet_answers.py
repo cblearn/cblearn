@@ -14,20 +14,23 @@ class NoiseTarget(enum.Enum):
     DIFFERENCES = 'differences'
 
 
-def noisy_triplet_answers(triplets: utils.Triplets, embedding: np.ndarray,
-                          question_format: Optional[str] = None,
-                          answer_format: Optional[str] = None,
-                          noise: Union[None, str, Callable] = None,
-                          noise_options: Dict = {}, noise_target: str = 'points',
-                          random_state: Union[None, int, np.random.RandomState] = None
-                          ) -> utils.TripletAnswers:
+class Distance(enum.Enum):
+    EUCLIDEAN = 'euclidean'
+    PRECOMPUTED = 'precomputed'
+
+
+def noisy_triplet_answers(triplets: utils.Questions, embedding: np.ndarray, result_format: Optional[str] = None,
+                          noise: Union[None, str, Callable] = None, noise_options: Dict = {},
+                          noise_target: Union[str, NoiseTarget] = 'differences',
+                          random_state: Union[None, int, np.random.RandomState] = None,
+                          distance: Union[str, Distance] = 'euclidean'
+                          ) -> utils.Answers:
     """ Triplet answers for an embedding with noise.
 
     Args:
         triplets: Numpy array or sparse matrix of triplet indices
-        embedding: Numpy array of object coordinates, (n_objects, n_components)
-        question_format: Format of the triplet questions. If none, keeps input format.
-        answer_format: Triplet format of answers.
+        embedding: Numpy array of object coordinates, (n_objects, n_components) or distance matrix (n_objects, n_objects)
+        result_format: Format of the result. If none, keeps input format.
         noise: Noise distribution.
                Can be the name of a distribution function from :class:`numpy.random.RandomState`
                or a function accepting the same arguments.
@@ -36,59 +39,95 @@ def noisy_triplet_answers(triplets: utils.Triplets, embedding: np.ndarray,
         noise_target: 'points' if noise should be added to triplet coordinates or
                       'differences' if noise should be added to distance difference.
         random_state: State or seed for noise sampling.
+        distance: {'euclidean', 'precomputed'}. Specifies distance metrix between embedding points
+                  or if distances are passed directly as distance matrix.
     Returns:
         Answers in format as defined by answer_format,
         either numpy array (n_triplets,) or sparse matrix
 
         If return_indices is True, a tuple of indices and answers can be returned
+
+
+    >>> from ordcomp.datasets import noisy_triplet_answers
+    >>> triplets = [[0, 1, 2], [1, 2, 3]]
+    >>> embedding = [[0.1], [0.5], [0.9], [1.]]
+    >>> noisy_triplet_answers(triplets, embedding, result_format='list-order')
+    array([[0, 1, 2],
+           [1, 2, 3]], dtype=uint32)
+
+    >>> noisy_triplet_answers(triplets, embedding, result_format='list-order',
+    ...                       noise='normal', noise_options={'scale': 1}, random_state=42)
+    array([[0, 2, 1],
+           [1, 2, 3]], dtype=uint32)
+
+    >>> from sklearn.metrics.pairwise import euclidean_distances
+    >>> distances = euclidean_distances(embedding)
+    >>> print(distances.shape)
+    (4, 4)
+    >>> noisy_triplet_answers(triplets, distances, result_format='list-order', distance='precomputed')
+    array([[0, 1, 2],
+           [1, 2, 3]], dtype=uint32)
     """
     noise_target = NoiseTarget(noise_target)
-    input_question_format, input_answer_format = utils.triplet_format(triplets)
-    question_format = utils.QuestionFormat(question_format or input_question_format)
-    answer_format = utils.AnswerFormat(answer_format or input_answer_format)
-
-    triplets: np.ndarray = utils.check_triplet_questions(triplets, format=utils.QuestionFormat.LIST)
+    distance = Distance(distance)
+    result_format = utils.check_format(result_format, triplets, None)
+    triplets: np.ndarray = utils.check_triplet_questions(triplets, result_format=utils.QuestionFormat.LIST)
     embedding = check_array(embedding)
-    input_dim = embedding.shape[1]
-
-    y_triplets = embedding[triplets.ravel()].reshape(-1, 3 * input_dim)
     if isinstance(noise, str):
         random_state = check_random_state(random_state)
         noise_fun: Callable = getattr(random_state, noise)
     elif callable(noise):
         noise_fun = noise
-    if noise is not None and noise_target is NoiseTarget.POINTS:
-        y_triplets += noise_fun(size=y_triplets.shape, **noise_options)
 
-    pivot = y_triplets[:, 0:input_dim]
-    differences = (pairwise.paired_euclidean_distances(pivot, y_triplets[:, input_dim:(2 * input_dim)])
-                   - pairwise.paired_euclidean_distances(pivot, y_triplets[:, (2 * input_dim):]))
+    if distance is Distance.EUCLIDEAN:
+        y_triplets = embedding[triplets.ravel()].reshape(-1, 3, embedding.shape[1])
+        if noise is not None and noise_target is NoiseTarget.POINTS:
+            y_triplets += noise_fun(size=y_triplets.shape, **noise_options)
+        near_distance = pairwise.paired_euclidean_distances(y_triplets[:, 0], y_triplets[:, 1])
+        far_distance = pairwise.paired_euclidean_distances(y_triplets[:, 0], y_triplets[:, 2])
+    elif distance is Distance.PRECOMPUTED:
+        if noise is not None and noise_target is NoiseTarget.POINTS:
+            raise ValueError("Applying noise on points is not possible for precomputed distances.")
+        near_distance = embedding[triplets[:, 0], triplets[:, 1]]
+        far_distance = embedding[triplets[:, 0], triplets[:, 2]]
+
+    differences = near_distance - far_distance
     if noise is not None and noise_target is NoiseTarget.DIFFERENCES:
         differences += noise_fun(size=differences.shape, **noise_options)
 
-    return utils.check_triplet_answers(triplets, answers=(differences < 0), question_format=question_format,
-                                       answer_format=answer_format, sort_others=False)
+    return utils.check_triplet_answers(triplets, answers=(differences < 0), result_format=result_format, sort_others=False)
 
 
-def triplet_answers(triplets: utils.Triplets, embedding: np.ndarray,
-                    question_format: Optional[str] = None, answer_format: Optional[str] = None) -> utils.TripletAnswers:
+def triplet_answers(triplets: utils.Questions, embedding: np.ndarray, result_format: Optional[str] = None,
+                    distance: Union[str, Distance] = 'euclidean') -> utils.Answers:
     """ Triplet answers for an embedding.
 
-    >>> triplets, answers = triplet_answers([[1, 0, 2], [1, 2, 0]], [[0], [4], [5]], answer_format='boolean')
+    The default assumes Euclidean distances between embedding points.
+
+    >>> triplets = [[1, 0, 2], [1, 2, 0]]
+    >>> points = [[0], [4], [5]]
+    >>> triplets, answers = triplet_answers(triplets, points, result_format='list-boolean')
+    >>> answers
+    array([False,  True])
+
+    To use alternative distance metrics, you can pass precomputed distances instead of an embedding.
+
+    >>> from sklearn.metrics import pairwise
+    >>> distances = pairwise.manhattan_distances(points)
+    >>> triplets, answers = triplet_answers(triplets, distances, result_format='list-boolean', distance='precomputed')
     >>> answers
     array([False,  True])
 
     Args:
         triplets: Numpy array or sparse matrix of triplet indices
         embedding: Numpy array of object coordinates, (n_objects, n_components)
-        question_format: Format of the triplet questions. If none, keeps input format.
-        answer_format: Triplet format of answers. If none, keeps input format.
-        return_indices: Return triplet indices along with answers
+        result_format: Format of the result. If none, keeps input format.
+        distance: {'euclidean', 'precomputed'}. Specifies distance metrix between embedding points
+                  or if distances are passed directly as distance matrix.
     Returns:
         Answers in format as defined by answer_format
         either numpy array (n_triplets,) or sparse matrix
 
         If return_indices is True, a tuple of indices and answers can be returned
     """
-    return noisy_triplet_answers(triplets, embedding, noise=None,
-                                 question_format=question_format, answer_format=answer_format)
+    return noisy_triplet_answers(triplets, embedding, noise=None, result_format=result_format, distance=distance)
