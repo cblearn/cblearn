@@ -4,6 +4,7 @@ from sklearn.base import BaseEstimator
 from sklearn.utils import check_random_state
 import numpy as np
 
+import ordcomp
 from ordcomp import utils
 from ordcomp.embedding._base import TripletEmbeddingMixin
 from ordcomp.embedding.wrapper._r_base import RWrapperMixin

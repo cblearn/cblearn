@@ -6,6 +6,7 @@ import numpy as np
 from scipy.optimize import minimize
 from scipy.spatial import distance_matrix
 
+import ordcomp
 from ordcomp import utils
 from ordcomp.embedding._base import TripletEmbeddingMixin
 from ordcomp.utils import assert_torch_is_available, torch_minimize_lbfgs
@@ -61,7 +62,7 @@ class SOE(BaseEstimator, TripletEmbeddingMixin):
                  random_state: Union[None, int, np.random.RandomState] = None,
                  algorithm: str = "majorizing", device: str = "auto"):
         """ Initialize the estimator.
-        
+
         Args:
             n_components :
                 The dimension of the embedding.
@@ -160,14 +161,14 @@ def _soe_majorizing_grad(x, x_shape, triplets, margin):
     is_diff_positive = differences > 0  # Case 1, 2.1.1
     ij_dist_valid, kl_dist_valid = ij_dist[is_diff_positive, np.newaxis], kl_dist[is_diff_positive, np.newaxis]
     double_dist = 2 * differences[is_diff_positive, np.newaxis]
-    i, j, l = triplets[is_diff_positive, 0], triplets[is_diff_positive, 1], triplets[is_diff_positive, 2]
+    i, j, k = triplets[is_diff_positive, 0], triplets[is_diff_positive, 1], triplets[is_diff_positive, 2]
 
-    i_is_l = (i == l)[:, np.newaxis]
+    i_is_l = (i == k)[:, np.newaxis]
     Xij = (X[i] - X[j]) / ij_dist_valid
-    Xil = (X[i] - X[l]) / kl_dist_valid
+    Xil = (X[i] - X[k]) / kl_dist_valid
 
     grad = np.zeros_like(X)
     np.add.at(grad, i, double_dist * (Xij - Xil + np.where(i_is_l, - Xil, 0)))
     np.add.at(grad, j, double_dist * -Xij)
-    np.add.at(grad, l, double_dist * Xil)
+    np.add.at(grad, k, double_dist * Xil)
     return grad.ravel()

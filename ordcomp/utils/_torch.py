@@ -1,7 +1,7 @@
 from typing import Sequence, Callable
 
 import numpy as np
-from scipy.optimize import OptimizeResult
+import scipy
 
 
 def assert_torch_is_available() -> None:
@@ -13,7 +13,7 @@ def assert_torch_is_available() -> None:
             ModuleNotFoundError: If torch package is not found.
     """
     try:
-        import torch
+        import torch  # noqa: F401  We do not use torch here on purpose
     except ModuleNotFoundError as e:
         raise ModuleNotFoundError(f"{e}.\n\n"
                                   "This function of ordcomp requires the installation of the pytorch package.\n"
@@ -78,8 +78,6 @@ def torch_minimize_lbfgs(objective: Callable, init: np.ndarray, args: Sequence, 
         success = False
         message = "LBFGS did not converge."
 
-    return OptimizeResult(x=X.cpu().detach().numpy(),
-                          success=success,
-                          message=message,
-                          fun=loss,
-                          nit=n_iter)
+    return scipy.optimize.OptimizeResult(
+        x=X.cpu().detach().numpy(), fun=loss, nit=n_iter,
+        success=success, message=message)

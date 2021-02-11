@@ -26,14 +26,14 @@ def triplet_error(true_answers: A, embedding_or_pred_answers: Union[np.ndarray, 
     """
     if not isinstance(true_answers, tuple) and np.asarray(true_answers).ndim == 1:
         # Assume only a sequence of answers was passed
-        triplets, true_answers = None, true_answers.astype(np.int)
+        triplets, true_answers = None, true_answers.astype(int)
     else:
         # Assume a complete triplet question+answer was passed
         triplets, true_answers = utils.check_triplet_answers(true_answers, result_format='list-boolean')
 
     if not isinstance(embedding_or_pred_answers, tuple) and np.asarray(embedding_or_pred_answers).ndim == 1:
         # Assume only a sequence of answers was passed
-        pred_triplets, pred_answers = None, embedding_or_pred_answers.astype(np.int)
+        pred_triplets, pred_answers = None, embedding_or_pred_answers.astype(int)
     elif isinstance(embedding_or_pred_answers, (np.ndarray, list)) and len(embedding_or_pred_answers) != len(triplets):
         # Assume an embedding was passed
         embedding = check_array(embedding_or_pred_answers, ensure_2d=True)
