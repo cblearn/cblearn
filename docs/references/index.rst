@@ -102,3 +102,12 @@ Wrapper
     utils.check_triplet_questions
     utils.check_triplet_answers
     utils.check_size
+
+Pytorch
+-------
+
+.. autosummary::
+    :toctree: generated/
+
+    utils.assert_torch_is_available
+    utils.torch_minimize_lbfgs
