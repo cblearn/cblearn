@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 
-from ordcomp import metrics
-from ordcomp import datasets
+from cblearn import metrics
+from cblearn import datasets
 
 
 class DummyOrdinalEmbedding():

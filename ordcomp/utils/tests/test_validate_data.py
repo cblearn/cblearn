@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 import sparse
 
-from ordcomp import utils
+from cblearn import utils
 
 
 triplets_numeric_undecided = [[0, 1, 2],

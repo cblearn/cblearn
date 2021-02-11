@@ -4,9 +4,9 @@ from sklearn.base import BaseEstimator
 from sklearn.utils import check_random_state
 import numpy as np
 
-from ordcomp import utils
-from ordcomp.embedding._base import TripletEmbeddingMixin
-from ordcomp.embedding.wrapper._r_base import RWrapperMixin
+from cblearn import utils
+from cblearn.embedding._base import TripletEmbeddingMixin
+from cblearn.embedding.wrapper._r_base import RWrapperMixin
 
 
 class SOE(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
@@ -19,7 +19,7 @@ class SOE(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
             stress_: Final value of the SOE stress corresponding to the embedding.
 
         Examples:
-        >>> from ordcomp import datasets
+        >>> from cblearn import datasets
         >>> triplets = datasets.make_random_triplets(np.random.rand(15, 2), result_format='list-order', size=1000)
         >>> triplets.shape, np.unique(triplets).shape
         ((1000, 3), (15,))

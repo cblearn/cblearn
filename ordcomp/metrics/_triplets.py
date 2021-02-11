@@ -4,7 +4,7 @@ import numpy as np
 from sklearn.utils import check_array
 from sklearn import metrics
 
-from ordcomp import utils
+from cblearn import utils
 from .. import datasets
 
 

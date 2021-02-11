@@ -1,10 +1,10 @@
 import numpy as np
 
-from ordcomp.datasets import fetch_musician_similarity
+from cblearn.datasets import fetch_musician_similarity
 
 
 def test_fetch_musician_similarity(tmp_path):
-    data_home = tmp_path / 'ordcomp_datasets'
+    data_home = tmp_path / 'cblearn_datasets'
     bunch = fetch_musician_similarity(data_home=data_home, shuffle=False)
 
     assert bunch.data.shape == (213629, 3)

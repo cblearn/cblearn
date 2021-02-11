@@ -10,7 +10,7 @@ In the usual applications of ordinal embedding algorithms, these true points can
 We try to reconstruct the original points from the comparisons and quantify how good this works.
 """
 from sklearn.datasets import make_blobs
-from ordcomp.datasets import make_random_triplets
+from cblearn.datasets import make_random_triplets
 
 # sample points from 3-dimensional Gaussian
 true_embedding, __ = make_blobs(n_samples=100, n_features=3, centers=1)
@@ -21,9 +21,9 @@ triplets = make_random_triplets(true_embedding, size=10000, result_format='list-
 print(f"Triplet comparisons: {triplets.shape}")
 
 # %%
-# The ordinal embedding estimators in ordcomp follow the interface of scikit-learn's transformers.
+# The ordinal embedding estimators in cblearn follow the interface of scikit-learn's transformers.
 # Let's estimate coordinates in a 2-dimensional and in a 3-dimensional Euclidean space.
-from ordcomp.embedding.wrapper import SOE  # noqa: E402 linter ignore import not at top of file
+from cblearn.embedding.wrapper import SOE  # noqa: E402 linter ignore import not at top of file
 
 
 transformer_2d = SOE(n_components=2)
@@ -49,7 +49,7 @@ print(f"Predicted 3D embedding: {pred_embedding_3d.shape}")
 #      which do not comply with the estimated embedding.
 #      Note, that 5-fold cross validation requires refitting the model 5 times.
 from sklearn.model_selection import cross_val_score  # noqa: E402 linter ignore import not at top of file
-from ordcomp.metrics import procrustes_distance  # noqa: E402
+from cblearn.metrics import procrustes_distance  # noqa: E402
 
 
 distance_3d = procrustes_distance(true_embedding, pred_embedding_3d)

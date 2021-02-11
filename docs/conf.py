@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.abspath('..'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'OrdComp'
+project = 'cblearn'
 author = 'David-Elias Künstle, Leena Suresh, Siyavash Haghiri, Michael Perrot, Debarghya Ghoshdastidari, Ulrike von Luxburg'
 copyright = f'2020, {author}' 
 

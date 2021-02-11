@@ -7,7 +7,7 @@ Unfortunately, they sample featurized input data.
 This is why we wrap the ordinal embedding estimators below
 to transform featurized input to triplets.
 
-Some checks are skipped, because ordcomp's estimators are not
+Some checks are skipped, because cblearn's estimators are not
 100% compatible to sklearn's estimators.
 While some of the checks could be adapted to our setting,
 some cannot work with triplet input.
@@ -18,8 +18,8 @@ import pytest
 import numpy as np
 from sklearn.utils.estimator_checks import parametrize_with_checks
 
-from ordcomp.embedding import wrapper
-from ordcomp.datasets import make_random_triplets
+from cblearn.embedding import wrapper
+from cblearn.datasets import make_random_triplets
 
 
 # Add new estimators here:
@@ -80,7 +80,7 @@ SKIP_CHECKS = [
 )
 def test_all_estimators(estimator, check):
     if check.func.__name__ in SKIP_CHECKS:
-        pytest.skip("Ordcomp ordinal embedding estimator's are not fully compatible to sklearn estimators.")
+        pytest.skip("cblearn ordinal embedding estimator's are not fully compatible to sklearn estimators.")
 
     with wrap_triplet_estimator(estimator) as wrapped_estimator:
         check(wrapped_estimator)

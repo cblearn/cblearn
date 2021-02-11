@@ -6,7 +6,7 @@ from sklearn.utils import check_random_state, check_array
 from sklearn.metrics import pairwise
 import numpy as np
 
-from ordcomp import utils
+from cblearn import utils
 
 
 class NoiseTarget(enum.Enum):
@@ -48,7 +48,7 @@ def noisy_triplet_answers(triplets: utils.Questions, embedding: np.ndarray, resu
         If return_indices is True, a tuple of indices and answers can be returned
 
 
-    >>> from ordcomp.datasets import noisy_triplet_answers
+    >>> from cblearn.datasets import noisy_triplet_answers
     >>> triplets = [[0, 1, 2], [1, 2, 3]]
     >>> embedding = [[0.1], [0.5], [0.9], [1.]]
     >>> noisy_triplet_answers(triplets, embedding, result_format='list-order')

@@ -24,7 +24,7 @@ Such, for each user judgement multiple triplets were created with the remaining 
     The original dataset, published 2002-10-15, contains 224793 triplets.
     We omit in this dataset the triplets with missing values for the last triplet index.
 
-This dataset can be downloaded using the :func:`ordcomp.datasets.fetch_musician_similarity`.
+This dataset can be downloaded using the :func:`cblearn.datasets.fetch_musician_similarity`.
 
 When using these triplets, please give credit to the original authors.
 

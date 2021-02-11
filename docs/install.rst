@@ -2,7 +2,7 @@
 Installation
 ============
 
-OrdComp requires Python 3.7 or newer.
+cblearn requires Python 3.7 or newer.
 We recommend using [Anaconda](https://docs.anaconda.com/anaconda/install/) to install Python and
 dependencies in separated environments.
 We support Linux (tested on Ubuntu 20.4), Windows and Mac OS.
@@ -12,11 +12,11 @@ Examples in this installation guide Linux shell commands.
 User Installation
 -----------------
 
-OrdComp and its dependencies can be installed using `pip`:
+cblearn and its dependencies can be installed using `pip`:
 
 .. code-block:: bash
 
-    $ pip install git+ssh://git@github.com/dekuenstle/ordcomp.git
+    $ pip install git+ssh://git@github.com/dekuenstle/cblearn.git
 
 
 .. _developer_install:
@@ -32,6 +32,6 @@ This way, changes in the code are directly considered without the need of re-ins
 
 .. code-block:: bash
 
-    $ git clone git@github.com/dekuenstle/ordcomp.git
-    $ cd ordcomp
+    $ git clone git@github.com/dekuenstle/cblearn.git
+    $ cd cblearn
     $ pip install -e.[tests,docs]

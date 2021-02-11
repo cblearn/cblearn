@@ -3,13 +3,13 @@ r"""
 Triplet Formats
 ===============
 
-OrdComp supports triplet input data in two
+cblearn supports triplet input data in two
 formats: As a triplet array (or matrix with three columns) or as a sparse matrix.
 """
 import time
 
-from ordcomp import datasets
-from ordcomp.utils import check_triplet_answers
+from cblearn import datasets
+from cblearn.utils import check_triplet_answers
 
 triplets_ordered = datasets.make_random_triplet_indices(n_objects=1000, size=1000000, repeat=False)
 print(f"'triplets_ordered' is a numpy array of shape {triplets_ordered.shape}.")
