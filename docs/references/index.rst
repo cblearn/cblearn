@@ -60,6 +60,8 @@ Low-level Dataset Utility
 .. autosummary::
     :toctree: generated/
 
+    embedding.SOE
+
 Wrapper
 -------
 
