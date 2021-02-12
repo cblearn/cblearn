@@ -18,12 +18,13 @@ import pytest
 import numpy as np
 from sklearn.utils.estimator_checks import parametrize_with_checks
 
+from ordcomp.embedding import SOE
 from ordcomp.embedding import wrapper
 from ordcomp.datasets import make_random_triplets
 
 
 # Add new estimators here:
-ALL_TRIPLET_EMBEDDING_ESTIMATORS = [wrapper.SOE(), wrapper.MLDS()]
+ALL_TRIPLET_EMBEDDING_ESTIMATORS = [SOE(), wrapper.SOE(), wrapper.MLDS()]
 
 
 def _features_to_triplets(X):

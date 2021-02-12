@@ -72,7 +72,7 @@ def data_format(questions: Union[Questions, Answers], answers: Optional[np.ndarr
             return QuestionFormat.LIST, AnswerFormat.ORDER
     elif isinstance(answers, (Sequence, np.ndarray)):
         answer_type = np.asarray(answers).dtype
-        if answer_type == np.bool:
+        if answer_type == bool:
             return QuestionFormat.LIST, AnswerFormat.BOOLEAN
         elif np.issubdtype(answer_type, np.number):
             return QuestionFormat.LIST, AnswerFormat.COUNT
