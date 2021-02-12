@@ -16,10 +16,10 @@ def assert_torch_is_available() -> None:
         import torch  # noqa: F401  We do not use torch here on purpose
     except ModuleNotFoundError as e:
         raise ModuleNotFoundError(f"{e}.\n\n"
-                                  "This function of ordcomp requires the installation of the pytorch package.\n"
+                                  "This function of cblearn requires the installation of the pytorch package.\n"
                                   "To install pytorch, visit https://pytorch.org/get-started/locally/\n"
                                   "or run either of the following commands:\n"
-                                  "    pip install ordcomp[torch]\n"
+                                  "    pip install cblearn[torch]\n"
                                   "    pip install torch\n"
                                   "    conda install -c=conda-forge pytorch\n")
 

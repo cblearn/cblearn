@@ -27,5 +27,5 @@ This library supports two representation formats of triplets, in an array or in 
 Dataset loading utilities
 -------------------------
 
-.. include:: ../../ordcomp/datasets/descr/musician_similarity.rst
-.. include:: ../../ordcomp/datasets/descr/food_similarity.rst
+.. include:: ../../cblearn/datasets/descr/musician_similarity.rst
+.. include:: ../../cblearn/datasets/descr/food_similarity.rst

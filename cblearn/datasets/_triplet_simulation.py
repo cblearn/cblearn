@@ -20,9 +20,9 @@ def make_all_triplets(embedding: np.ndarray, result_format: str, monotonic: bool
             embedding: Object coordinates or distance matrix
             monotonic: Only triplets (j, i, k), such that j < i < k.
             random_state: Seed for noisy answers
-            kwargs: Additional arguments passed to :func:`ordcomp.datasets.noisy_triplet_answers`
+            kwargs: Additional arguments passed to :func:`cblearn.datasets.noisy_triplet_answers`
         Returns:
-            The triplets and answers, based on format. See :func:`ordcomp.utils.check_triplets`.
+            The triplets and answers, based on format. See :func:`cblearn.utils.check_triplets`.
     """
     triplets = make_all_triplet_indices(len(embedding), monotonic)
     return noisy_triplet_answers(triplets, embedding, result_format=result_format, **kwargs)
@@ -49,9 +49,9 @@ def make_random_triplets(embedding: np.ndarray, result_format: str, size: Union[
             make_all: Choose from all triplets instead of iterative sampling,
                       if the difference between all triplets to the requested number is smaller than this value.
             random_state: Seed for triplet sampling and noisy answers
-            kwargs: Additional arguments passed to :func:`ordcomp.datasets.noisy_triplet_answers`
+            kwargs: Additional arguments passed to :func:`cblearn.datasets.noisy_triplet_answers`
         Returns:
-            The triplets and answers, based on format. See :func:`ordcomp.utils.check_triplets`.
+            The triplets and answers, based on format. See :func:`cblearn.utils.check_triplets`.
     """
     triplets = make_random_triplet_indices(len(embedding), size, random_state, repeat, monotonic, make_all)
     return noisy_triplet_answers(triplets, embedding, result_format=result_format, random_state=random_state, **kwargs)

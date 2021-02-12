@@ -19,7 +19,7 @@ Per user selection, multiple triplet constraints were created.
     Dimensionality                      unknown
     ===================   =====================
 
-This dataset can be downloaded using the :func:`ordcomp.datasets.fetch_food_similarity`.
+This dataset can be downloaded using the :func:`cblearn.datasets.fetch_food_similarity`.
 
 .. License statement from the original homepage
 

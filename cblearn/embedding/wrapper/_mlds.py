@@ -4,9 +4,9 @@ from sklearn.base import BaseEstimator
 from sklearn.utils import check_random_state
 import numpy as np
 
-from ordcomp import utils
-from ordcomp.embedding._base import TripletEmbeddingMixin
-from ordcomp.embedding.wrapper._r_base import RWrapperMixin
+from cblearn import utils
+from cblearn.embedding._base import TripletEmbeddingMixin
+from cblearn.embedding.wrapper._r_base import RWrapperMixin
 
 
 class MLDS(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
@@ -24,7 +24,7 @@ class MLDS(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
         embedding_: array-likeThe final embedding, shape (n_objects, 1)
         log_likelihood_: The final log-likelihood of the embedding.
 
-    >>> from ordcomp import datasets
+    >>> from cblearn import datasets
     >>> triplets = datasets.make_random_triplets(np.arange(15).reshape(-1, 1), size=400, result_format='list-order')
     >>> triplets.shape, np.unique(triplets).shape
     ((400, 3), (15,))

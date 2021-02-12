@@ -1,6 +1,6 @@
 import numpy as np
 
-from ordcomp import metrics
+from cblearn import metrics
 
 
 def test_procrustes_distance():

@@ -1,9 +1,9 @@
-# ordcomp
-Machine Learning Toolkit for Comparison-based Learning in Python
+# cblearn
+## Comparison-based Machine Learning in Python
 
-[![Unit tests](https://github.com/dekuenstle/ordcomp/workflows/Python%20package/badge.svg)](https://github.com/dekuenstle/ordcomp/actions)
-[![Test Coverage](https://codecov.io/gh/dekuenstle/ordcomp/branch/master/graph/badge.svg?token=P9JRT6OK6O)](https://codecov.io/gh/dekuenstle/ordcomp)
-[![Documentation](https://readthedocs.org/projects/ordcomp/badge/?version=latest)](https://ordcomp.readthedocs.io/en/latest/?badge=latest)
+[![Unit tests](https://github.com/dekuenstle/cblearn/workflows/Python%20package/badge.svg)](https://github.com/dekuenstle/cblearn/actions)
+[![Test Coverage](https://codecov.io/gh/dekuenstle/cblearn/branch/master/graph/badge.svg?token=P9JRT6OK6O)](https://codecov.io/gh/dekuenstle/cblearn)
+[![Documentation](https://readthedocs.org/projects/cblearn/badge/?version=latest)](https://cblearn.readthedocs.io/en/latest/?badge=latest)
 
 Comparison-based Learning are the Machine Learning algorithms to use, when training data
 are ordinal comparisons instead of Euclidean points. 
@@ -16,9 +16,9 @@ It plays hand-in-hand with scikit-learn:
 from sklearn.datasets import load_iris
 from sklearn.model_selection import cross_val_score
 
-from ordcomp.datasets import make_random_triplets
-from ordcomp.embedding.wrapper import SOE
-from ordcomp.metrics import TripletScorer
+from cblearn.datasets import make_random_triplets
+from cblearn.embedding.wrapper import SOE
+from cblearn.metrics import TripletScorer
 
 
 X = load_iris().data
@@ -32,25 +32,25 @@ embedding = estimator.fit_transform(triplets, responses)
 print(f"The embedding has shape {embedding.shape}.")
 ```
 
-Please try the [Examples](https://ordcomp.readthedocs.io/en/latest/generated_examples/index.html).
+Please try the [Examples](https://cblearn.readthedocs.io/en/latest/generated_examples/index.html).
 
 ## Getting Started
 
-OrdComp required Python 3.7 or newer. The easiest way to install is using `pip`:
+cblearn required Python 3.7 or newer. The easiest way to install is using `pip`:
 
 ```
-pip install https://github.com/dekuenstle/ordcomp.git
+pip install https://github.com/dekuenstle/cblearn.git
 ```
-Find more details in the [installation instructions](https://ordcomp.readthedocs.io/en/latest/install.html).
+Find more details in the [installation instructions](https://cblearn.readthedocs.io/en/latest/install.html).
 
 
-In the [User Guide](https://ordcomp.readthedocs.io/en/latest/user_guide/index.html) you find a detailed introduction.
+In the [User Guide](https://cblearn.readthedocs.io/en/latest/user_guide/index.html) you find a detailed introduction.
 
 ## Contribute
 
 We are happy about your contributions.
-Please see our [Contributor Guide](https://ordcomp.readthedocs.io/en/latest/contributor_guide/index.html). 
+Please see our [Contributor Guide](https://cblearn.readthedocs.io/en/latest/contributor_guide/index.html). 
 
 ## License
 
-This library is free to use under the [MIT License](https://github.com/dekuenstle/ordcomp/blob/master/LICENSE) conditions.
+This library is free to use under the [MIT License](https://github.com/dekuenstle/cblearn/blob/master/LICENSE) conditions.

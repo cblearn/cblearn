@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from ordcomp import datasets
+from cblearn import datasets
 
 
 def test_make_triplets_raises():

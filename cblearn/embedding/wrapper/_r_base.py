@@ -17,8 +17,8 @@ class RWrapperMixin:
             numpy2ri.activate()
         except ImportError:
             raise ImportError("Expects installed python package 'rpy2', could not find it. "
-                              "Did you install ordcomp with the r_wrapper extras? "
-                              "pip install ordcomp[r_wrapper]")
+                              "Did you install cblearn with the r_wrapper extras? "
+                              "pip install cblearn[r_wrapper]")
 
     @classmethod
     def import_r_package(cls, package_name, install_if_missing=True, **kwargs):

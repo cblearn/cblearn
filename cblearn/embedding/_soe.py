@@ -6,10 +6,9 @@ import numpy as np
 from scipy.optimize import minimize
 from scipy.spatial import distance_matrix
 
-import ordcomp
-from ordcomp import utils
-from ordcomp.embedding._base import TripletEmbeddingMixin
-from ordcomp.utils import assert_torch_is_available, torch_minimize_lbfgs
+from cblearn import utils
+from cblearn.embedding._base import TripletEmbeddingMixin
+from cblearn.utils import assert_torch_is_available, torch_minimize_lbfgs
 
 
 class SOE(BaseEstimator, TripletEmbeddingMixin):
@@ -31,7 +30,7 @@ class SOE(BaseEstimator, TripletEmbeddingMixin):
 
         Examples:
 
-        >>> from ordcomp import datasets
+        >>> from cblearn import datasets
         >>> true_embedding = np.random.rand(15, 2)
         >>> triplets = datasets.make_random_triplets(true_embedding, result_format='list-order', size=1000)
         >>> triplets.shape, np.unique(triplets).shape
@@ -91,7 +90,7 @@ class SOE(BaseEstimator, TripletEmbeddingMixin):
         self.device = device
 
     def fit(self, X: utils.Questions, y: np.ndarray = None, init: np.ndarray = None,
-            n_objects: Optional[int] = None) -> 'ordcomp.embedding.SOE':
+            n_objects: Optional[int] = None) -> 'SOE':
         """Computes the embedding.
 
         Args:

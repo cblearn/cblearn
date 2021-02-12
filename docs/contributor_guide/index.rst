@@ -6,16 +6,16 @@ There are multiple ways to contribute to this project.
 You can report bugs in this library or propose new ideas via `Github issues`_.
 This guide describes how to contribute code or documentation.
 
-.. _Github issues: https://github.com/dekuenstle/ordcomp/issues
+.. _Github issues: https://github.com/dekuenstle/cblearn/issues
 
 
 ---------------
 Getting Started
 ---------------
 
-We assume, you downloaded and installed OrdComp as described in :ref:`developer_install`.
+We assume, you downloaded and installed cblearn as described in :ref:`developer_install`.
 
-The project directory contains the code directory ``ordcomp/`` and the documentation ``docs/``.
+The project directory contains the code directory ``cblearn/`` and the documentation ``docs/``.
 In addition, there are readme, license, and a multiple configuration files as well as an examples folder.
 
 -------------
@@ -37,7 +37,7 @@ The docstring will be added to the :ref:`api_ref` by adding the function name in
 Check the syntax of the docstring by running ``make html`` in the ``docs/`` folder.
 
 Types should not be added to the docstring, but in the code as `type hints`_.
-Typechecks can be performed using ``mypy ordcomp``.
+Typechecks can be performed using ``mypy cblearn``.
 
 .. _PEP8 Style Guide: https://www.python.org/dev/peps/pep-0008/
 .. _Google Docstring Style: https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html
@@ -84,14 +84,14 @@ sections below. Commit your changes to a separate *git* branch (do **not** commi
 After you finished changing push this branch to Github and open a pull request to the ``master`` branch there.
 Once the request is opened, automated tests are run.
 If these tests indicate a problem, you can fix this problem on your branch and push again.
-Once the automated tests are successful, maintainers of OrdComp will review the changes and provide feedback.
+Once the automated tests are successful, maintainers of cblearn will review the changes and provide feedback.
 Usually after some iterations, your changes will be merged to the ``master`` branch.
 
 .. Note:
 
     If you state a pull request, your changes will be published under `this open source license`_.
 
-.. _this open source license: https://github.com/dekuenstle/ordcomp/blob/master/LICENSE
+.. _this open source license: https://github.com/dekuenstle/cblearn/blob/master/LICENSE
 
 
 

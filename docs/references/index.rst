@@ -4,18 +4,18 @@
 API Reference
 =============
 
-This is the class and function reference of OrdComp.
+This is the class and function reference of cblearn.
 
 
-:mod:`ordcomp.datasets` Datasets
+:mod:`cblearn.datasets` Datasets
 ================================
 
-.. automodule:: ordcomp.datasets
+.. automodule:: cblearn.datasets
 
 Loaders
 -------
 
-.. currentmodule:: ordcomp
+.. currentmodule:: cblearn
 
 .. autosummary::
     :toctree: generated/
@@ -27,7 +27,7 @@ Loaders
 Simulations
 -----------
 
-.. currentmodule:: ordcomp
+.. currentmodule:: cblearn
 
 .. autosummary::
     :toctree: generated/
@@ -39,7 +39,7 @@ Simulations
 Low-level Dataset Utility
 -------------------------
 
-.. currentmodule:: ordcomp
+.. currentmodule:: cblearn
 
 .. autosummary::
     :toctree: generated/
@@ -50,12 +50,12 @@ Low-level Dataset Utility
     datasets.noisy_triplet_answers
 
 
-:mod:`ordcomp.embedding` Embedding
+:mod:`cblearn.embedding` Embedding
 ==================================
 
-.. automodule:: ordcomp.embedding
+.. automodule:: cblearn.embedding
 
-.. currentmodule:: ordcomp
+.. currentmodule:: cblearn
 
 .. autosummary::
     :toctree: generated/
@@ -65,7 +65,7 @@ Low-level Dataset Utility
 Wrapper
 -------
 
-.. currentmodule:: ordcomp.embedding
+.. currentmodule:: cblearn.embedding
 
 
 .. autosummary::
@@ -75,12 +75,12 @@ Wrapper
     wrapper.SOE
 
 
-:mod:`ordcomp.metrics` Metrics
+:mod:`cblearn.metrics` Metrics
 ==============================
 
-.. automodule:: ordcomp.metrics
+.. automodule:: cblearn.metrics
 
-.. currentmodule:: ordcomp
+.. currentmodule:: cblearn
 
 .. autosummary::
     :toctree: generated/
@@ -89,12 +89,12 @@ Wrapper
     metrics.procrustes_distance
     metrics.TripletScorer
 
-:mod:`ordcomp.utils` Utility
+:mod:`cblearn.utils` Utility
 ============================
 
-.. automodule:: ordcomp.utils
+.. automodule:: cblearn.utils
 
-.. currentmodule:: ordcomp
+.. currentmodule:: cblearn
 
 .. autosummary::
     :toctree: generated/

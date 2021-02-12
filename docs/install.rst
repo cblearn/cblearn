@@ -2,7 +2,7 @@
 Installation
 ============
 
-OrdComp requires Python 3.7 or newer.
+cblearn requires Python 3.7 or newer.
 We recommend using Anaconda_ to install Python and
 dependencies in separated environments.
 We support Linux (tested on Ubuntu 20.4), Windows and Mac OS.
@@ -14,11 +14,11 @@ Examples in this installation guide Linux shell commands.
 User Installation
 -----------------
 
-OrdComp and its dependencies can be installed using `pip`:
+cblearn and its dependencies can be installed using `pip`:
 
 .. code-block:: bash
 
-    $ pip install git+ssh://git@github.com/dekuenstle/ordcomp.git
+    $ pip install git+ssh://git@github.com/dekuenstle/cblearn.git
 
 .. _extras_install:
 
@@ -26,7 +26,7 @@ Extras Requirements
 ===================
 
 The installation routine above tries to only install a minimal set of required packages.
-Some of OrdComp's features depend on extra dependencies.
+Some of cblearn's features depend on extra dependencies.
 These can be installed by adding them comma-separated in squared brackets to the pip command.
 
 For example, to use estimators on GPU, based on pytorch, and estimators
@@ -34,7 +34,7 @@ wrapping paper author's original implementation in R-lang:
 
 .. code-block:: bash
 
-    $ pip install git+ssh://git@github.com/dekuenstle/ordcomp.git[torch,wrapper]
+    $ pip install git+ssh://git@github.com/dekuenstle/cblearn.git[torch,wrapper]
 
 ======= =============================================================
 Extras  Description
@@ -59,6 +59,6 @@ This way, changes in the code are directly considered without the need of re-ins
 
 .. code-block:: bash
 
-    $ git clone git@github.com/dekuenstle/ordcomp.git
-    $ cd ordcomp
+    $ git clone git@github.com/dekuenstle/cblearn.git
+    $ cd cblearn
     $ pip install -e.[tests,docs]

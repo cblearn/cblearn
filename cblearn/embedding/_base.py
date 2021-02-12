@@ -4,8 +4,8 @@ import numpy as np
 from sklearn.base import TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
-from ordcomp import datasets
-from ordcomp import utils
+from cblearn import datasets
+from cblearn import utils
 
 
 class TripletEmbeddingMixin(TransformerMixin):
