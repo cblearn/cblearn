@@ -34,27 +34,27 @@ class SOE(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
                International Conference on Machine Learning, 847–855.
         """
 
-    def __init__(self, n_components=2, n_init=10, C=.1, max_iter=1000, verbose=False,
+    def __init__(self, n_components=2, n_init=10, margin=.1, max_iter=1000, verbose=False,
                  random_state: Union[None, int, np.random.RandomState] = None):
         """
         Args:
-            n_components : int, default=2
+            n_components:
                 The dimension of the embedding.
-            n_init: int, default=10
+            n_init:
                 Number of times the BFGS algorithm will be run with different initializations.
                 The final result will be the output of the run with the smallest final stress.
-            C: float, default=.1
+            margin:
                 Scale parameter which only takes strictly positive value.
-            max_iter: int, default=1000
+            max_iter:
                 Maximum number of optimization iterations.
-            verbose: boolean, default=False
+            verbose:
                 Enable verbose output.
-            random_state: int, RandomState instance or None, default=None
+            random_state:
                 The seed of the pseudo random number generator used to initialize the optimization.
         """
         self.n_components = n_components
         self.n_init = n_init
-        self.C = C
+        self.margin = margin
         self.max_iter = max_iter
         self.verbose = verbose
         self.random_state = random_state
@@ -96,7 +96,7 @@ class SOE(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
 
         self.stress_ = np.infty
         for i_init in range(n_init):
-            soe_result = loe.SOE(CM=quadruplets, N=n_objects, p=self.n_components, c=self.C,
+            soe_result = loe.SOE(CM=quadruplets, N=n_objects, p=self.n_components, c=self.margin,
                                  maxit=self.max_iter, report=report_every, iniX=init,
                                  rnd=quadruplets.shape[0])
             i_stress = soe_result.rx2("str")[0]
