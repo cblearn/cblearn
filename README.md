@@ -1,4 +1,5 @@
-# cblearn - Comparison-based Machine Learning in Python
+# cblearn
+## Comparison-based Machine Learning in Python
 
 [![Unit tests](https://github.com/dekuenstle/cblearn/workflows/Python%20package/badge.svg)](https://github.com/dekuenstle/cblearn/actions)
 [![Test Coverage](https://codecov.io/gh/dekuenstle/cblearn/branch/master/graph/badge.svg?token=P9JRT6OK6O)](https://codecov.io/gh/dekuenstle/cblearn)
