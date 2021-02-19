@@ -3,6 +3,7 @@ from typing import Optional, Union
 from sklearn.base import BaseEstimator
 from sklearn.utils import check_random_state
 import numpy as np
+import scipy
 from scipy.optimize import minimize
 from scipy.spatial import distance_matrix
 
@@ -184,24 +185,14 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
         optimizer = torch.optim.Adam(params=[K], lr=self.learning_rate, amsgrad=True)
         loss = float("inf")
         success, message = True, ""
-
-        # Compute initial loss
-        epoch_loss = 0
-        for batch_ind in range(batches):
-            batch_trips = triplets[batch_ind * batch_size: (batch_ind + 1) * batch_size, ]  # a batch of triplets
-            batch_loss = -1 * _ckl_kernel_loss_torch(K, batch_trips, C)
-            epoch_loss += batch_loss.item()
-
         best_K = K
-        total_time = 0
-        for it in range(epochs):
-            intermediate_time = time.time()
+        for n_iter in range(self.max_iter):
             epoch_loss = 0
             for batch_ind in range(batches):
                 batch_trips = triplets[batch_ind * batch_size: (batch_ind + 1) * batch_size, ]  # a batch of triplets
                 K.requires_grad = True
 
-                batch_loss = -1 * get_ckl_k_loss(batch_trips, K, reg_lbda, mu=mu)
+                batch_loss = -1 * _ckl_kernel_loss_torch(K, batch_trips, C)
 
                 optimizer.zero_grad()
                 batch_loss.backward()
@@ -209,27 +200,19 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
                 K.requires_grad = False
                 epoch_loss += batch_loss.item()
                 # projection back onto semidefinite cone
-                K = project_rank(K, dim)
+                K = _project_rank(K, self.n_components)
 
-            end_time = time.time()
-            total_time += (end_time - intermediate_time)
-            epoch_loss = epoch_loss / triplets.shape[0]
-        for n_iter in range(max_iter):
-            def closure():
-                optimizer.zero_grad()
-                loss = _ckl_kernel_loss_torch(K, triplets, C)
-                loss.backward()
-                return loss
-
-            optimizer.step(closure)
             prev_loss = loss
-            loss = optimizer.state[X]['prev_loss']
+            loss = epoch_loss / triplets.shape[0]
             if abs(prev_loss - loss) / max(abs(loss), abs(prev_loss), 1) < factr:
                 break
-        else:
-            success = False
-            message = "LBFGS did not converge."
+            else:
+                success = False
+                message = "Adam did not converge."
 
+        # SVD to get embedding
+        U, s, _ = torch.svd(best_K)
+        X = torch.mm(U[:, :self.n_components], torch.diag(torch.sqrt(s[:self.n_components])))
         return scipy.optimize.OptimizeResult(
             x=X.cpu().detach().numpy(), fun=loss, nit=n_iter,
             success=success, message=message)
@@ -237,42 +220,7 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
 
 
 
-    # number of iterations to get through the dataset
 
 
 
-
-    # Compute initial triplet error
-    error_batch_indices = np.random.randint(triplet_num, size=min(nmb_train_triplets_for_error, triplet_num))
-    triplet_error_history.append(triplet_error_torch(X, triplets[error_batch_indices, :])[0].item())
-
-
-
-        if it % 50 == 0 or it == epochs - 1:
-            if error_change_threshold != -1:
-                # Compute triplet error
-                error_batch_indices = np.random.randint(triplet_num, size=min(nmb_train_triplets_for_error, triplet_num))
-                # SVD to get embedding
-                U, s, _ = torch.svd(K)
-                X = torch.mm(U[:, :dim], torch.diag(torch.sqrt(s[:dim])))
-                triplet_error = triplet_error_torch(X, triplets[error_batch_indices, :])[0].item()
-                triplet_error_history.append(triplet_error)
-                if triplet_error < best_triplet_error - error_change_threshold:
-                    best_K = K
-                    best_triplet_error = triplet_error
-                    time_to_best = total_time
-                    logger.info('Found new best in Epoch: ' + str(it) + ' Loss: ' + str(epoch_loss) + ' Triplet error: ' + str(triplet_error))
-
-                logger.info('Epoch: ' + str(it) + ' Loss: ' + str(epoch_loss) + ' Triplet error: ' + str(triplet_error))
-                sys.stdout.flush()
-            else:
-                best_K = K
-                time_to_best = total_time
-                logger.info('Epoch: ' + str(it) + ' Loss: ' + str(epoch_loss))
-                sys.stdout.flush()
-
-    # SVD to get embedding
-    U, s, _ = torch.svd(best_K)
-    X = torch.mm(U[:, :dim], torch.diag(torch.sqrt(s[:dim])))
-    return X.cpu().detach().numpy(), loss_history, triplet_error_history, time_to_best, time_history
 
