@@ -11,10 +11,6 @@ from cblearn import utils
 from cblearn.embedding._base import TripletEmbeddingMixin
 from cblearn.utils import assert_torch_is_available, torch_minimize_lbfgs
 
-
-#remove later
-from typing import Sequence, Callable
-
 class CKL(BaseEstimator, TripletEmbeddingMixin):
     """ Crowd Kernel Learning (CKL).
 
@@ -48,20 +44,20 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
 
         The following is running on the CUDA GPU, if available (but requires pytorch installed).
 
-        >>> estimator = CKL(n_components=2, algorithm="backprop", random_state=42, kernel_matrix=True)
-        >>> embedding = estimator.fit_transform(triplets, n_objects=15)
-        >>> estimator.score(triplets)
+        # >>> estimator = CKL(n_components=2, algorithm="SGD", random_state=42, kernel_matrix=True)
+        # >>> embedding = estimator.fit_transform(triplets, n_objects=15)
+        # >>> estimator.score(triplets)
         1.0
 
         References
         ----------
-        .. [1] Tamuz, O., & Liu, C., & Belognie, S., & Shamir, O., & Kalai, A.T. (2011). Adaptively Learning th Crowd Kernel.
+        .. [1] Tamuz, O., & Liu, C., & Belognie, S., & Shamir, O., & Kalai, A.T. (2011). Adaptively Learning the Crowd Kernel.
                International Conference on Machine Learning.
         .. [2] Vankadara, L. et al. (2019) Insights into Ordinal Embedding Algorithms: A Systematic Evaluation
                Arxiv Preprint, https://arxiv.org/abs/1912.01666
         """
 
-    def __init__(self, n_components=2, max_iter=1000, C=0.01, learning_rate=0.01, batch_size=1000000, kernel_matrix: bool = False, verbose=False,
+    def __init__(self, n_components=2, max_iter=1000, C=0.1, learning_rate=100, batch_size=1000000, kernel_matrix: bool = False, verbose=False,
                  random_state: Union[None, int, np.random.RandomState] = None,
                  algorithm: str = 'SGD', device: str = "auto"):
         """ Initialize the estimator.
@@ -117,8 +113,7 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
 
         if self.algorithm == "SGD" and self.kernel_matrix:
             assert_torch_is_available()
-            init = np.dot(init, np.transpose(init))
-            result = self.torch_minimize_adam_kernel(init, triplets, device=self.device, max_iter=self.max_iter, batch_size=self.batch_size)
+            result = self.torch_minimize_adam_kernel(init, triplets.astype(int), device=self.device, max_iter=self.max_iter, batch_size=self.batch_size)
         else:
             raise ValueError(f"Unknown CKL algorithm '{self.algorithm}'. Try 'SGD' instead.")
 
@@ -128,7 +123,7 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
         self.stress_, self.n_iter_ = result.fun, result.nit
         return self
 
-    def torch_minimize_adam_kernel(self, init: np.ndarray, triplets: np.ndarray, args: Sequence, device: str, max_iter: int, batch_size: int
+    def torch_minimize_adam_kernel(self, init: np.ndarray, triplets: np.ndarray, device: str, max_iter: int, batch_size: int
                              ) -> 'scipy.optimize.OptimizeResult':
         """ Pytorch minimization routine using Adam.
 
@@ -165,7 +160,7 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
 
         def _project_rank(K, dim):
             D, U = torch.symeig(K, eigenvectors=True)  # will K be surely symmetric?
-            D = torch.max(D[-dim:], torch.Tensor([0]).to(K.device))
+            D = torch.max(D[-dim:], torch.Tensor([0.]).to(K.device))
             return torch.mm(torch.mm(U[:, -dim:], torch.diag(D)), torch.transpose(U[:, -dim:], 0, 1))
 
         if device == "auto":
@@ -178,7 +173,7 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
         triplets = torch.tensor(triplets).to(device).long()
         batches = 1 if batch_size > triplet_num else triplet_num // batch_size
         C = torch.Tensor([self.C]).to(device)
-        X = torch.tensor(init).to(device)
+        X = torch.tensor(init, dtype=torch.float).to(device)
         K = torch.mm(X, torch.transpose(X, 0, 1)).to(device) * .1
         factr = 1e7 * np.finfo(float).eps
 
@@ -186,7 +181,7 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
         loss = float("inf")
         success, message = True, ""
         best_K = K
-        for n_iter in range(self.max_iter):
+        for n_iter in range(max_iter):
             epoch_loss = 0
             for batch_ind in range(batches):
                 batch_trips = triplets[batch_ind * batch_size: (batch_ind + 1) * batch_size, ]  # a batch of triplets
@@ -204,11 +199,12 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
 
             prev_loss = loss
             loss = epoch_loss / triplets.shape[0]
-            if abs(prev_loss - loss) / max(abs(loss), abs(prev_loss), 1) < factr:
-                break
-            else:
-                success = False
-                message = "Adam did not converge."
+            print(loss)
+            # if abs(prev_loss - loss) / max(abs(loss), abs(prev_loss), 1) < factr:
+            #     break
+            # else:
+            #     success = False
+            #     message = "Adam did not converge."
 
         # SVD to get embedding
         U, s, _ = torch.svd(best_K)
