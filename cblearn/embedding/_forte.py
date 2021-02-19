@@ -156,7 +156,7 @@ class FORTE(BaseEstimator, TripletEmbeddingMixin):
             diag = torch.diag(K)[:, None]
             Dist = -2 * K + diag + torch.transpose(diag, 0, 1)
             return torch.sum(_forte_logistic(Dist[triplets[:, 0], triplets[:, 1]].squeeze(),
-                                        Dist[triplets[:, 0], triplets[:, 2]].squeeze()))
+                                             Dist[triplets[:, 0], triplets[:, 2]].squeeze()))
 
         def _forte_logistic(d_ij, d_ik):
             loss = torch.log(1 + torch.exp(d_ij - d_ik))

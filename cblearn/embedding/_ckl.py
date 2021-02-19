@@ -163,7 +163,7 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
             diag = torch.diag(kernel)[:, None]
             Dist = -2 * kernel + diag + torch.transpose(diag, 0, 1)
             prob = _ckl_prob_dist(Dist[triplets[:, 0], triplets[:, 1]].squeeze(),
-                                    Dist[triplets[:, 0], triplets[:, 2]].squeeze(), mu=mu)
+                                  Dist[triplets[:, 0], triplets[:, 2]].squeeze(), mu=mu)
 
             return torch.sum(torch.log(prob))
 
