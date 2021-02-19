@@ -10,12 +10,12 @@ from scipy.spatial import distance_matrix
 from cblearn import utils
 from cblearn.embedding._base import TripletEmbeddingMixin
 from cblearn.utils import assert_torch_is_available, torch_minimize_lbfgs
-import torch
 
-class CKL(BaseEstimator, TripletEmbeddingMixin):
-    """ Crowd Kernel Learning (CKL).
 
-        CKL [1]_ is minimizing the soft objective as a smooth relaxation of the triplet error.
+class FORTE(BaseEstimator, TripletEmbeddingMixin):
+    """ Generalized Non-metric Multidimensional Scaling (FORTE).
+
+        FORTE [1]_ minimizes a kernel version of the triplet hinge soft objective as a smooth relaxation of the triplet error.
 
         This estimator supports multiple implementations which can be selected by the `algorithm` parameter.
         The majorizing algorithm for SOE is described in the paper original paper [1]_.
@@ -36,65 +36,64 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
         >>> triplets = datasets.make_random_triplets(true_embedding, result_format='list-order', size=1000)
         >>> triplets.shape, np.unique(triplets).shape
         ((1000, 3), (15,))
-        >>> estimator = CKL(n_components=2, random_state=42, kernel_matrix=True)
+        >>> estimator = FORTE(n_components=2, random_state=42)
         >>> embedding = estimator.fit_transform(triplets)
         >>> embedding.shape
         (15, 2)
-        >>> estimator.score(triplets) > 0.7
+        >>> estimator.score(triplets) > 0.9
         True
 
         The following is running on the CUDA GPU, if available (but requires pytorch installed).
 
-        # >>> estimator = CKL(n_components=2, algorithm="SGD", random_state=42, kernel_matrix=True)
-        # >>> embedding = estimator.fit_transform(triplets, n_objects=15)
-        # >>> estimator.score(triplets)
-        1.0
+        >>> estimator = FORTE(n_components=2, random_state=42)
+        >>> embedding = estimator.fit_transform(triplets, n_objects=15)
+        >>> estimator.score(triplets) > 0.9
+        True
 
         References
         ----------
-        .. [1] Tamuz, O., & Liu, C., & Belognie, S., & Shamir, O., & Kalai, A.T. (2011). Adaptively Learning the Crowd Kernel.
-               International Conference on Machine Learning.
+        .. [1] Terada, Y., & Luxburg, U. (2014). Local ordinal embedding.
+               International Conference on Machine Learning, 847–855.
         .. [2] Vankadara, L. et al. (2019) Insights into Ordinal Embedding Algorithms: A Systematic Evaluation
                Arxiv Preprint, https://arxiv.org/abs/1912.01666
         """
 
-    def __init__(self, n_components=2, max_iter=2000, mu=0.1, learning_rate=100, batch_size=1000000, kernel_matrix: bool = False, verbose=False,
+    def __init__(self, n_components=2, margin=1, max_iter=2000, learning_rate=1000, batch_size=1000000, verbose=False,
                  random_state: Union[None, int, np.random.RandomState] = None,
-                 algorithm: str = 'SGD', device: str = "auto"):
+                 algorithm: str = "LineSearch", device: str = "auto"):
         """ Initialize the estimator.
 
         Args:
             n_components :
                 The dimension of the embedding.
+            margin:
+                Scale parameter which only takes strictly positive value.
+                Defines the intended minimal difference of distances in the embedding space between
+                for any triplet.
             max_iter:
                 Maximum number of optimization iterations.
-            mu:
-
-            kernel_matrix:
-                If True, we optimize over the kernel matrix. Otherwise, we optimize over the embedding directly.
             verbose: boolean, default=False
                 Enable verbose output.
             random_state:
                 The seed of the pseudo random number generator used to initialize the optimization.
             algorithm:
-                The algorithm used to optimize the soft objective. {"SGD"}
+                The algorithm used to optimize the soft objective. {"majorizing", "backprop"}
             device: The device on which pytorch computes. {"auto", "cpu", "cuda"}
                 "auto" chooses cuda (GPU) if available, but falls back on cpu if not.
                 This parameter is only used if "backprop" algorithm is used.
         """
         self.n_components = n_components
+        self.margin = margin
         self.max_iter = max_iter
-        self.mu = mu
-        self.learning_rate = learning_rate
-        self.batch_size = batch_size
-        self.kernel_matrix = kernel_matrix
         self.verbose = verbose
         self.random_state = random_state
         self.algorithm = algorithm
         self.device = device
+        self.learning_rate = learning_rate
+        self.batch_size = batch_size
 
     def fit(self, X: utils.Questions, y: np.ndarray = None, init: np.ndarray = None,
-            n_objects: Optional[int] = None) -> 'CKL':
+            n_objects: Optional[int] = None) -> 'FORTE':
         """Computes the embedding.
 
         Args:
@@ -112,26 +111,21 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
             init = random_state.multivariate_normal(np.zeros(self.n_components), np.eye(self.n_components),
                                                     size=n_objects)
 
-        if self.algorithm == "SGD" and self.kernel_matrix:
+        if self.algorithm == "LineSearch":
             assert_torch_is_available()
-            result = self.torch_minimize_adam_kernel(init, triplets.astype(int), device=self.device, max_iter=self.max_iter, batch_size=self.batch_size)
-        elif self.algorithm == "SGD" and not self.kernel_matrix:
-            assert_torch_is_available()
-            result = torch_minimize_lbfgs(_ckl_x_loss_torch, init, args=(triplets.astype(int), self.mu),
-                                          device=self.device, max_iter=self.max_iter)
-            pass
+            result = self.torch_minimize_kernel(init, triplets.astype(int), device=self.device, max_iter=self.max_iter, batch_size=self.batch_size)
         else:
-            raise ValueError(f"Unknown CKL algorithm '{self.algorithm}'. Try 'SGD' instead.")
+            raise ValueError(f"Unknown FORTE algorithm '{self.algorithm}'. Try 'K' or 'X' instead.")
 
         if self.verbose and not result.success:
-            print(f"CKL's optimization failed with reason: {result.message}.")
+            print(f"FORTE's optimization failed with reason: {result.message}.")
         self.embedding_ = result.x.reshape(-1, self.n_components)
         self.stress_, self.n_iter_ = result.fun, result.nit
         return self
 
-    def torch_minimize_adam_kernel(self, init: np.ndarray, triplets: np.ndarray, device: str, max_iter: int, batch_size: int
-                             ) -> 'scipy.optimize.OptimizeResult':
-        """ Pytorch minimization routine using Adam.
+    def torch_minimize_kernel(self, init: np.ndarray, triplets: np.ndarray, device: str, max_iter: int, batch_size: int
+                                   ) -> 'scipy.optimize.OptimizeResult':
+        """ Pytorch minimization routine using LineSearch.
 
             This function aims to be a pytorch version of :func:`scipy.optimize.minimize`.
 
@@ -150,24 +144,22 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
                 of the optimization.
         """
         import torch  # pytorch is an optional dependency of the library
-
-        def _ckl_prob_dist(d_ij, d_ik, mu):
-            nom = d_ik + mu
-            denom = d_ij + d_ik + 2 * mu
-            return nom / denom
-
-        def _ckl_kernel_loss_torch(kernel, triplets, mu):
-            diag = torch.diag(kernel)[:, None]
-            Dist = -2 * kernel + diag + torch.transpose(diag, 0, 1)
-            prob = _ckl_prob_dist(Dist[triplets[:, 0], triplets[:, 1]].squeeze(),
-                                 Dist[triplets[:, 0], triplets[:, 2]].squeeze(), mu=mu)
-
-            return torch.sum(torch.log(prob))
+        from torch.autograd import grad
 
         def _project_rank(K, dim):
             D, U = torch.symeig(K, eigenvectors=True)  # will K be surely symmetric?
             D = torch.max(D[-dim:], torch.Tensor([0.]).to(K.device))
             return torch.mm(torch.mm(U[:, -dim:], torch.diag(D)), torch.transpose(U[:, -dim:], 0, 1))
+
+        def _forte_loss(K, triplets):
+            diag = torch.diag(K)[:, None]
+            Dist = -2 * K + diag + torch.transpose(diag, 0, 1)
+            return torch.sum(_forte_logistic(Dist[triplets[:, 0], triplets[:, 1]].squeeze(),
+                                        Dist[triplets[:, 0], triplets[:, 2]].squeeze()))
+
+        def _forte_logistic(d_ij, d_ik):
+            loss = torch.log(1 + torch.exp(d_ij - d_ik))
+            return loss
 
         if device == "auto":
             if torch.cuda.is_available():
@@ -176,14 +168,15 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
                 device = "cpu"
 
         triplet_num = triplets.shape[0]
+        learning_rate = torch.tensor([self.learning_rate]).to(device)  # learning rate
         triplets = torch.tensor(triplets).to(device).long()
         batches = 1 if batch_size > triplet_num else triplet_num // batch_size
-        mu = torch.Tensor([self.mu]).to(device)
+        rho = torch.tensor([0.5]).to(device)  # backtracking line search parameter
+        c1 = torch.tensor([0.0001]).to(device)  # Amarijo stopping condition parameter
         X = torch.tensor(init, dtype=torch.float).to(device)
         K = torch.mm(X, torch.transpose(X, 0, 1)).to(device) * .1
-        factr = 1e7 * np.finfo(float).eps
+        # factr = 1e7 * np.finfo(float).eps
 
-        optimizer = torch.optim.Adam(params=[K], lr=self.learning_rate, amsgrad=True)
         loss = float("inf")
         success, message = True, ""
         for n_iter in range(max_iter):
@@ -191,25 +184,35 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
             for batch_ind in range(batches):
                 batch_trips = triplets[batch_ind * batch_size: (batch_ind + 1) * batch_size, ]  # a batch of triplets
                 K.requires_grad = True
-
-                batch_loss = -1 * _ckl_kernel_loss_torch(K, batch_trips, mu)
-
-                optimizer.zero_grad()
-                batch_loss.backward()
-                optimizer.step()
+                old_loss = _forte_loss(K, batch_trips)
+                epoch_loss += old_loss.item()
+                gradient = grad(old_loss, K)[0]
                 K.requires_grad = False
-                epoch_loss += batch_loss.item()
-                # projection back onto semidefinite cone
-                K = _project_rank(K, self.n_components)
+                new_K = _project_rank(K - learning_rate * gradient, self.n_components)
+                new_loss = _forte_loss(new_K, batch_trips)
+                diff = new_K - K
+                beta = rho
+                norm_grad = torch.norm(gradient, dim=0)
+                norm_grad_sq = torch.sum(norm_grad)
+                inner_t = 0
+                while new_loss > old_loss - c1 * learning_rate * norm_grad_sq and inner_t < 10:
+                    beta = beta * beta
+                    new_loss = _forte_loss(K + beta * diff, batch_trips)
+                    inner_t += 1
+                if inner_t > 0:
+                    learning_rate = torch.max(torch.FloatTensor([0.1]).to(device), learning_rate * rho)
 
-            prev_loss = loss
+                K = _project_rank(K + beta * diff, self.n_components)
+
+            # prev_loss = loss
             loss = epoch_loss / triplets.shape[0]
-            #print(loss)
+            # print(loss)
             # if abs(prev_loss - loss) / max(abs(loss), abs(prev_loss), 1) < factr:
             #     break
             # else:
             #     success = False
             #     message = "Adam did not converge."
+
 
         # SVD to get embedding
         U, s, _ = torch.svd(K)
@@ -217,22 +220,6 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
         return scipy.optimize.OptimizeResult(
             x=X.cpu().detach().numpy(), fun=loss, nit=n_iter,
             success=success, message=message)
-
-
-def _ckl_x_loss_torch(embedding, triplets, mu=0.1):
-    X = embedding[triplets]
-    anchor, positive, negative = X[:, 0, :], X[:, 1, :], X[:, 2, :]
-    prob = ckl_prob(anchor,
-                    positive,
-                    negative, mu=mu)
-    loss = -1*torch.sum(torch.log(prob))
-    return loss
-
-
-def ckl_prob(x_i, x_j, x_k, mu=0.1):
-    nom = torch.norm(x_i - x_k, p=2, dim=1)**2 + mu
-    denom = torch.norm(x_i - x_j, p=2, dim=1)**2 + torch.norm(x_i - x_k, p=2, dim=1)**2 + 2*mu
-    return nom / denom
 
 
 
