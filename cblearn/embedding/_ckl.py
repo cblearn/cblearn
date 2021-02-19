@@ -36,11 +36,11 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
         >>> triplets.shape, np.unique(triplets).shape
         ((1000, 3), (15,))
         >>> estimator = CKL(n_components=2, random_state=42, kernel_matrix=True)
-        >>> embedding = estimator.fit_transform(triplets, n_objects=15)
+        >>> embedding = estimator.fit_transform(triplets)
         >>> embedding.shape
         (15, 2)
-        >>> estimator.score(triplets)
-        1.0
+        >>> estimator.score(triplets) > 0.7
+        True
 
         The following is running on the CUDA GPU, if available (but requires pytorch installed).
 
@@ -57,7 +57,7 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
                Arxiv Preprint, https://arxiv.org/abs/1912.01666
         """
 
-    def __init__(self, n_components=2, max_iter=1000, C=0.1, learning_rate=100, batch_size=1000000, kernel_matrix: bool = False, verbose=False,
+    def __init__(self, n_components=2, max_iter=2000, C=0.01, learning_rate=100, batch_size=1000000, kernel_matrix: bool = False, verbose=False,
                  random_state: Union[None, int, np.random.RandomState] = None,
                  algorithm: str = 'SGD', device: str = "auto"):
         """ Initialize the estimator.
