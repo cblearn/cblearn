@@ -4,12 +4,12 @@ from sklearn.base import BaseEstimator
 from sklearn.utils import check_random_state
 import numpy as np
 import scipy
-from scipy.optimize import minimize
-from scipy.spatial import distance_matrix
+# from scipy.optimize import minimize
+# from scipy.spatial import distance_matrix
 
 from cblearn import utils
 from cblearn.embedding._base import TripletEmbeddingMixin
-from cblearn.utils import assert_torch_is_available, torch_minimize_lbfgs
+from cblearn.utils import assert_torch_is_available  # , torch_minimize_lbfgs
 
 
 class FORTE(BaseEstimator, TripletEmbeddingMixin):
@@ -113,7 +113,8 @@ class FORTE(BaseEstimator, TripletEmbeddingMixin):
 
         if self.algorithm == "LineSearch":
             assert_torch_is_available()
-            result = self.torch_minimize_kernel(init, triplets.astype(int), device=self.device, max_iter=self.max_iter, batch_size=self.batch_size)
+            result = self.torch_minimize_kernel(init, triplets.astype(int), device=self.device,
+                                                max_iter=self.max_iter, batch_size=self.batch_size)
         else:
             raise ValueError(f"Unknown FORTE algorithm '{self.algorithm}'. Try 'K' or 'X' instead.")
 
@@ -124,7 +125,7 @@ class FORTE(BaseEstimator, TripletEmbeddingMixin):
         return self
 
     def torch_minimize_kernel(self, init: np.ndarray, triplets: np.ndarray, device: str, max_iter: int, batch_size: int
-                                   ) -> 'scipy.optimize.OptimizeResult':
+                              ) -> 'scipy.optimize.OptimizeResult':
         """ Pytorch minimization routine using LineSearch.
 
             This function aims to be a pytorch version of :func:`scipy.optimize.minimize`.
@@ -206,13 +207,6 @@ class FORTE(BaseEstimator, TripletEmbeddingMixin):
 
             # prev_loss = loss
             loss = epoch_loss / triplets.shape[0]
-            # print(loss)
-            # if abs(prev_loss - loss) / max(abs(loss), abs(prev_loss), 1) < factr:
-            #     break
-            # else:
-            #     success = False
-            #     message = "Adam did not converge."
-
 
         # SVD to get embedding
         U, s, _ = torch.svd(K)
@@ -220,7 +214,3 @@ class FORTE(BaseEstimator, TripletEmbeddingMixin):
         return scipy.optimize.OptimizeResult(
             x=X.cpu().detach().numpy(), fun=loss, nit=n_iter,
             success=success, message=message)
-
-
-
-

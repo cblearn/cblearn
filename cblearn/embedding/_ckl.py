@@ -4,13 +4,14 @@ from sklearn.base import BaseEstimator
 from sklearn.utils import check_random_state
 import numpy as np
 import scipy
-from scipy.optimize import minimize
-from scipy.spatial import distance_matrix
+# from scipy.optimize import minimize
+# from scipy.spatial import distance_matrix
 
 from cblearn import utils
 from cblearn.embedding._base import TripletEmbeddingMixin
 from cblearn.utils import assert_torch_is_available, torch_minimize_lbfgs
 import torch
+
 
 class CKL(BaseEstimator, TripletEmbeddingMixin):
     """ Crowd Kernel Learning (CKL).
@@ -58,7 +59,8 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
                Arxiv Preprint, https://arxiv.org/abs/1912.01666
         """
 
-    def __init__(self, n_components=2, max_iter=2000, mu=0.1, learning_rate=100, batch_size=1000000, kernel_matrix: bool = False, verbose=False,
+    def __init__(self, n_components=2, max_iter=2000, mu=0.1, learning_rate=100, batch_size=1000000,
+                 kernel_matrix: bool = False, verbose=False,
                  random_state: Union[None, int, np.random.RandomState] = None,
                  algorithm: str = 'SGD', device: str = "auto"):
         """ Initialize the estimator.
@@ -114,7 +116,8 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
 
         if self.algorithm == "SGD" and self.kernel_matrix:
             assert_torch_is_available()
-            result = self.torch_minimize_adam_kernel(init, triplets.astype(int), device=self.device, max_iter=self.max_iter, batch_size=self.batch_size)
+            result = self.torch_minimize_adam_kernel(init, triplets.astype(int), device=self.device,
+                                                     max_iter=self.max_iter, batch_size=self.batch_size)
         elif self.algorithm == "SGD" and not self.kernel_matrix:
             assert_torch_is_available()
             result = torch_minimize_lbfgs(_ckl_x_loss_torch, init, args=(triplets.astype(int), self.mu),
@@ -129,8 +132,8 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
         self.stress_, self.n_iter_ = result.fun, result.nit
         return self
 
-    def torch_minimize_adam_kernel(self, init: np.ndarray, triplets: np.ndarray, device: str, max_iter: int, batch_size: int
-                             ) -> 'scipy.optimize.OptimizeResult':
+    def torch_minimize_adam_kernel(self, init: np.ndarray, triplets: np.ndarray,
+                                   device: str, max_iter: int, batch_size: int) -> 'scipy.optimize.OptimizeResult':
         """ Pytorch minimization routine using Adam.
 
             This function aims to be a pytorch version of :func:`scipy.optimize.minimize`.
@@ -160,7 +163,7 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
             diag = torch.diag(kernel)[:, None]
             Dist = -2 * kernel + diag + torch.transpose(diag, 0, 1)
             prob = _ckl_prob_dist(Dist[triplets[:, 0], triplets[:, 1]].squeeze(),
-                                 Dist[triplets[:, 0], triplets[:, 2]].squeeze(), mu=mu)
+                                    Dist[triplets[:, 0], triplets[:, 2]].squeeze(), mu=mu)
 
             return torch.sum(torch.log(prob))
 
@@ -181,7 +184,7 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
         mu = torch.Tensor([self.mu]).to(device)
         X = torch.tensor(init, dtype=torch.float).to(device)
         K = torch.mm(X, torch.transpose(X, 0, 1)).to(device) * .1
-        factr = 1e7 * np.finfo(float).eps
+        # factr = 1e7 * np.finfo(float).eps
 
         optimizer = torch.optim.Adam(params=[K], lr=self.learning_rate, amsgrad=True)
         loss = float("inf")
@@ -202,14 +205,8 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
                 # projection back onto semidefinite cone
                 K = _project_rank(K, self.n_components)
 
-            prev_loss = loss
+            # prev_loss = loss
             loss = epoch_loss / triplets.shape[0]
-            #print(loss)
-            # if abs(prev_loss - loss) / max(abs(loss), abs(prev_loss), 1) < factr:
-            #     break
-            # else:
-            #     success = False
-            #     message = "Adam did not converge."
 
         # SVD to get embedding
         U, s, _ = torch.svd(K)
@@ -233,7 +230,3 @@ def ckl_prob(x_i, x_j, x_k, mu=0.1):
     nom = torch.norm(x_i - x_k, p=2, dim=1)**2 + mu
     denom = torch.norm(x_i - x_j, p=2, dim=1)**2 + torch.norm(x_i - x_k, p=2, dim=1)**2 + 2*mu
     return nom / denom
-
-
-
-
