@@ -114,11 +114,14 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
         if self.algorithm == "SGD" and self.kernel_matrix:
             assert_torch_is_available()
             result = self.torch_minimize_adam_kernel(init, triplets.astype(int), device=self.device, max_iter=self.max_iter, batch_size=self.batch_size)
+        elif self.algorithm == "SGD" and not self.kernel_matrix:
+            # Fill this with optimization over X
+            pass
         else:
             raise ValueError(f"Unknown CKL algorithm '{self.algorithm}'. Try 'SGD' instead.")
 
         if self.verbose and not result.success:
-            print(f"SOE's optimization failed with reason: {result.message}.")
+            print(f"CKL's optimization failed with reason: {result.message}.")
         self.embedding_ = result.x.reshape(-1, self.n_components)
         self.stress_, self.n_iter_ = result.fun, result.nit
         return self
@@ -127,7 +130,7 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
                              ) -> 'scipy.optimize.OptimizeResult':
         """ Pytorch minimization routine using Adam.
 
-            This function is aims to be a pytorch version of :func:`scipy.optimize.minimize`.
+            This function aims to be a pytorch version of :func:`scipy.optimize.minimize`.
 
             Args:
                 init:
@@ -199,7 +202,7 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
 
             prev_loss = loss
             loss = epoch_loss / triplets.shape[0]
-            print(loss)
+            #print(loss)
             # if abs(prev_loss - loss) / max(abs(loss), abs(prev_loss), 1) < factr:
             #     break
             # else:
