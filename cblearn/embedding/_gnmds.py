@@ -4,7 +4,7 @@ from sklearn.base import BaseEstimator
 from sklearn.utils import check_random_state
 import numpy as np
 import scipy
-from scipy.optimize import minimize
+# from scipy.optimize import minimize
 from scipy.spatial import distance_matrix
 
 from cblearn import utils
@@ -117,7 +117,8 @@ class GNMDS(BaseEstimator, TripletEmbeddingMixin):
             The kernel version of the algorithm.
             """
             assert_torch_is_available()
-            result = self.torch_minimize_adam_kernel(init, triplets.astype(int), device=self.device, max_iter=self.max_iter, batch_size=self.batch_size)
+            result = self.torch_minimize_adam_kernel(init, triplets.astype(int), device=self.device,
+                                                     max_iter=self.max_iter, batch_size=self.batch_size)
         elif self.algorithm == "X":
             """
                 The embedding (X) version of the algorithm.
@@ -187,7 +188,7 @@ class GNMDS(BaseEstimator, TripletEmbeddingMixin):
         C = torch.Tensor([self.C]).to(device)
         X = torch.tensor(init, dtype=torch.float).to(device)
         K = torch.mm(X, torch.transpose(X, 0, 1)).to(device) * .1
-        factr = 1e7 * np.finfo(float).eps
+        # factr = 1e7 * np.finfo(float).eps
 
         optimizer = torch.optim.Adam(params=[K], lr=self.learning_rate, amsgrad=True)
         loss = float("inf")
@@ -208,7 +209,7 @@ class GNMDS(BaseEstimator, TripletEmbeddingMixin):
                 # projection back onto semidefinite cone
                 K = _project_rank(K, self.n_components)
 
-            prev_loss = loss
+            # prev_loss = loss
             loss = epoch_loss / triplets.shape[0]
 
         # SVD to get embedding
@@ -238,8 +239,3 @@ def _gnmds_x_loss(x, x_shape, triplets, margin):
     kl_dist = X_dist[triplets[:, 0], triplets[:, 2]]
     stress = np.maximum(ij_dist + margin - kl_dist, 0) ** 2
     return stress.sum()
-
-
-
-
-
