@@ -23,6 +23,8 @@ triplets_ordered = [[0, 1, 2],
                     [0, 1, 2],
                     [3, 2, 0]]
 
+# WARNING:
+# Avoid using np.testing.assert_equal on sparse matrix -> leads to false positives
 triplets_spmatrix = sparse.COO(np.transpose(triplets_explicit), answers_numeric, shape=(4, 4, 4))
 
 
@@ -32,7 +34,7 @@ def test_check_triplet_questions():
     np.testing.assert_equal(triplets, triplets_ordered)
 
     triplets = utils.check_triplet_questions(triplets_ordered, result_format='tensor')
-    np.testing.assert_equal(triplets, triplets_spmatrix)
+    assert (triplets == triplets_spmatrix).all()
     np.testing.assert_equal(np.triu(triplets), triplets)
 
     triplets = utils.check_triplet_questions(triplets_spmatrix, result_format='list')
@@ -54,7 +56,7 @@ def test_check_triplet_answers():
         utils.check_triplet_answers(np.asarray(triplets_ordered)[:, :2], result_format='list-count')
 
     triplets = utils.check_triplet_answers(triplets_ordered, result_format='tensor-count')
-    np.testing.assert_equal(triplets, triplets_spmatrix)
+    assert (triplets == triplets_spmatrix).all()
 
     # spmatrix contains duplicates, which have to be unrolled for the array format
     triplets = utils.check_triplet_answers(triplets_spmatrix, result_format='list-order')
@@ -65,7 +67,7 @@ def test_check_triplet_answers():
     np.testing.assert_equal(triplets, np.unique(triplets_ordered, axis=0))
 
     triplets = utils.check_triplet_answers(triplets_spmatrix.reshape((4, 16)).tocsr())
-    np.testing.assert_equal(triplets, triplets_spmatrix)
+    assert (triplets == triplets_spmatrix).all()
 
     with pytest.raises(TypeError):  # not an array/matrix
         utils.check_triplet_answers(13)

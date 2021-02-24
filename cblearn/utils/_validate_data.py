@@ -208,6 +208,7 @@ def check_triplet_answers(triplet_answers: Union[Questions, Answers], answers: O
         if input_question_format is QuestionFormat.LIST:
             triplets, answers = _check_triplet_array(triplets, answers, sort_others=False,
                                                      answer_format=AnswerFormat.COUNT)
+            print(triplets, answers)
             n_objects = n_objects or int(triplets.max() + 1)
             triplets = sparse.COO(triplets.T, np.ones(len(triplets)), shape=(n_objects, n_objects, n_objects))
         return _check_triplet_spmatrix(triplets, output_answer_format, sort_others=sort_others, n_objects=n_objects)
