@@ -75,7 +75,7 @@ SKIP_CHECKS = [
     'check_methods_sample_order_invariance',
 ]
 
-
+@pytest.mark.sklearn
 @parametrize_with_checks(
     ALL_TRIPLET_EMBEDDING_ESTIMATORS
 )

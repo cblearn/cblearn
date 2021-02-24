@@ -27,6 +27,7 @@ a `tests` folder with unit-tests.
 There should be such a test for every method and function.
 Use ``pytest --cov`` to run these tests and to measure the coverage, no tests should fail.
 The coverage indicates the tested fraction of code and should be close to *100%*.
+You can exclude some of the more time expensive tests by ``pytest -m "not (sklearn or download)``.
 
 All Python code follows the `PEP8 Style Guide`_. The style
 of all code can be checked, running ``flake8 .`` and should print no warnings.
