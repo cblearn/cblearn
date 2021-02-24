@@ -59,10 +59,9 @@ def _check_triplet_array(triplets: np.ndarray,
 
     # repeat questions with answers >1/<-1
     if input_answer_format is AnswerFormat.COUNT and np.any(np.abs(answers) > 1):
-        answer_frequency = np.maximum(1, np.abs(answers.data))
+        answer_frequency = np.maximum(1, np.abs(answers.astype(int)))
         triplets, answers = (np.repeat(triplets, answer_frequency, axis=0),
                              np.repeat(answers.clip(-1, 1), answer_frequency, axis=0))
-
     triplets, answers = _triplet_array_by_answer_format(triplets, answers, input_answer_format, answer_format)
 
     if sort_others and answers is not None:
@@ -93,7 +92,7 @@ def _check_triplet_spmatrix(triplets: Union[sparse.COO, scipy.sparse.spmatrix],
         triplets = sparse.COO.from_scipy_sparse(triplets)
 
     if n_objects is None:
-        n_objects = int(np.cbrt(np.product(triplets.shape)))
+        n_objects = int(np.rint(np.cbrt(np.product(triplets.shape))))
     expected_shape = (n_objects, n_objects, n_objects)
     if len(triplets.shape) != 3 or np.any(np.not_equal(triplets.shape, expected_shape)):
         triplets = triplets.reshape(expected_shape)
@@ -103,7 +102,7 @@ def _check_triplet_spmatrix(triplets: Union[sparse.COO, scipy.sparse.spmatrix],
         if np.any(not_sorted):
             new_coords = np.c_[triplets.coords[:, ~not_sorted], triplets.coords[[0, 2, 1]][:, not_sorted]]
             new_data = np.r_[triplets.data[~not_sorted], -triplets.data[not_sorted]]
-            triplets = sparse.COO(new_coords, new_data)
+            triplets = sparse.COO(new_coords, new_data, shape=triplets.shape)
 
     return triplets
 
@@ -208,9 +207,8 @@ def check_triplet_answers(triplet_answers: Union[Questions, Answers], answers: O
         if input_question_format is QuestionFormat.LIST:
             triplets, answers = _check_triplet_array(triplets, answers, sort_others=False,
                                                      answer_format=AnswerFormat.COUNT)
-            print(triplets, answers)
             n_objects = n_objects or int(triplets.max() + 1)
-            triplets = sparse.COO(triplets.T, np.ones(len(triplets)), shape=(n_objects, n_objects, n_objects))
+            triplets = sparse.COO(triplets.T, answers, shape=(n_objects, n_objects, n_objects))
         return _check_triplet_spmatrix(triplets, output_answer_format, sort_others=sort_others, n_objects=n_objects)
     elif output_question_format is QuestionFormat.LIST:
         if input_question_format is QuestionFormat.TENSOR:
