@@ -130,7 +130,7 @@ def _soe_loss_torch(embedding, triplets, margin):
     """ Equation (1) of Terada & Luxburg (2014) """
     import torch  # Pytorch is an optional dependency
 
-    X = embedding[triplets]
+    X = embedding[triplets.long()]
     anchor, positive, negative = X[:, 0, :], X[:, 1, :], X[:, 2, :]
     triplet_loss = torch.nn.functional.triplet_margin_loss(anchor, positive, negative,
                                                            margin=margin, p=2, reduction='none')
