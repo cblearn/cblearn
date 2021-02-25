@@ -30,7 +30,7 @@ class RWrapperMixin:
                 if install_if_missing:
                     utils = cls.rpackages.importr('utils')
                     utils.chooseCRANmirror(ind=1)
-                    utils.install_packages(cls.robjects.vectors.StrVector([package_name]), verbose=False)
+                    utils.install_packages(cls.robjects.vectors.StrVector([package_name]), verbose=False, quiet=True)
                 else:
                     raise ImportError(f"Expects installed R package '{package_name}', could not find it.")
 
