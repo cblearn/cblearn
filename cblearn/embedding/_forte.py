@@ -4,12 +4,11 @@ from sklearn.base import BaseEstimator
 from sklearn.utils import check_random_state
 import numpy as np
 import scipy
-# from scipy.optimize import minimize
-# from scipy.spatial import distance_matrix
 
 from cblearn import utils
 from cblearn.embedding._base import TripletEmbeddingMixin
 from cblearn.utils import assert_torch_is_available  # , torch_minimize_lbfgs
+from . import _torch_utils
 
 
 class FORTE(BaseEstimator, TripletEmbeddingMixin):
@@ -124,6 +123,7 @@ class FORTE(BaseEstimator, TripletEmbeddingMixin):
         self.stress_, self.n_iter_ = result.fun, result.nit
         return self
 
+
     def torch_minimize_kernel(self, init: np.ndarray, triplets: np.ndarray, device: str, max_iter: int, batch_size: int
                               ) -> 'scipy.optimize.OptimizeResult':
         """ Pytorch minimization routine using LineSearch.
@@ -147,20 +147,6 @@ class FORTE(BaseEstimator, TripletEmbeddingMixin):
         import torch  # pytorch is an optional dependency of the library
         from torch.autograd import grad
 
-        def _project_rank(K, dim):
-            D, U = torch.symeig(K, eigenvectors=True)  # will K be surely symmetric?
-            D = torch.max(D[-dim:], torch.Tensor([0.]).to(K.device))
-            return torch.mm(torch.mm(U[:, -dim:], torch.diag(D)), torch.transpose(U[:, -dim:], 0, 1))
-
-        def _forte_loss(K, triplets):
-            diag = torch.diag(K)[:, None]
-            Dist = -2 * K + diag + torch.transpose(diag, 0, 1)
-            return torch.sum(_forte_logistic(Dist[triplets[:, 0], triplets[:, 1]].squeeze(),
-                                             Dist[triplets[:, 0], triplets[:, 2]].squeeze()))
-
-        def _forte_logistic(d_ij, d_ik):
-            loss = torch.log(1 + torch.exp(d_ij - d_ik))
-            return loss
 
         if device == "auto":
             if torch.cuda.is_available():
@@ -185,12 +171,12 @@ class FORTE(BaseEstimator, TripletEmbeddingMixin):
             for batch_ind in range(batches):
                 batch_trips = triplets[batch_ind * batch_size: (batch_ind + 1) * batch_size, ]  # a batch of triplets
                 K.requires_grad = True
-                old_loss = _forte_loss(K, batch_trips)
+                old_loss = _torch_forte_loss(K, batch_trips)
                 epoch_loss += old_loss.item()
                 gradient = grad(old_loss, K)[0]
                 K.requires_grad = False
-                new_K = _project_rank(K - learning_rate * gradient, self.n_components)
-                new_loss = _forte_loss(new_K, batch_trips)
+                new_K = _torch_utils.project_rank(K - learning_rate * gradient, self.n_components)
+                new_loss = _torch_forte_loss(new_K, batch_trips)
                 diff = new_K - K
                 beta = rho
                 norm_grad = torch.norm(gradient, dim=0)
@@ -198,19 +184,27 @@ class FORTE(BaseEstimator, TripletEmbeddingMixin):
                 inner_t = 0
                 while new_loss > old_loss - c1 * learning_rate * norm_grad_sq and inner_t < 10:
                     beta = beta * beta
-                    new_loss = _forte_loss(K + beta * diff, batch_trips)
+                    new_loss = _torch_forte_loss(K + beta * diff, batch_trips)
                     inner_t += 1
                 if inner_t > 0:
                     learning_rate = torch.max(torch.FloatTensor([0.1]).to(device), learning_rate * rho)
 
-                K = _project_rank(K + beta * diff, self.n_components)
+                K = _torch_utils.project_rank(K + beta * diff, self.n_components)
 
             # prev_loss = loss
             loss = epoch_loss / triplets.shape[0]
 
         # SVD to get embedding
-        U, s, _ = torch.svd(K)
-        X = torch.mm(U[:, :self.n_components], torch.diag(torch.sqrt(s[:self.n_components])))
+        U, s, _ = K.svd()
+        X = U[:, :self.n_components].mm(s[:self.n_components].sqrt().diag())
         return scipy.optimize.OptimizeResult(
             x=X.cpu().detach().numpy(), fun=loss, nit=n_iter,
             success=success, message=message)
+
+
+def _torch_forte_loss(kernel_matrix, triplets):
+    diag = kernel_matrix.diag()[:, None]
+    dist = -2 * kernel_matrix + diag + diag.transpose(0, 1)
+    d_ij = dist[triplets[:, 0], triplets[:, 1]].squeeze()
+    d_ik = dist[triplets[:, 0], triplets[:, 2]].squeeze()
+    return (1 + (d_ij - d_ik).exp()).log().sum()

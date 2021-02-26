@@ -4,12 +4,12 @@ from sklearn.base import BaseEstimator
 from sklearn.utils import check_random_state
 import numpy as np
 import scipy
-# from scipy.optimize import minimize
 from scipy.spatial import distance_matrix
 
 from cblearn import utils
 from cblearn.embedding._base import TripletEmbeddingMixin
 from cblearn.utils import assert_torch_is_available, torch_minimize_lbfgs
+from cblearn.embedding import _torch_utils
 
 
 class GNMDS(BaseEstimator, TripletEmbeddingMixin):
@@ -40,14 +40,14 @@ class GNMDS(BaseEstimator, TripletEmbeddingMixin):
         >>> embedding = estimator.fit_transform(triplets, n_objects=15)
         >>> embedding.shape
         (15, 2)
-        >>> estimator.score(triplets) > 0.8
+        >>> estimator.score(triplets) > 0.75
         True
 
         The following is running on the CUDA GPU, if available (but requires pytorch installed).
 
         >>> estimator = GNMDS(n_components=2, algorithm="X", random_state=42)
         >>> embedding = estimator.fit_transform(triplets, n_objects=15)
-        >>> estimator.score(triplets) > 0.8
+        >>> estimator.score(triplets) > 0.75
         True
 
         References
@@ -157,25 +157,6 @@ class GNMDS(BaseEstimator, TripletEmbeddingMixin):
         """
         import torch  # pytorch is an optional dependency of the library
 
-        def _gnmds_kernel_loss_torch(K, triplets, C):
-
-            diag = torch.diag(K)[:, None]
-            Dist = -2 * K + diag + torch.transpose(diag, 0, 1)
-            loss = _gnmds_k_hinge(Dist[triplets[:, 0], triplets[:, 1]].squeeze(),
-                                  Dist[triplets[:, 0], triplets[:, 2]].squeeze())
-
-            return torch.sum(loss) + C * torch.trace(K)
-
-        def _gnmds_k_hinge(d_ij, d_ik):
-            device = d_ij.device
-            loss = torch.max(d_ij - d_ik + 1, torch.FloatTensor([0]).to(device))
-            return loss
-
-        def _project_rank(K, dim):
-            D, U = torch.symeig(K, eigenvectors=True)  # will K be surely symmetric?
-            D = torch.max(D[-dim:], torch.Tensor([0.]).to(K.device))
-            return torch.mm(torch.mm(U[:, -dim:], torch.diag(D)), torch.transpose(U[:, -dim:], 0, 1))
-
         if device == "auto":
             if torch.cuda.is_available():
                 device = "cuda"
@@ -207,7 +188,7 @@ class GNMDS(BaseEstimator, TripletEmbeddingMixin):
                 K.requires_grad = False
                 epoch_loss += batch_loss.item()
                 # projection back onto semidefinite cone
-                K = _project_rank(K, self.n_components)
+                K = _torch_utils.project_rank(K, self.n_components)
 
             # prev_loss = loss
             loss = epoch_loss / triplets.shape[0]
@@ -220,22 +201,20 @@ class GNMDS(BaseEstimator, TripletEmbeddingMixin):
             success=success, message=message)
 
 
+def _gnmds_kernel_loss_torch(kernel_matrix, triplets, C):
+    diag = kernel_matrix.diag()[:, None]
+    dist = -2 * kernel_matrix + diag + diag.transpose(0, 1)
+    d_ij = dist[triplets[:, 0], triplets[:, 1]].squeeze()
+    d_ik = dist[triplets[:, 0], triplets[:, 2]].squeeze()
+    return (d_ij - d_ik).clamp(min=0).sum() + C * kernel_matrix.trace()
+
+
 def _gnmds_x_loss_torch(embedding, triplets, margin):
     """ Equation (1) of Terada & Luxburg (2014) """
     import torch  # Pytorch is an optional dependency
 
-    X = embedding[triplets]
+    X = embedding[triplets.long()]
     anchor, positive, negative = X[:, 0, :], X[:, 1, :], X[:, 2, :]
     triplet_loss = torch.nn.functional.triplet_margin_loss(anchor, positive, negative,
                                                            margin=margin, p=2, reduction='none')
-    return torch.sum(triplet_loss**2)
-
-
-def _gnmds_x_loss(x, x_shape, triplets, margin):
-    """ Equation (1) of Terada & Luxburg (2014) """
-    X = x.reshape(x_shape)
-    X_dist = distance_matrix(X, X)
-    ij_dist = X_dist[triplets[:, 0], triplets[:, 1]]
-    kl_dist = X_dist[triplets[:, 0], triplets[:, 2]]
-    stress = np.maximum(ij_dist + margin - kl_dist, 0) ** 2
-    return stress.sum()
+    return (triplet_loss**2).sum()

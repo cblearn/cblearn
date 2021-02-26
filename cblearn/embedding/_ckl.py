@@ -4,13 +4,11 @@ from sklearn.base import BaseEstimator
 from sklearn.utils import check_random_state
 import numpy as np
 import scipy
-# from scipy.optimize import minimize
-# from scipy.spatial import distance_matrix
 
 from cblearn import utils
 from cblearn.embedding._base import TripletEmbeddingMixin
 from cblearn.utils import assert_torch_is_available, torch_minimize_lbfgs
-import torch
+from . import _torch_utils
 
 
 class CKL(BaseEstimator, TripletEmbeddingMixin):
@@ -154,24 +152,6 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
         """
         import torch  # pytorch is an optional dependency of the library
 
-        def _ckl_prob_dist(d_ij, d_ik, mu):
-            nom = d_ik + mu
-            denom = d_ij + d_ik + 2 * mu
-            return nom / denom
-
-        def _ckl_kernel_loss_torch(kernel, triplets, mu):
-            diag = torch.diag(kernel)[:, None]
-            Dist = -2 * kernel + diag + torch.transpose(diag, 0, 1)
-            prob = _ckl_prob_dist(Dist[triplets[:, 0], triplets[:, 1]].squeeze(),
-                                  Dist[triplets[:, 0], triplets[:, 2]].squeeze(), mu=mu)
-
-            return torch.sum(torch.log(prob))
-
-        def _project_rank(K, dim):
-            D, U = torch.symeig(K, eigenvectors=True)  # will K be surely symmetric?
-            D = torch.max(D[-dim:], torch.Tensor([0.]).to(K.device))
-            return torch.mm(torch.mm(U[:, -dim:], torch.diag(D)), torch.transpose(U[:, -dim:], 0, 1))
-
         if device == "auto":
             if torch.cuda.is_available():
                 device = "cuda"
@@ -203,7 +183,7 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
                 K.requires_grad = False
                 epoch_loss += batch_loss.item()
                 # projection back onto semidefinite cone
-                K = _project_rank(K, self.n_components)
+                K = _torch_utils.project_rank(K, self.n_components)
 
             # prev_loss = loss
             loss = epoch_loss / triplets.shape[0]
@@ -218,15 +198,16 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
 
 def _ckl_x_loss_torch(embedding, triplets, mu=0.1):
     X = embedding[triplets]
-    anchor, positive, negative = X[:, 0, :], X[:, 1, :], X[:, 2, :]
-    prob = ckl_prob(anchor,
-                    positive,
-                    negative, mu=mu)
-    loss = -1*torch.sum(torch.log(prob))
-    return loss
+    x_i, x_j, x_k = X[:, 0, :], X[:, 1, :], X[:, 2, :]
+    nominator = (x_i - x_k).norm(p=2, dim=1)**2 + mu
+    denominator = (x_i - x_j).norm(p=2, dim=1)**2 + (x_i - x_k).norm(p=2, dim=1)**2 + 2*mu
+    return -1 * (nominator / denominator).log().sum()
 
 
-def ckl_prob(x_i, x_j, x_k, mu=0.1):
-    nom = torch.norm(x_i - x_k, p=2, dim=1)**2 + mu
-    denom = torch.norm(x_i - x_j, p=2, dim=1)**2 + torch.norm(x_i - x_k, p=2, dim=1)**2 + 2*mu
-    return nom / denom
+def _ckl_kernel_loss_torch(kernel_matrix, triplets, mu):
+    diag = kernel_matrix.diag()[:, None]
+    dist = -2 * kernel_matrix + diag + diag.transpose(0, 1)
+    d_ij = dist[triplets[:, 0], triplets[:, 1]].squeeze()
+    d_ik = dist[triplets[:, 0], triplets[:, 2]].squeeze()
+    probability = (d_ik + mu) / (d_ij + d_ik + 2 * mu)
+    return probability.log().sum()
