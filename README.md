@@ -17,7 +17,7 @@ from sklearn.datasets import load_iris
 from sklearn.model_selection import cross_val_score
 
 from cblearn.datasets import make_random_triplets
-from cblearn.embedding.wrapper import SOE
+from cblearn.embedding import SOE
 from cblearn.metrics import TripletScorer
 
 
