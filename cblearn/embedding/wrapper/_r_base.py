@@ -30,7 +30,10 @@ class RWrapperMixin:
                 if install_if_missing:
                     utils = cls.rpackages.importr('utils')
                     utils.chooseCRANmirror(ind=1)
-                    utils.install_packages(cls.robjects.vectors.StrVector([package_name]), verbose=False, quiet=True)
+                    # Install prints log on stdout on windows/macos even if verbose and quiet are set.
+                    # We capture these here. Disadvantage: Also hides install error messages!
+                    utils.capture_output(utils.install_packages(cls.robjects.vectors.StrVector([package_name]),
+                                                                verbose=False, quiet=True))
                 else:
                     raise ImportError(f"Expects installed R package '{package_name}', could not find it.")
 
