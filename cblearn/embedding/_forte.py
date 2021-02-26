@@ -8,7 +8,7 @@ import scipy
 from cblearn import utils
 from cblearn.embedding._base import TripletEmbeddingMixin
 from cblearn.utils import assert_torch_is_available  # , torch_minimize_lbfgs
-from . import _torch_utils
+from cblearn.embedding import _torch_utils
 
 
 class FORTE(BaseEstimator, TripletEmbeddingMixin):
@@ -31,23 +31,18 @@ class FORTE(BaseEstimator, TripletEmbeddingMixin):
         Examples:
 
         >>> from cblearn import datasets
+        >>> np.random.seed(42)
         >>> true_embedding = np.random.rand(15, 2)
         >>> triplets = datasets.make_random_triplets(true_embedding, result_format='list-order', size=1000)
         >>> triplets.shape, np.unique(triplets).shape
         ((1000, 3), (15,))
-        >>> estimator = FORTE(n_components=2, random_state=42)
+        >>> estimator = FORTE(n_components=2)
         >>> embedding = estimator.fit_transform(triplets)
         >>> embedding.shape
         (15, 2)
-        >>> estimator.score(triplets) > 0.9
-        True
+        >>> round(estimator.score(triplets), 1)
+        1.0
 
-        The following is running on the CUDA GPU, if available (but requires pytorch installed).
-
-        >>> estimator = FORTE(n_components=2, random_state=42)
-        >>> embedding = estimator.fit_transform(triplets, n_objects=15)
-        >>> estimator.score(triplets) > 0.9
-        True
 
         References
         ----------

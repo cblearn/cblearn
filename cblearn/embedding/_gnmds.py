@@ -32,23 +32,24 @@ class GNMDS(BaseEstimator, TripletEmbeddingMixin):
         Examples:
 
         >>> from cblearn import datasets
+        >>> np.random.seed(42)
         >>> true_embedding = np.random.rand(15, 2)
         >>> triplets = datasets.make_random_triplets(true_embedding, result_format='list-order', size=1000)
         >>> triplets.shape, np.unique(triplets).shape
         ((1000, 3), (15,))
-        >>> estimator = GNMDS(n_components=2, random_state=42, algorithm='K')
+        >>> estimator = GNMDS(n_components=2, algorithm='K')
         >>> embedding = estimator.fit_transform(triplets, n_objects=15)
         >>> embedding.shape
         (15, 2)
-        >>> estimator.score(triplets) > 0.75
-        True
+        >>> round(estimator.score(triplets), 1)
+        0.7
 
         The following is running on the CUDA GPU, if available (but requires pytorch installed).
 
-        >>> estimator = GNMDS(n_components=2, algorithm="X", random_state=42)
+        >>> estimator = GNMDS(n_components=2, algorithm="X")
         >>> embedding = estimator.fit_transform(triplets, n_objects=15)
-        >>> estimator.score(triplets) > 0.75
-        True
+        >>> round(estimator.score(triplets), 1)
+        1.0
 
         References
         ----------
