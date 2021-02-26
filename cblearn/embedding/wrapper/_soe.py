@@ -20,11 +20,13 @@ class SOE(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
 
         Examples:
         >>> from cblearn import datasets
+        >>> import doctest; doctest.ELLIPSIS_MARKER = "-output from R-"
         >>> triplets = datasets.make_random_triplets(np.random.rand(15, 2), result_format='list-order', size=1000)
         >>> triplets.shape, np.unique(triplets).shape
         ((1000, 3), (15,))
         >>> estimator = SOE(verbose=False)
-        >>> embedding = estimator.fit_transform(triplets)
+        >>> embedding = estimator.fit_transform(triplets)  # doctest: +ELLIPSIS
+        -output from R-
         >>> embedding.shape
         (15, 2)
 
