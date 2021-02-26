@@ -25,11 +25,13 @@ class MLDS(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
         log_likelihood_: The final log-likelihood of the embedding.
 
     >>> from cblearn import datasets
+    >>> import doctest; doctest.ELLIPSIS_MARKER = "-output from R-"
     >>> triplets = datasets.make_random_triplets(np.arange(15).reshape(-1, 1), size=400, result_format='list-order')
     >>> triplets.shape, np.unique(triplets).shape
     ((400, 3), (15,))
     >>> estimator = MLDS()
-    >>> embedding = estimator.fit_transform(triplets)
+    >>> embedding = estimator.fit_transform(triplets)  # doctest: +ELLIPSIS
+    -output from R-
     >>> embedding.shape
     (15, 1)
 

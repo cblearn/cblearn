@@ -31,11 +31,13 @@ class SOE(BaseEstimator, TripletEmbeddingMixin):
         Examples:
 
         >>> from cblearn import datasets
-        >>> true_embedding = np.random.rand(15, 2)
-        >>> triplets = datasets.make_random_triplets(true_embedding, result_format='list-order', size=1000)
+        >>> seed = np.random.RandomState(42)
+        >>> true_embedding = seed.rand(15, 2)
+        >>> triplets = datasets.make_random_triplets(true_embedding, result_format='list-order',
+        ...                                          size=1000, random_state=seed)
         >>> triplets.shape, np.unique(triplets).shape
         ((1000, 3), (15,))
-        >>> estimator = SOE(n_components=2, random_state=42)
+        >>> estimator = SOE(n_components=2, random_state=seed)
         >>> embedding = estimator.fit_transform(triplets, n_objects=15)
         >>> embedding.shape
         (15, 2)
@@ -44,7 +46,7 @@ class SOE(BaseEstimator, TripletEmbeddingMixin):
 
         The following is running on the CUDA GPU, if available (but requires pytorch installed).
 
-        >>> estimator = SOE(n_components=2, algorithm="backprop", random_state=42)
+        >>> estimator = SOE(n_components=2, algorithm="backprop", random_state=seed)
         >>> embedding = estimator.fit_transform(triplets, n_objects=15)
         >>> estimator.score(triplets)
         1.0
@@ -130,7 +132,7 @@ def _soe_loss_torch(embedding, triplets, margin):
     """ Equation (1) of Terada & Luxburg (2014) """
     import torch  # Pytorch is an optional dependency
 
-    X = embedding[triplets]
+    X = embedding[triplets.long()]
     anchor, positive, negative = X[:, 0, :], X[:, 1, :], X[:, 2, :]
     triplet_loss = torch.nn.functional.triplet_margin_loss(anchor, positive, negative,
                                                            margin=margin, p=2, reduction='none')
