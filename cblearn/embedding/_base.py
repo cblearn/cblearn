@@ -6,6 +6,7 @@ from sklearn.utils.validation import check_is_fitted
 
 from cblearn import datasets
 from cblearn import utils
+from cblearn import metrics
 
 
 class TripletEmbeddingMixin(TransformerMixin):
@@ -36,4 +37,4 @@ class TripletEmbeddingMixin(TransformerMixin):
 
         if y is None:
             y = X
-        return 1 - triplet_error(self.predict(X), y)
+        return metrics.triplet_score(self.predict(X), y)

@@ -13,7 +13,7 @@ from .. import datasets
 A = TypeVar('A', utils.Answers, np.ndarray)
 
 
-def triplet_error(true_answers: A, embedding_or_pred_answers: Union[np.ndarray, A]) -> float:
+def triplet_score(true_answers: A, embedding_or_pred_answers: Union[np.ndarray, A], distance=None) -> float:
     """Fraction of violated triplet constraints.
 
     For all triplets (i, j, k), count R * (||O(j) - O(i)|| - ||O(k) - O(i)||) > 0
@@ -40,14 +40,18 @@ def triplet_error(true_answers: A, embedding_or_pred_answers: Union[np.ndarray, 
     elif isinstance(embedding_or_pred_answers, (np.ndarray, list)) and len(embedding_or_pred_answers) != len(triplets):
         # Assume an embedding was passed
         embedding = check_array(embedding_or_pred_answers, ensure_2d=True)
-        pred_triplets, pred_answers = datasets.triplet_answers(triplets, embedding, result_format='list-boolean')
+        pred_triplets, pred_answers = datasets.triplet_answers(triplets, embedding, distance=distance,
+                                                               result_format='list-boolean')
     else:
         # Assume a complete triplet question+answer was passed
         pred_triplets, pred_answers = utils.check_triplet_answers(embedding_or_pred_answers, result_format='list-boolean')
 
     if pred_triplets is not None and np.any(triplets != pred_triplets):
         raise ValueError("Expects identical questions for true and predicted triplets.")
-    return 1 - metrics.accuracy_score(true_answers, pred_answers)
+    return metrics.accuracy_score(true_answers, pred_answers)
 
 
-TripletScorer = metrics.make_scorer(lambda y_true, y_pred: 1 - triplet_error(y_true, y_pred))
+def triplet_error(true_answers: A, embedding_or_pred_answers: Union[np.ndarray, A], distance=None) -> float:
+    return 1 - triplet_score(true_answers, embedding_or_pred_answers, distance)
+
+TripletScorer = metrics.make_scorer(lambda y_true, y_pred: triplet_score(y_true, y_pred))
