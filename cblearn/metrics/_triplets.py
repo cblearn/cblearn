@@ -13,7 +13,7 @@ from .. import datasets
 A = TypeVar('A', utils.Answers, np.ndarray)
 
 
-def triplet_score(true_answers: A, embedding_or_pred_answers: Union[np.ndarray, A], distance=None) -> float:
+def triplet_score(true_answers: A, embedding_or_pred_answers: Union[np.ndarray, A], distance='euclidean') -> float:
     """Fraction of violated triplet constraints.
 
     For all triplets (i, j, k), count R * (||O(j) - O(i)|| - ||O(k) - O(i)||) > 0
