@@ -33,8 +33,6 @@ class TripletEmbeddingMixin(TransformerMixin):
         Returns.
             Fraction of correct triplets.
         """
-        from ..metrics import triplet_error
-
         if y is None:
             y = X
         return metrics.triplet_score(self.predict(X), y)
