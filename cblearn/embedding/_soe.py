@@ -8,7 +8,7 @@ from scipy.spatial import distance_matrix
 
 from cblearn import utils
 from cblearn.embedding._base import TripletEmbeddingMixin
-from cblearn.utils import assert_torch_is_available, torch_minimize_lbfgs
+from cblearn.embedding._torch_utils import assert_torch_is_available, torch_minimize
 
 
 class SOE(BaseEstimator, TripletEmbeddingMixin):
@@ -112,8 +112,8 @@ class SOE(BaseEstimator, TripletEmbeddingMixin):
 
         if self.algorithm == "backprop":
             assert_torch_is_available()
-            result = torch_minimize_lbfgs(_soe_loss_torch, init, args=(triplets.astype(int), self.margin),
-                                          device=self.device, max_iter=self.max_iter)
+            result = torch_minimize('l-bfgs-b', _soe_loss_torch, init, data=(triplets.astype(int),), args=(self.margin,),
+                                    device=self.device, max_iter=self.max_iter)
         elif self.algorithm == "majorizing":
             result = minimize(_soe_loss, init.ravel(), args=(init.shape, triplets, self.margin),
                               method='L-BFGS-B', jac=_soe_majorizing_grad,

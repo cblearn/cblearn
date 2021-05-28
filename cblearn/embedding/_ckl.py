@@ -7,7 +7,6 @@ import scipy
 
 from cblearn import utils
 from cblearn.embedding._base import TripletEmbeddingMixin
-from cblearn.utils import assert_torch_is_available, torch_minimize_lbfgs
 from cblearn.embedding import _torch_utils
 
 
@@ -41,18 +40,18 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
         >>> embedding.shape
         (15, 2)
         >>> round(estimator.score(triplets), 1)
-        0.8
+        0.7
 
 
         References
         ----------
-        .. [1] Tamuz, O., & Liu, C., & Belognie, S., & Shamir, O., & Kalai, A.T. (2011). Adaptively Learning the Crowd Kernel.
+        .. [1] Tamuz, O., & Liu, lambd., & Belognie, S., & Shamir, O., & Kalai, A.T. (2011). Adaptively Learning the Crowd Kernel.
                International Conference on Machine Learning.
         .. [2] Vankadara, L. et al. (2019) Insights into Ordinal Embedding Algorithms: A Systematic Evaluation
                Arxiv Preprint, https://arxiv.org/abs/1912.01666
         """
 
-    def __init__(self, n_components=2, max_iter=2000, mu=0.1, learning_rate=100, batch_size=1000000,
+    def __init__(self, n_components=2, max_iter=2000, lambd=0.0, learning_rate=None, batch_size=50000,
                  kernel_matrix: bool = False, verbose=False,
                  random_state: Union[None, int, np.random.RandomState] = None,
                  algorithm: str = 'SGD', device: str = "auto"):
@@ -63,8 +62,8 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
                 The dimension of the embedding.
             max_iter:
                 Maximum number of optimization iterations.
-            mu:
-
+            lambd:
+                Regularization parameter
             kernel_matrix:
                 If True, we optimize over the kernel matrix. Otherwise, we optimize over the embedding directly.
             verbose: boolean, default=False
@@ -79,7 +78,7 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
         """
         self.n_components = n_components
         self.max_iter = max_iter
-        self.mu = mu
+        self.lambd = lambd
         self.learning_rate = learning_rate
         self.batch_size = batch_size
         self.kernel_matrix = kernel_matrix
@@ -108,14 +107,14 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
                                                     size=n_objects)
 
         if self.algorithm == "SGD" and self.kernel_matrix:
-            assert_torch_is_available()
-            result = self.torch_minimize_adam_kernel(init, triplets.astype(int), device=self.device,
-                                                     max_iter=self.max_iter, batch_size=self.batch_size)
+            _torch_utils.assert_torch_is_available()
+            result = _torch_utils.torch_minimize_kernel('adam', _ckl_kernel_loss_torch, init, data=[triplets.astype(int)], args=(self.lambd,),
+                                                        device=self.device, max_iter=self.max_iter, batch_size=self.batch_size, lr=self.learning_rate or 100)
         elif self.algorithm == "SGD" and not self.kernel_matrix:
-            assert_torch_is_available()
-            result = torch_minimize_lbfgs(_ckl_x_loss_torch, init, args=(triplets.astype(int), self.mu),
-                                          device=self.device, max_iter=self.max_iter)
-            pass
+            _torch_utils.assert_torch_is_available()
+            result = _torch_utils.torch_minimize('adam',
+                                                 _ckl_x_loss_torch, init, data=(triplets.astype(int),), args=(self.lambd,),
+                                                 device=self.device, max_iter=self.max_iter, lr=self.learning_rate or 1)
         else:
             raise ValueError(f"Unknown CKL algorithm '{self.algorithm}'. Try 'SGD' instead.")
 
@@ -125,78 +124,13 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
         self.stress_, self.n_iter_ = result.fun, result.nit
         return self
 
-    def torch_minimize_adam_kernel(self, init: np.ndarray, triplets: np.ndarray,
-                                   device: str, max_iter: int, batch_size: int) -> 'scipy.optimize.OptimizeResult':
-        """ Pytorch minimization routine using Adam.
 
-            This function aims to be a pytorch version of :func:`scipy.optimize.minimize`.
-
-            Args:
-                init:
-                    The initial parameter values.
-                args:
-                    Sequence of additional arguments, passed to the objective.
-                device:
-                    Device to run the minimization on, usually "cpu" or "cuda".
-                    "auto" uses "cuda", if available.
-                max_iter:
-                    The maximum number of optimizer iteration.
-            Returns:
-                Dict-like object containing status and result information
-                of the optimization.
-        """
-        import torch  # pytorch is an optional dependency of the library
-
-        if device == "auto":
-            if torch.cuda.is_available():
-                device = "cuda"
-            else:
-                device = "cpu"
-
-        triplet_num = triplets.shape[0]
-        triplets = torch.tensor(triplets).to(device).long()
-        batches = 1 if batch_size > triplet_num else triplet_num // batch_size
-        mu = torch.Tensor([self.mu]).to(device)
-        X = torch.tensor(init, dtype=torch.float).to(device)
-        K = torch.mm(X, torch.transpose(X, 0, 1)).to(device) * .1
-        # factr = 1e7 * np.finfo(float).eps
-
-        optimizer = torch.optim.Adam(params=[K], lr=self.learning_rate, amsgrad=True)
-        loss = float("inf")
-        success, message = True, ""
-        for n_iter in range(max_iter):
-            epoch_loss = 0
-            for batch_ind in range(batches):
-                batch_trips = triplets[batch_ind * batch_size: (batch_ind + 1) * batch_size, ]  # a batch of triplets
-                K.requires_grad = True
-
-                batch_loss = -1 * _ckl_kernel_loss_torch(K, batch_trips, mu)
-
-                optimizer.zero_grad()
-                batch_loss.backward()
-                optimizer.step()
-                K.requires_grad = False
-                epoch_loss += batch_loss.item()
-                # projection back onto semidefinite cone
-                K = _torch_utils.project_rank(K, self.n_components)
-
-            # prev_loss = loss
-            loss = epoch_loss / triplets.shape[0]
-
-        # SVD to get embedding
-        U, s, _ = torch.svd(K)
-        X = torch.mm(U[:, :self.n_components], torch.diag(torch.sqrt(s[:self.n_components])))
-        return scipy.optimize.OptimizeResult(
-            x=X.cpu().detach().numpy(), fun=loss, nit=n_iter,
-            success=success, message=message)
-
-
-def _ckl_x_loss_torch(embedding, triplets, mu=0.1):
+def _ckl_x_loss_torch(embedding, triplets, mu):
     X = embedding[triplets]
     x_i, x_j, x_k = X[:, 0, :], X[:, 1, :], X[:, 2, :]
     nominator = (x_i - x_k).norm(p=2, dim=1)**2 + mu
     denominator = (x_i - x_j).norm(p=2, dim=1)**2 + (x_i - x_k).norm(p=2, dim=1)**2 + 2*mu
-    return -1 * (nominator / denominator).log().sum()
+    return -1 * (nominator.log() - denominator.log()).sum()
 
 
 def _ckl_kernel_loss_torch(kernel_matrix, triplets, mu):
@@ -204,5 +138,5 @@ def _ckl_kernel_loss_torch(kernel_matrix, triplets, mu):
     dist = -2 * kernel_matrix + diag + diag.transpose(0, 1)
     d_ij = dist[triplets[:, 0], triplets[:, 1]].squeeze()
     d_ik = dist[triplets[:, 0], triplets[:, 2]].squeeze()
-    probability = (d_ik + mu) / (d_ij + d_ik + 2 * mu)
-    return probability.log().sum()
+    probability = (d_ik + mu).log() - (d_ij + d_ik + 2 * mu).log()
+    return -probability.sum()

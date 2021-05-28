@@ -7,7 +7,6 @@ import scipy
 
 from cblearn import utils
 from cblearn.embedding._base import TripletEmbeddingMixin
-from cblearn.utils import assert_torch_is_available  # , torch_minimize_lbfgs
 from cblearn.embedding import _torch_utils
 
 
@@ -106,9 +105,9 @@ class FORTE(BaseEstimator, TripletEmbeddingMixin):
                                                     size=n_objects)
 
         if self.algorithm == "LineSearch":
-            assert_torch_is_available()
-            result = self.torch_minimize_kernel(init, triplets.astype(int), device=self.device,
-                                                max_iter=self.max_iter, batch_size=self.batch_size)
+            _torch_utils.assert_torch_is_available()
+            result = _torch_utils.torch_minimize_kernel('l-bfgs-b', _torch_forte_loss, init, data=(triplets.astype(int),), device=self.device,
+                                                max_iter=self.max_iter, batch_size=self.batch_size, line_search_fn='strong_wolfe')
         else:
             raise ValueError(f"Unknown FORTE algorithm '{self.algorithm}'. Try 'K' or 'X' instead.")
 
@@ -117,84 +116,6 @@ class FORTE(BaseEstimator, TripletEmbeddingMixin):
         self.embedding_ = result.x.reshape(-1, self.n_components)
         self.stress_, self.n_iter_ = result.fun, result.nit
         return self
-
-
-    def torch_minimize_kernel(self, init: np.ndarray, triplets: np.ndarray, device: str, max_iter: int, batch_size: int
-                              ) -> 'scipy.optimize.OptimizeResult':
-        """ Pytorch minimization routine using LineSearch.
-
-            This function aims to be a pytorch version of :func:`scipy.optimize.minimize`.
-
-            Args:
-                init:
-                    The initial parameter values.
-                args:
-                    Sequence of additional arguments, passed to the objective.
-                device:
-                    Device to run the minimization on, usually "cpu" or "cuda".
-                    "auto" uses "cuda", if available.
-                max_iter:
-                    The maximum number of optimizer iteration.
-            Returns:
-                Dict-like object containing status and result information
-                of the optimization.
-        """
-        import torch  # pytorch is an optional dependency of the library
-        from torch.autograd import grad
-
-
-        if device == "auto":
-            if torch.cuda.is_available():
-                device = "cuda"
-            else:
-                device = "cpu"
-
-        triplet_num = triplets.shape[0]
-        learning_rate = torch.tensor([self.learning_rate]).to(device)  # learning rate
-        triplets = torch.tensor(triplets).to(device).long()
-        batches = 1 if batch_size > triplet_num else triplet_num // batch_size
-        rho = torch.tensor([0.5]).to(device)  # backtracking line search parameter
-        c1 = torch.tensor([0.0001]).to(device)  # Amarijo stopping condition parameter
-        X = torch.tensor(init, dtype=torch.float).to(device)
-        K = torch.mm(X, torch.transpose(X, 0, 1)).to(device) * .1
-        # factr = 1e7 * np.finfo(float).eps
-
-        loss = float("inf")
-        success, message = True, ""
-        for n_iter in range(max_iter):
-            epoch_loss = 0
-            for batch_ind in range(batches):
-                batch_trips = triplets[batch_ind * batch_size: (batch_ind + 1) * batch_size, ]  # a batch of triplets
-                K.requires_grad = True
-                old_loss = _torch_forte_loss(K, batch_trips)
-                epoch_loss += old_loss.item()
-                gradient = grad(old_loss, K)[0]
-                K.requires_grad = False
-                new_K = _torch_utils.project_rank(K - learning_rate * gradient, self.n_components)
-                new_loss = _torch_forte_loss(new_K, batch_trips)
-                diff = new_K - K
-                beta = rho
-                norm_grad = torch.norm(gradient, dim=0)
-                norm_grad_sq = torch.sum(norm_grad)
-                inner_t = 0
-                while new_loss > old_loss - c1 * learning_rate * norm_grad_sq and inner_t < 10:
-                    beta = beta * beta
-                    new_loss = _torch_forte_loss(K + beta * diff, batch_trips)
-                    inner_t += 1
-                if inner_t > 0:
-                    learning_rate = torch.max(torch.FloatTensor([0.1]).to(device), learning_rate * rho)
-
-                K = _torch_utils.project_rank(K + beta * diff, self.n_components)
-
-            # prev_loss = loss
-            loss = epoch_loss / triplets.shape[0]
-
-        # SVD to get embedding
-        U, s, _ = K.svd()
-        X = U[:, :self.n_components].mm(s[:self.n_components].sqrt().diag())
-        return scipy.optimize.OptimizeResult(
-            x=X.cpu().detach().numpy(), fun=loss, nit=n_iter,
-            success=success, message=message)
 
 
 def _torch_forte_loss(kernel_matrix, triplets):

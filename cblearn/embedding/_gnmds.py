@@ -8,7 +8,6 @@ from scipy.spatial import distance_matrix
 
 from cblearn import utils
 from cblearn.embedding._base import TripletEmbeddingMixin
-from cblearn.utils import assert_torch_is_available, torch_minimize_lbfgs
 from cblearn.embedding import _torch_utils
 
 
@@ -59,7 +58,7 @@ class GNMDS(BaseEstimator, TripletEmbeddingMixin):
                Arxiv Preprint, https://arxiv.org/abs/1912.01666
         """
 
-    def __init__(self, n_components=2, margin=1, max_iter=2000, C=0.01, learning_rate=100, batch_size=1000000, verbose=False,
+    def __init__(self, n_components=2, max_iter=2000, lambd=0.0, learning_rate=10, batch_size=1000000, verbose=False,
                  random_state: Union[None, int, np.random.RandomState] = None,
                  algorithm: str = "X", device: str = "auto"):
         """ Initialize the estimator.
@@ -67,10 +66,8 @@ class GNMDS(BaseEstimator, TripletEmbeddingMixin):
         Args:
             n_components :
                 The dimension of the embedding.
-            margin:
-                Scale parameter which only takes strictly positive value.
-                Defines the intended minimal difference of distances in the embedding space between
-                for any triplet.
+            lambd:
+                Regularization parameter.
             max_iter:
                 Maximum number of optimization iterations.
             verbose: boolean, default=False
@@ -84,13 +81,12 @@ class GNMDS(BaseEstimator, TripletEmbeddingMixin):
                 This parameter is only used if "backprop" algorithm is used.
         """
         self.n_components = n_components
-        self.margin = margin
         self.max_iter = max_iter
         self.verbose = verbose
         self.random_state = random_state
         self.algorithm = algorithm
         self.device = device
-        self.C = C
+        self.lambd = lambd
         self.learning_rate = learning_rate
         self.batch_size = batch_size
 
@@ -117,16 +113,17 @@ class GNMDS(BaseEstimator, TripletEmbeddingMixin):
             """
             The kernel version of the algorithm.
             """
-            assert_torch_is_available()
-            result = self.torch_minimize_adam_kernel(init, triplets.astype(int), device=self.device,
-                                                     max_iter=self.max_iter, batch_size=self.batch_size)
+            _torch_utils.assert_torch_is_available()
+            result = _torch_utils.torch_minimize_kernel('adam', _gnmds_kernel_loss_torch, init, data=(triplets.astype(int),),
+                                                        args=(self.lambd,), device=self.device,
+                                                     max_iter=self.max_iter, batch_size=self.batch_size, lr=self.learning_rate)
         elif self.algorithm == "X":
             """
                 The embedding (X) version of the algorithm.
             """
-            assert_torch_is_available()
-            result = torch_minimize_lbfgs(_gnmds_x_loss_torch, init, args=(triplets.astype(int), self.margin),
-                                          device=self.device, max_iter=self.max_iter)
+            _torch_utils.assert_torch_is_available()
+            result = _torch_utils.torch_minimize('adam', _gnmds_x_loss_torch, init, data=(triplets.astype(int),),args=(self.lambd,),
+                                          device=self.device, max_iter=self.max_iter, lr=self.learning_rate)
         else:
             raise ValueError(f"Unknown GNMDS algorithm '{self.algorithm}'. Try 'K' or 'X' instead.")
 
@@ -136,86 +133,22 @@ class GNMDS(BaseEstimator, TripletEmbeddingMixin):
         self.stress_, self.n_iter_ = result.fun, result.nit
         return self
 
-    def torch_minimize_adam_kernel(self, init: np.ndarray, triplets: np.ndarray, device: str, max_iter: int, batch_size: int
-                                   ) -> 'scipy.optimize.OptimizeResult':
-        """ Pytorch minimization routine using Adam.
-
-            This function aims to be a pytorch version of :func:`scipy.optimize.minimize`.
-
-            Args:
-                init:
-                    The initial parameter values.
-                args:
-                    Sequence of additional arguments, passed to the objective.
-                device:
-                    Device to run the minimization on, usually "cpu" or "cuda".
-                    "auto" uses "cuda", if available.
-                max_iter:
-                    The maximum number of optimizer iteration.
-            Returns:
-                Dict-like object containing status and result information
-                of the optimization.
-        """
-        import torch  # pytorch is an optional dependency of the library
-
-        if device == "auto":
-            if torch.cuda.is_available():
-                device = "cuda"
-            else:
-                device = "cpu"
-
-        triplet_num = triplets.shape[0]
-        triplets = torch.tensor(triplets).to(device).long()
-        batches = 1 if batch_size > triplet_num else triplet_num // batch_size
-        C = torch.Tensor([self.C]).to(device)
-        X = torch.tensor(init, dtype=torch.float).to(device)
-        K = torch.mm(X, torch.transpose(X, 0, 1)).to(device) * .1
-        # factr = 1e7 * np.finfo(float).eps
-
-        optimizer = torch.optim.Adam(params=[K], lr=self.learning_rate, amsgrad=True)
-        loss = float("inf")
-        success, message = True, ""
-        for n_iter in range(max_iter):
-            epoch_loss = 0
-            for batch_ind in range(batches):
-                batch_trips = triplets[batch_ind * batch_size: (batch_ind + 1) * batch_size, ]  # a batch of triplets
-                K.requires_grad = True
-
-                batch_loss = _gnmds_kernel_loss_torch(K, batch_trips, C)
-
-                optimizer.zero_grad()
-                batch_loss.backward()
-                optimizer.step()
-                K.requires_grad = False
-                epoch_loss += batch_loss.item()
-                # projection back onto semidefinite cone
-                K = _torch_utils.project_rank(K, self.n_components)
-
-            # prev_loss = loss
-            loss = epoch_loss / triplets.shape[0]
-
-        # SVD to get embedding
-        U, s, _ = torch.svd(K)
-        X = torch.mm(U[:, :self.n_components], torch.diag(torch.sqrt(s[:self.n_components])))
-        return scipy.optimize.OptimizeResult(
-            x=X.cpu().detach().numpy(), fun=loss, nit=n_iter,
-            success=success, message=message)
 
 
-def _gnmds_kernel_loss_torch(kernel_matrix, triplets, C):
+def _gnmds_kernel_loss_torch(kernel_matrix, triplets, lambd):
     diag = kernel_matrix.diag()[:, None]
     dist = -2 * kernel_matrix + diag + diag.transpose(0, 1)
     d_ij = dist[triplets[:, 0], triplets[:, 1]].squeeze()
     d_ik = dist[triplets[:, 0], triplets[:, 2]].squeeze()
-    return (d_ij - d_ik).clamp(min=0).sum() + C * kernel_matrix.trace()
+    return (d_ij - d_ik).clamp(min=0).sum() + lambd * kernel_matrix.trace()
 
 
-def _gnmds_x_loss_torch(embedding, triplets, margin):
+def _gnmds_x_loss_torch(embedding, triplets, lambd):
     """ Equation (1) of Terada & Luxburg (2014) """
     import torch  # Pytorch is an optional dependency
 
     X = embedding[triplets.long()]
     anchor, positive, negative = X[:, 0, :], X[:, 1, :], X[:, 2, :]
     triplet_loss = torch.nn.functional.triplet_margin_loss(anchor, positive, negative,
-                                                           margin=margin, p=2, reduction='none')
+                                                           margin=lambd, p=2, reduction='none')
     return (triplet_loss**2).sum()
