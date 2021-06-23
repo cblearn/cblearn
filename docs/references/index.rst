@@ -89,6 +89,21 @@ Wrapper
     metrics.procrustes_distance
     metrics.TripletScorer
 
+:mod:`cblearn.preprocessing` Preprocessing
+==========================================
+
+.. automodule:: cblearn.preprocessing
+
+.. currentmodule:: cblearn
+
+.. autosummary::
+    :toctree: generated/
+
+    preprocessing.triplets_from_multiselect
+    preprocessing.triplets_from_oddoneout
+    preprocessing.triplets_from_mostcentral
+
+
 :mod:`cblearn.utils` Utility
 ============================
 
