@@ -1,4 +1,3 @@
-import pytest
 import numpy as np
 
 from cblearn.preprocessing import triplets_from_multiselect
