@@ -17,11 +17,13 @@ class SOE(BaseEstimator, TripletEmbeddingMixin):
         SOE [1]_ is minimizing the soft objective as a smooth relaxation of the triplet error.
 
         This estimator supports multiple implementations which can be selected by the `backend` parameter.
-        The majorizing backend for SOE is described in the paper original paper [1]_.
+        The majorizing backend for SOE is described in the paper original paper.
 
-        An alternative implementation is using backpropagation, like descibed in [2]_.
-        This one can run not only on CPU, but also GPU with CUDA. For this, it depends
-        on the pytorch package (see :ref:`extras_install`).
+        The *torch* backend uses the ADAM optimizer and backpropagation [2]_.
+        It can executed on CPU, but also CUDA GPUs.
+
+        .. note::
+            The *torch* backend requires the *pytorch* python package (see :ref:`extras_install`).
 
         Attributes:
             embedding_: Final embedding, shape (n_objects, n_components)
@@ -56,7 +58,7 @@ class SOE(BaseEstimator, TripletEmbeddingMixin):
         .. [1] Terada, Y., & Luxburg, U. (2014). Local ordinal embedding.
                International Conference on Machine Learning, 847–855.
         .. [2] Vankadara, L. et al. (2019) Insights into Ordinal Embedding Algorithms: A Systematic Evaluation
-               Arxiv Preprint, https://arxiv.org/abs/1912.01666
+               Arxiv Preprint, https://arxiv.org/abs/1912.01666.
         """
 
     def __init__(self, n_components=2, margin=1, verbose=False,

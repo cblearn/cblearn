@@ -13,14 +13,14 @@ class FORTE(BaseEstimator, TripletEmbeddingMixin):
     """ Fast Ordinal Triplet Embedding (FORTE).
 
         FORTE [1]_ minimizes a kernel version of the triplet hinge soft objective
-         as a smooth relaxation of the triplet error.
+        as a smooth relaxation of the triplet error.
 
         This estimator supports multiple implementations which can be selected by the `backend` parameter.
 
         The *torch* backend uses the ADAM optimizer and backpropagation [2]_.
         It can executed on CPU, but also CUDA GPUs. We optimize using BFSGS and Strong-Wolfe line search.
 
-        ..Note:
+        .. Note::
             The *torch* backend requires the *pytorch* python package (see :ref:`extras_install`).
 
         Attributes:

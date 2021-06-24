@@ -20,7 +20,7 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
         The *torch* backend uses the ADAM optimizer and backpropagation [2]_.
         It can executed on CPU, but also CUDA GPUs.
 
-        ..Note:
+        .. note::
             The *torch* backend requires the *pytorch* python package (see :ref:`extras_install`).
 
         Attributes:
