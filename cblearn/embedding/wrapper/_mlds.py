@@ -68,7 +68,7 @@ class MLDS(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
         random_state = check_random_state(self.random_state)
         self.seed_r(random_state)
 
-        triplets, answer = utils.check_triplet_answers(X, y, result_format='list-boolean')
+        triplets, answer = utils.check_query_response(X, y, result_format='list-boolean')
         triplets = triplets.astype(np.int32) + 1
         r_df = self.robjects.vectors.DataFrame({
             'resp': answer,

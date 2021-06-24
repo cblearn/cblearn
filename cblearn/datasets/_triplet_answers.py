@@ -71,7 +71,7 @@ def noisy_triplet_answers(triplets: utils.Questions, embedding: np.ndarray, resu
     noise_target = NoiseTarget(noise_target)
     distance = Distance(distance)
     result_format = utils.check_format(result_format, triplets, None)
-    triplets: np.ndarray = utils.check_triplet_questions(triplets, result_format=utils.QuestionFormat.LIST)
+    triplets: np.ndarray = utils.check_query(triplets, result_format=utils.QuestionFormat.LIST)
     embedding = check_array(embedding)
     if isinstance(noise, str):
         random_state = check_random_state(random_state)
@@ -95,7 +95,7 @@ def noisy_triplet_answers(triplets: utils.Questions, embedding: np.ndarray, resu
     if noise is not None and noise_target is NoiseTarget.DIFFERENCES:
         differences += noise_fun(size=differences.shape, **noise_options)
 
-    return utils.check_triplet_answers(triplets, answers=(differences < 0), result_format=result_format, sort_others=False)
+    return utils.check_query_response(triplets, response=(differences < 0), result_format=result_format, standard=False)
 
 
 def triplet_answers(triplets: utils.Questions, embedding: np.ndarray, result_format: Optional[str] = None,
@@ -107,8 +107,9 @@ def triplet_answers(triplets: utils.Questions, embedding: np.ndarray, result_for
     >>> triplets = [[1, 0, 2], [1, 2, 0]]
     >>> points = [[0], [4], [5]]
     >>> triplets, answers = triplet_answers(triplets, points, result_format='list-boolean')
-    >>> answers
-    array([False,  True])
+    >>> triplets, answers
+    (array([[1, 0, 2],
+           [1, 0, 2]], dtype=uint32), array([False, False]))
 
     To use alternative distance metrics, you can pass precomputed distances instead of an embedding.
 
@@ -116,7 +117,7 @@ def triplet_answers(triplets: utils.Questions, embedding: np.ndarray, result_for
     >>> distances = pairwise.manhattan_distances(points)
     >>> triplets, answers = triplet_answers(triplets, distances, result_format='list-boolean', distance='precomputed')
     >>> answers
-    array([False,  True])
+    array([False, False])
 
     Args:
         triplets: Numpy array or sparse matrix of triplet indices

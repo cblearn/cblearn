@@ -101,8 +101,9 @@ Wrapper
 
     utils.data_format
     utils.check_format
-    utils.check_triplet_questions
-    utils.check_triplet_answers
+    utils.check_query
+    utils.check_query_response
+    utils.check_response
     utils.check_size
 
 Pytorch

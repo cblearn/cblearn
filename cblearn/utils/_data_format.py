@@ -22,8 +22,8 @@ class AnswerFormat(enum.Enum):
 Format = Union[str, Tuple[QuestionFormat, AnswerFormat]]
 
 
-def check_format(format: Optional[Format], default_questions: Union[Questions, Answers], default_answers: Optional[np.ndarray]
-                 ) -> Tuple[QuestionFormat, AnswerFormat]:
+def check_format(format: Optional[Format], default_questions: Union[Questions, Answers],
+                 default_answers: Optional[np.ndarray]) -> Tuple[QuestionFormat, AnswerFormat]:
     """ Validate comparison format description.
 
     The format of comparison data is specified as a single string separated by '-', or a tuple of format identifiers.
@@ -40,42 +40,54 @@ def check_format(format: Optional[Format], default_questions: Union[Questions, A
         ValueError: Format identifier is unknown.
         IndexError: Less than 2 format components.
     """
-    if format:
+    if format is None:
+        return data_format(default_questions, default_answers)
+    else:
         if isinstance(format, str):
             format_parts = format.split('-')
             return QuestionFormat(format_parts[0]), AnswerFormat(format_parts[1])
         elif isinstance(format, tuple):
             return QuestionFormat(format[0]), AnswerFormat(format[1])
-    else:
-        return data_format(default_questions, default_answers)
+        else:
+            raise ValueError(f"Expects either format as string, enum-tuple or None; got {format}.")
 
 
-def data_format(questions: Union[Questions, Answers], answers: Optional[np.ndarray] = None
+def data_format(query: Union[Questions], response: Optional[np.ndarray] = None
                 ) -> Tuple[QuestionFormat, AnswerFormat]:
     """ Extract format of comparison data.
 
     Args:
-        questions: Comparison questions to extract format.
-        answers: Comparison answers to extract format.
+        query: Comparison questions to extract format.
+        response: Comparison answers to extract format.
     Returns:
         Tuple of format identifiers (question, answer)
     Raises:
         TypeError: Invalid type of data.
     """
-    if isinstance(questions, tuple) and answers is None:
-        questions, answers = questions
+    if isinstance(query, (scipy.sparse.spmatrix, sparse.SparseArray)):
+        query_format = QuestionFormat.TENSOR
+    elif isinstance(query, (Sequence, np.ndarray)):
+        query_format = QuestionFormat.LIST
+    elif query is None:
+        query_format = None
+    else:
+        raise ValueError(f"Expects query as sequence, array, or sparse array; got {query}")
 
-    if answers is None:
-        if isinstance(questions, (scipy.sparse.spmatrix, sparse.SparseArray)):
-            return QuestionFormat.TENSOR, AnswerFormat.COUNT
-        elif isinstance(questions, (Sequence, np.ndarray)):
-            return QuestionFormat.LIST, AnswerFormat.ORDER
-    elif isinstance(answers, (Sequence, np.ndarray)):
-        answer_type = np.asarray(answers).dtype
-        if answer_type == bool:
-            return QuestionFormat.LIST, AnswerFormat.BOOLEAN
-        elif np.issubdtype(answer_type, np.number):
-            return QuestionFormat.LIST, AnswerFormat.COUNT
+    if response is None:
+        if query_format is QuestionFormat.TENSOR:
+            response_dtype = query.dtype
+        elif query_format is QuestionFormat.LIST:
+            return query_format, AnswerFormat.ORDER
         else:
-            raise TypeError(f"Unknown question/answer format for answer.dtype=={answer_type}.")
-    raise TypeError(f"Unknown question/answer format for {type(questions)}/{type(answers)}.")
+            return query_format, None
+    elif isinstance(response, (Sequence, np.ndarray)):
+        response_dtype = np.asarray(response).dtype
+    else:
+        return query_format, None
+
+    if response_dtype == bool:
+        return query_format, AnswerFormat.BOOLEAN
+    elif np.issubdtype(response_dtype, np.number):
+        return query_format, AnswerFormat.COUNT
+    else:
+        raise ValueError(f"Expects response dtype bool or numeric, got {response_dtype}")
