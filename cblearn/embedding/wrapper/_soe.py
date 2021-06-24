@@ -25,8 +25,7 @@ class SOE(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
         >>> triplets.shape, np.unique(triplets).shape
         ((1000, 3), (15,))
         >>> estimator = SOE(verbose=False)
-        >>> embedding = estimator.fit_transform(triplets)  # doctest: +ELLIPSIS
-        -output from R-
+        >>> embedding = estimator.fit_transform(triplets)
         >>> embedding.shape
         (15, 2)
 
@@ -43,7 +42,7 @@ class SOE(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
             n_components:
                 The dimension of the embedding.
             n_init:
-                Number of times the BFGS algorithm will be run with different initializations.
+                Number of times the BFGS backend will be run with different initializations.
                 The final result will be the output of the run with the smallest final stress.
             margin:
                 Scale parameter which only takes strictly positive value.

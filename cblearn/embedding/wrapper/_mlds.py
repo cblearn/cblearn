@@ -30,8 +30,7 @@ class MLDS(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
     >>> triplets.shape, np.unique(triplets).shape
     ((400, 3), (15,))
     >>> estimator = MLDS()
-    >>> embedding = estimator.fit_transform(triplets)  # doctest: +ELLIPSIS
-    -output from R-
+    >>> embedding = estimator.fit_transform(triplets)
     >>> embedding.shape
     (15, 1)
 
