@@ -24,6 +24,7 @@ class MLDS(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
         embedding_: array-likeThe final embedding, shape (n_objects, 1)
         log_likelihood_: The final log-likelihood of the embedding.
 
+
     >>> from cblearn import datasets
     >>> import doctest; doctest.ELLIPSIS_MARKER = "-output from R-"
     >>> triplets = datasets.make_random_triplets(np.arange(15).reshape(-1, 1), size=400, result_format='list-order')
