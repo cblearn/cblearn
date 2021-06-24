@@ -35,4 +35,4 @@ class TripletEmbeddingMixin(TransformerMixin):
         """
         if y is None:
             y = X
-        return metrics.triplet_score(self.predict(X), y)
+        return metrics.query_accurary(self.predict(X), y)
