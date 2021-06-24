@@ -25,8 +25,9 @@ def torch_minimize_kernel(method, objective, init, **kwargs):
 
 
 def torch_minimize(method,
-                   objective: Callable, init: np.ndarray, data: Sequence, args: Sequence = [], device: str = 'auto',
-                   max_iter: int = 100, batch_size=50000, shuffle=True, **kwargs) -> 'scipy.optimize.OptimizeResult':
+                   objective: Callable, init: np.ndarray, data: Sequence, args: Sequence = [],
+                   seed: Optional[int] = None, device: str = 'auto', max_iter: int = 100,
+                   batch_size=50_000, shuffle=True, **kwargs) -> 'scipy.optimize.OptimizeResult':
     """ Pytorch minimization routine using L-BFGS.
 
         This function is aims to be a pytorch version of :func:`scipy.optimize.minimize`.
@@ -41,6 +42,8 @@ def torch_minimize(method,
                 Sequence of data arrays.
             args:
                 Sequence of additional arguments, passed to the objective.
+            seed:
+                Manual seed of randomness in data sampling. Use to preserve reproducability.
             device:
                 Device to run the minimization on, usually "cpu" or "cuda".
                 "auto" uses "cuda", if available.
@@ -63,8 +66,11 @@ def torch_minimize(method,
     data = [torch.tensor(d).to(device) for d in data]
     args = [torch.tensor(a).to(device) for a in args]
     factr = 1e7 * np.finfo(float).eps
+    g = torch.Generator()
+    if seed is not None:
+        g.manual_seed(seed)
     dataloader = torch.utils.data.DataLoader(torch.utils.data.TensorDataset(*data),
-                                             batch_size=batch_size, shuffle=shuffle)
+                                             batch_size=batch_size, shuffle=shuffle, generator=g)
 
     method = method.lower()
     optimizers = {
