@@ -3,7 +3,6 @@ from typing import Optional, Union
 from sklearn.base import BaseEstimator
 from sklearn.utils import check_random_state
 import numpy as np
-import scipy
 
 from cblearn import utils
 from cblearn.embedding._base import TripletEmbeddingMixin
@@ -11,16 +10,18 @@ from cblearn.embedding import _torch_utils
 
 
 class CKL(BaseEstimator, TripletEmbeddingMixin):
-    """ Crowd Kernel Learning (CKL).
+    """ Crowd Kernel Learning (CKL) embedding kernel for triplet data.
 
-        CKL [1]_ is minimizing the soft objective as a smooth relaxation of the triplet error.
+        CKL [1]_ searches for an Euclidean representation of objects.
+        The model is regularized through the rank of the embedding's kernel matrix.
 
-        This estimator supports multiple implementations which can be selected by the `algorithm` parameter.
-        The majorizing algorithm for SOE is described in the paper original paper [1]_.
+        This estimator supports multiple implementations which can be selected by the `backend` parameter.
 
-        An alternative implementation is using backpropagation, like descibed in [2]_.
-        This one can run not only on CPU, but also GPU with CUDA. For this, it depends
-        on the pytorch package (see :ref:`extras_install`).
+        The *torch* backend uses the ADAM optimizer and backpropagation [2]_.
+        It can executed on CPU, but also CUDA GPUs.
+
+        ..Note:
+            The *torch* backend requires the *pytorch* python package (see :ref:`extras_install`).
 
         Attributes:
             embedding_: Final embedding, shape (n_objects, n_components)
@@ -35,56 +36,57 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
         >>> triplets = datasets.make_random_triplets(true_embedding, result_format='list-order', size=1000)
         >>> triplets.shape, np.unique(triplets).shape
         ((1000, 3), (15,))
-        >>> estimator = CKL(n_components=2, kernel_matrix=True)
+        >>> estimator = CKL(n_components=2)
         >>> embedding = estimator.fit_transform(triplets)
         >>> embedding.shape
         (15, 2)
         >>> round(estimator.score(triplets), 1)
-        0.7
+        0.9
+        >>> estimator = CKL(n_components=2, kernel=True)
+        >>> embedding = estimator.fit_transform(triplets)
+        >>> embedding.shape
+        (15, 2)
 
 
         References
         ----------
-        .. [1] Tamuz, O., & Liu, lambd., & Belognie, S., & Shamir, O., & Kalai, A.T. (2011). Adaptively Learning the Crowd Kernel.
-               International Conference on Machine Learning.
+        .. [1] Tamuz, O., & Liu, mu., & Belognie, S., & Shamir, O., & Kalai, A.T. (2011).
+               Adaptively Learning the Crowd Kernel. International Conference on Machine Learning.
         .. [2] Vankadara, L. et al. (2019) Insights into Ordinal Embedding Algorithms: A Systematic Evaluation
                Arxiv Preprint, https://arxiv.org/abs/1912.01666
         """
 
-    def __init__(self, n_components=2, max_iter=2000, lambd=0.0, learning_rate=None, batch_size=50000,
-                 kernel_matrix: bool = False, verbose=False,
-                 random_state: Union[None, int, np.random.RandomState] = None,
-                 algorithm: str = 'SGD', device: str = "auto"):
+    def __init__(self, n_components=2, mu=0.0, verbose=False,
+                 random_state: Union[None, int, np.random.RandomState] = None, max_iter=2000,
+                 backend: str = 'torch', kernel: bool = False, learning_rate=None, batch_size=50000,
+                 device: str = "auto"):
         """ Initialize the estimator.
 
         Args:
-            n_components :
-                The dimension of the embedding.
-            max_iter:
-                Maximum number of optimization iterations.
-            lambd:
-                Regularization parameter
-            kernel_matrix:
-                If True, we optimize over the kernel matrix. Otherwise, we optimize over the embedding directly.
-            verbose: boolean, default=False
-                Enable verbose output.
-            random_state:
-                The seed of the pseudo random number generator used to initialize the optimization.
-            algorithm:
-                The algorithm used to optimize the soft objective. {"SGD"}
+            n_components: The dimension of the embedding.
+            mu: Regularization parameter >= 0. Increased mu serves as increasing a margin constraint.
+            verbose: Enable verbose output.
+            random_state: The seed of the pseudo random number generator used to initialize the optimization.
+            max_iter: Maximum number of optimization iterations.
+            backend: The optimization backend for fitting. {"torch"}
+            kernel: Whether to optimize the kernel or the embedding (default).
+            learning_rate: Learning rate of the gradient-based optimizer.
+                           If None, then 100 is used, or 1 if kernel=True.
+                           Only used with *torch* backend, else ignored.
+            batch_size: Batch size of stochastic optimization. Only used with the *torch* backend, else ignored.
             device: The device on which pytorch computes. {"auto", "cpu", "cuda"}
                 "auto" chooses cuda (GPU) if available, but falls back on cpu if not.
-                This parameter is only used if "backprop" algorithm is used.
+                Only used with the *torch* backend, else ignored.
         """
         self.n_components = n_components
         self.max_iter = max_iter
-        self.lambd = lambd
+        self.mu = mu
         self.learning_rate = learning_rate
         self.batch_size = batch_size
-        self.kernel_matrix = kernel_matrix
+        self.kernel = kernel
         self.verbose = verbose
         self.random_state = random_state
-        self.algorithm = algorithm
+        self.backend = backend
         self.device = device
 
     def fit(self, X: utils.Questions, y: np.ndarray = None, init: np.ndarray = None,
@@ -101,22 +103,25 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
         triplets = utils.check_triplet_answers(X, y, result_format='list-order')
         if not n_objects:
             n_objects = len(np.unique(triplets))
+        random_state = check_random_state(self.random_state)
         if init is None:
-            random_state = check_random_state(self.random_state)
-            init = random_state.multivariate_normal(np.zeros(self.n_components), np.eye(self.n_components),
-                                                    size=n_objects)
+            init = random_state.multivariate_normal(
+                np.zeros(self.n_components), np.eye(self.n_components), size=n_objects)
 
-        if self.algorithm == "SGD" and self.kernel_matrix:
-            _torch_utils.assert_torch_is_available()
-            result = _torch_utils.torch_minimize_kernel('adam', _ckl_kernel_loss_torch, init, data=[triplets.astype(int)], args=(self.lambd,),
-                                                        device=self.device, max_iter=self.max_iter, batch_size=self.batch_size, lr=self.learning_rate or 100)
-        elif self.algorithm == "SGD" and not self.kernel_matrix:
-            _torch_utils.assert_torch_is_available()
-            result = _torch_utils.torch_minimize('adam',
-                                                 _ckl_x_loss_torch, init, data=(triplets.astype(int),), args=(self.lambd,),
-                                                 device=self.device, max_iter=self.max_iter, lr=self.learning_rate or 1)
+        if self.backend != 'torch':
+            raise ValueError(f"Invalid backend '{self.backend}'")
+
+        _torch_utils.assert_torch_is_available()
+        if self.kernel:
+            result = _torch_utils.torch_minimize_kernel(
+                'adam', _ckl_kernel_loss_torch, init, data=[triplets.astype(int)], args=(self.mu,),
+                device=self.device, max_iter=self.max_iter, batch_size=self.batch_size, lr=self.learning_rate or 100,
+                seed=random_state.randint(1))
         else:
-            raise ValueError(f"Unknown CKL algorithm '{self.algorithm}'. Try 'SGD' instead.")
+            result = _torch_utils.torch_minimize(
+                'adam', _ckl_x_loss_torch, init, data=(triplets.astype(int),), args=(self.mu,),
+                device=self.device, max_iter=self.max_iter, lr=self.learning_rate or 1,
+                seed=random_state.randint(1))
 
         if self.verbose and not result.success:
             print(f"CKL's optimization failed with reason: {result.message}.")
@@ -128,8 +133,8 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
 def _ckl_x_loss_torch(embedding, triplets, mu):
     X = embedding[triplets]
     x_i, x_j, x_k = X[:, 0, :], X[:, 1, :], X[:, 2, :]
-    nominator = (x_i - x_k).norm(p=2, dim=1)**2 + mu
-    denominator = (x_i - x_j).norm(p=2, dim=1)**2 + (x_i - x_k).norm(p=2, dim=1)**2 + 2*mu
+    nominator = (x_i - x_k).norm(p=2, dim=1) ** 2 + mu
+    denominator = (x_i - x_j).norm(p=2, dim=1) ** 2 + (x_i - x_k).norm(p=2, dim=1) ** 2 + 2 * mu
     return -1 * (nominator.log() - denominator.log()).sum()
 
 
