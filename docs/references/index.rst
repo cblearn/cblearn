@@ -85,9 +85,10 @@ Wrapper
 .. autosummary::
     :toctree: generated/
 
-    metrics.triplet_error
+    metrics.query_accuracy
+    metrics.query_error
     metrics.procrustes_distance
-    metrics.TripletScorer
+    metrics.QueryScorer
 
 :mod:`cblearn.utils` Utility
 ============================

@@ -13,7 +13,11 @@ class DummyOrdinalEmbedding():
         return self.embedding
 
     def predict(self, triplets):
-        return datasets.triplet_answers(triplets, self.embedding)
+        result = datasets.triplet_answers(triplets, self.embedding)
+        if isinstance(result, tuple):
+            return result[1]
+        else:
+            return result
 
 
 @pytest.mark.parametrize("format", ['list-order', 'list-count', 'list-boolean', 'tensor-count'])
@@ -21,22 +25,28 @@ def test_triplet_error(format):
     triplets = datasets.make_random_triplet_indices(10)
     embedding = np.random.random((10, 2))
     triplets, bool_answers = datasets.triplet_answers(triplets, embedding, result_format='list-boolean')
+    order_triplets = datasets.triplet_answers(triplets, embedding, result_format='list-order')
 
     test_answers = datasets.triplet_answers(triplets, embedding, result_format=format)
-    assert metrics.triplet_error(test_answers, bool_answers) == 0
-    assert metrics.triplet_error(test_answers, ~bool_answers) == 1
-    assert metrics.triplet_error(test_answers, embedding) == 0
-    assert metrics.triplet_error(test_answers, test_answers) == 0
-    assert metrics.triplet_error(test_answers, np.random.permutation(bool_answers)) > 0
 
     if isinstance(test_answers, tuple):
         test_triplets, test_answers = test_answers
-        assert metrics.triplet_error(test_answers, bool_answers) == 0
-        assert metrics.triplet_error((test_triplets, np.random.permutation(test_answers)), embedding) > 0
+        assert metrics.query_error(test_answers, bool_answers) == 0
+        assert metrics.query_error(test_answers, ~bool_answers) == 1
+        assert metrics.query_error(test_answers, np.random.permutation(bool_answers)) > 0
+        assert metrics.query_error(np.random.permutation(test_answers), bool_answers) > 0
 
         with pytest.raises(ValueError):
-            metrics.triplet_error((test_triplets, test_answers), (test_triplets + 1, test_answers))
+            metrics.query_error((test_triplets, test_answers), (test_triplets + 1, test_answers))
+        with pytest.raises(ValueError):
+            metrics.query_error((test_triplets, test_answers), bool_answers)
+    else:
+        assert metrics.query_error(test_answers, test_answers) == 0
+        assert metrics.query_error(test_answers, order_triplets) == 0
+        assert metrics.query_error(test_answers, embedding) == 0
 
+        with pytest.raises(ValueError):
+            metrics.query_error(test_answers, bool_answers) == 1
 
 
 def test_triplet_scorer():
@@ -45,5 +55,5 @@ def test_triplet_scorer():
     triplets, answers = datasets.triplet_answers(triplets, embedding, result_format='list-boolean')
 
     estimator = DummyOrdinalEmbedding(embedding)
-    assert metrics.TripletScorer(estimator, triplets, (triplets, answers)) == 1
-    assert metrics.TripletScorer(estimator, triplets, (triplets, ~answers)) == 0
+    assert metrics.QueryScorer(estimator, triplets, answers) == 1
+    assert metrics.QueryScorer(estimator, triplets, ~answers) == 0
