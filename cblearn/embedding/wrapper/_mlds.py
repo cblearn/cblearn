@@ -35,6 +35,7 @@ class MLDS(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
     >>> estimator.embedding_.shape
     (15, 1)
 
+
     References
     ----------
     .. [1] M Knoblauch, K., & Maloney, L. T. (2012). Modeling Psychophysical Data in R.

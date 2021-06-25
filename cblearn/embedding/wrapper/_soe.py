@@ -18,7 +18,7 @@ class SOE(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
             embedding_: Final embedding, shape (n_objects, n_components)
             stress_: Final value of the SOE stress corresponding to the embedding.
 
-        Examples:
+
         >>> from cblearn import datasets
         >>> import doctest; doctest.ELLIPSIS_MARKER = "-output from R-"
         >>> triplets = datasets.make_random_triplets(np.random.rand(15, 2), result_format='list-order', size=1000)
@@ -28,6 +28,7 @@ class SOE(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
         -output from R-
         >>> estimator.embedding_.shape
         (15, 2)
+
 
         References
         ----------
