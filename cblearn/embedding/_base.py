@@ -21,9 +21,13 @@ class TripletEmbeddingMixin(TransformerMixin):
         check_is_fitted(self, 'embedding_')
         return self.embedding_
 
-    def predict(self, X: utils.Questions) -> np.ndarray:
+    def predict(self, X: utils.Query, result_format: Optional[utils.Format] = None) -> np.ndarray:
         check_is_fitted(self, 'embedding_')
-        return datasets.triplet_answers(X, self.embedding_)
+        result = datasets.triplet_response(X, self.embedding_, result_format=result_format)
+        if isinstance(result, tuple):
+            return result[1]
+        else:
+            return result
 
     def score(self, X: utils.Query, y: Optional[np.ndarray] = None) -> float:
         """ Triplet score on the estimated embedding.
