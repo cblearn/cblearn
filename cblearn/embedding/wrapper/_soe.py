@@ -61,7 +61,7 @@ class SOE(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
         self.verbose = verbose
         self.random_state = random_state
 
-    def fit(self, X: utils.Questions, y: np.ndarray = None, init: np.ndarray = None,
+    def fit(self, X: utils.Query, y: np.ndarray = None, init: np.ndarray = None,
             n_objects: Optional[int] = None) -> 'SOE':
         """Computes the embedding.
 

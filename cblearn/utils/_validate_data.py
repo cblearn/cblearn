@@ -6,8 +6,8 @@ import sparse
 from sklearn.utils import check_X_y, check_array
 
 from ._data_format import data_format, check_format
-from ._data_format import QuestionFormat, AnswerFormat, Format
-from ._typing import Questions
+from ._data_format import QueryFormat, ResponseFormat, Format
+from ._typing import Query
 
 
 def _check_list_query_response(query, response):
@@ -57,16 +57,16 @@ def _standardize_list_query(query):
 
 def check_bool_list_query_response(query, response, standard: bool = True):
     query, response = _check_list_query_response(query, response)
-    __, input_answer_format = data_format(query, response)
+    __, input_response_format = data_format(query, response)
 
-    if input_answer_format is AnswerFormat.BOOLEAN:
+    if input_response_format is ResponseFormat.BOOLEAN:
         bool_response = response
-    elif input_answer_format is AnswerFormat.COUNT:
+    elif input_response_format is ResponseFormat.COUNT:
         if np.any(response == 0):
             raise ValueError("Undecided responses (0) cannot be represented as order or bool.")
         query, response = _unroll_responses(query, response)
         bool_response = ((response + 1) / 2).astype(bool)
-    elif input_answer_format is AnswerFormat.ORDER:
+    elif input_response_format is ResponseFormat.ORDER:
         bool_response = np.full((query.shape[0],), True)
 
     if standard:
@@ -77,13 +77,13 @@ def check_bool_list_query_response(query, response, standard: bool = True):
 
 
 def check_count_list_query_response(query, response, standard: bool = True):
-    __, input_answer_format = data_format(query, response)
+    __, input_response_format = data_format(query, response)
     query, response = _check_list_query_response(query, response)
-    if input_answer_format is AnswerFormat.COUNT:
+    if input_response_format is ResponseFormat.COUNT:
         query, count_response = _unroll_responses(query, response)
-    if input_answer_format is AnswerFormat.BOOLEAN:
+    if input_response_format is ResponseFormat.BOOLEAN:
         count_response = response.astype(int) * 2 - 1
-    elif input_answer_format is AnswerFormat.ORDER:
+    elif input_response_format is ResponseFormat.ORDER:
         count_response = np.full((query.shape[0],), 1)
 
     if standard:
@@ -94,17 +94,17 @@ def check_count_list_query_response(query, response, standard: bool = True):
 
 def check_order_list_query_response(query, response):
     query, response = _check_list_query_response(query, response)
-    __, input_answer_format = data_format(query, response)
+    __, input_response_format = data_format(query, response)
 
-    if input_answer_format is AnswerFormat.COUNT:
+    if input_response_format is ResponseFormat.COUNT:
         if np.any(response == 0):
             raise ValueError("Undecided responses (0) cannot be represented as order or bool.")
         query, response = _unroll_responses(query, response)
         filter = response == 1
-    elif input_answer_format is AnswerFormat.BOOLEAN:
+    elif input_response_format is ResponseFormat.BOOLEAN:
         filter = response
 
-    if input_answer_format is not AnswerFormat.ORDER:
+    if input_response_format is not ResponseFormat.ORDER:
         if query.shape[1] == 3:
             return np.where(np.c_[filter, filter, filter], query, query[:, [0, 2, 1]])
         elif query.shape[1] == 4:
@@ -124,18 +124,18 @@ def check_list_query_response(query: np.ndarray,
         See documentation of check_triplets.
     """
     if isinstance(result_format, str) and '-' not in result_format:
-        result_format = QuestionFormat.LIST.value + '-' + result_format
-    if isinstance(result_format, AnswerFormat):
-        result_format = (QuestionFormat.LIST, result_format)
+        result_format = QueryFormat.LIST.value + '-' + result_format
+    if isinstance(result_format, ResponseFormat):
+        result_format = (QueryFormat.LIST, result_format)
     query_format, response_format = check_format(result_format, query, None)
-    if query_format is not QuestionFormat.LIST:
+    if query_format is not QueryFormat.LIST:
         raise ValueError(f"Expects result_format list-..., got {result_format}.")
 
-    if response_format is AnswerFormat.ORDER:
+    if response_format is ResponseFormat.ORDER:
         return check_order_list_query_response(query, response)
-    elif response_format is AnswerFormat.BOOLEAN:
+    elif response_format is ResponseFormat.BOOLEAN:
         return check_bool_list_query_response(query, response, standard=standard)
-    elif response_format is AnswerFormat.COUNT:
+    elif response_format is ResponseFormat.COUNT:
         return check_count_list_query_response(query, response, standard=standard)
     else:
         raise ValueError(f"Response format {response_format.value} not supported.")
@@ -148,11 +148,11 @@ def check_tensor_query_response(query: Union[sparse.COO, scipy.sparse.spmatrix],
         See documentation of check_triplets.
     """
     if isinstance(result_format, str) and '-' not in result_format:
-        result_format = QuestionFormat.TENSOR.value + '-' + result_format
-    if isinstance(result_format, AnswerFormat):
-        result_format = (QuestionFormat.TENSOR, result_format)
+        result_format = QueryFormat.TENSOR.value + '-' + result_format
+    if isinstance(result_format, ResponseFormat):
+        result_format = (QueryFormat.TENSOR, result_format)
     format = check_format(result_format, query, None)
-    if format[0] is not QuestionFormat.TENSOR or format[1] is not AnswerFormat.COUNT:
+    if format[0] is not QueryFormat.TENSOR or format[1] is not ResponseFormat.COUNT:
         raise ValueError(f"Expects result_format tensor-count, got {result_format}.")
 
     if isinstance(query, scipy.sparse.spmatrix):
@@ -183,7 +183,7 @@ def check_response(response: np.ndarray, result_format: Optional[Format] = None)
     Checks response shape and datatype. Converts between count and boolean.
 
     Args:
-        response: Either array_like with index-questions or sparse matrix.
+        response: Either array_like with index-query or sparse matrix.
         result_format: One of 'boolean', or 'count'. If none, format is not changed.
 
     Returns:
@@ -191,64 +191,64 @@ def check_response(response: np.ndarray, result_format: Optional[Format] = None)
     """
     if isinstance(result_format, str) and '-' not in result_format:
         result_format = 'list-' + result_format
-    if isinstance(result_format, AnswerFormat):
-        result_format = (QuestionFormat.LIST, result_format)
+    if isinstance(result_format, ResponseFormat):
+        result_format = (QueryFormat.LIST, result_format)
     result_format = check_format(result_format, [], response)
-    if result_format[0] is not QuestionFormat.LIST or result_format[1] is AnswerFormat.ORDER:
+    if result_format[0] is not QueryFormat.LIST or result_format[1] is ResponseFormat.ORDER:
         raise ValueError(f"Expects result format list-boolean or list-count, got {result_format}.")
 
     dummy_query = np.empty_like(response).reshape(-1, 1)
     return check_list_query_response(dummy_query, response, standard=False, result_format=(result_format))[1]
 
 
-def check_query(query: Questions, result_format: Optional[Format] = None) -> Questions:
+def check_query(query: Query, result_format: Optional[Format] = None) -> Query:
     """ Input validation for queries.
 
     Checks query shape and datatype.
-    Converts between array (T-STE style) and sparse matrix format for questions.
+    Converts between array (T-STE style) and sparse matrix format for query.
 
     Args:
-        query: Either array_like with index-questions or sparse matrix.
+        query: Either array_like with index-query or sparse matrix.
         result_format: One of 'list', or 'tensor'. If none, format is not changed.
 
     Returns:
-        If answer_format='tensor', a three-dimensional sparse.COO matrix is returned.
+        If response_format='tensor', a three-dimensional sparse.COO matrix is returned.
         The three dimensions all have size 'n_objects'.
-        The entry questions[i, j, k] indicates the answer on ij <= jk.
+        The entry query[i, j, k] indicates the response on ij <= jk.
         It is -1 if wrong, 0 if undecidable, and 1 if correct.
 
-        If answer_format='list',
+        If response_format='list',
         a numpy array of shape (n_samples, 3) is returned.
         Each row (i, j, k) indicates, ij <= ik.
 
     Raises:
-        ValueError: If the array_like input has the wrong shape, or answer types cannot be converted.
-                    This happens e.g. if undecided (0) answers, should be converted to ordered or boolean answers.
+        ValueError: If the array_like input has the wrong shape, or response types cannot be converted.
+                    This happens e.g. if undecided (0) response, should be converted to ordered or boolean response.
     """
     if isinstance(result_format, str) and '-' not in result_format:
         result_format = result_format + '-count'
-    if isinstance(result_format, QuestionFormat):
-        result_format = (result_format, AnswerFormat.COUNT)
-    result_format = check_format(result_format, query, None)[0], AnswerFormat.COUNT
+    if isinstance(result_format, QueryFormat):
+        result_format = (result_format, ResponseFormat.COUNT)
+    result_format = check_format(result_format, query, None)[0], ResponseFormat.COUNT
     query = check_query_response(query, None, standard=True, result_format=result_format)
-    if result_format[0] is QuestionFormat.TENSOR:
+    if result_format[0] is QueryFormat.TENSOR:
         return sparse.elemwise(np.abs, query)
     else:
         return query[0]
 
 
-def check_query_response(query: Union[Questions], response: Optional[np.ndarray] = None,
+def check_query_response(query: Union[Query], response: Optional[np.ndarray] = None,
                          result_format: Optional[Format] = None, standard: bool = True) \
         -> Union[Tuple[np.ndarray, np.ndarray], np.ndarray]:
     """ Input validation for query formats.
 
-    Checks questions and answers for shape and datatype.
-    Converts between list (T-STE style) and tensor (sparse matrix) format for questions.
-    For query list, also converts between different ordered, boolean or count responses.
+    Checks query-response pair for shape and datatype.
+    Converts query from/to list (T-STE style) and tensor (sparse matrix) format.
+    For query list, converts from/to different ordered, boolean or count responses.
 
     Args:
-        query: Either array_like with index-questions or sparse matrix.
-        response: Optional answers per index-triplet.
+        query: Either array_like with index-query or sparse matrix.
+        response: Optional response per index-triplet.
         result_format: Format of result
         standard: If true, then assures that for every triplet (i, j, k): j < k
                      This is ignored for format='list-order'.
@@ -256,7 +256,7 @@ def check_query_response(query: Union[Questions], response: Optional[np.ndarray]
     Returns:
         If format='tensor-count', a three-dimensional sparse.COO matrix is returned.
         The three dimensions all have size 'n_objects'.
-        The entry questions[i, j, k] indicates the answer on ij <= jk.
+        The entry query[i, j, k] indicates the response on ij <= jk.
         It is -1 if wrong, 0 if undecidable, and 1 if correct.
 
         If format='list-order',
@@ -265,29 +265,29 @@ def check_query_response(query: Union[Questions], response: Optional[np.ndarray]
 
         If format='list-count', two numpy arrays are of shape (n_samples, 3)
         and n_samples are returned.
-        The first array contains index-questions (i, j, k).
-        The second array elements represent the answer as described above for format='tensor-count'.
+        The first array contains index-query (i, j, k).
+        The second array elements represent the response as described above for format='tensor-count'.
 
-        If answer_format='list-boolean', same as for answer_format='list-count'.
-        The answers are True/False instead of 1/-1.
+        If response_format='list-boolean', same as for response_format='list-count'.
+        The responses are True/False instead of 1/-1.
 
     Raises:
-        ValueError: If the array_like input has the wrong shape, or answer types cannot be converted.
-                    This happens e.g. if undecided (0) answers, should be converted to ordered or boolean answers.
+        ValueError: If the array_like input has the wrong shape, or response format cannot be converted.
+                    This happens e.g. if undecided (0) responses, should be converted to ordered or boolean responses.
     """
-    input_question_format, input_answer_format = data_format(query, response)
-    output_question_format, output_answer_format = check_format(result_format, query, response)
+    input_query_format, input_response_format = data_format(query, response)
+    output_query_format, output_response_format = check_format(result_format, query, response)
 
-    if output_question_format is QuestionFormat.TENSOR:
-        if input_question_format is QuestionFormat.LIST:
-            query, response = check_list_query_response(query, response, (QuestionFormat.LIST, output_answer_format),
+    if output_query_format is QueryFormat.TENSOR:
+        if input_query_format is QueryFormat.LIST:
+            query, response = check_list_query_response(query, response, (QueryFormat.LIST, output_response_format),
                                                         standard=False)
             shape = query.shape[1] * (int(query.max() + 1),)
             query = sparse.COO(query.T, response, shape=shape)
-        return check_tensor_query_response(query, (output_question_format, output_answer_format), standard=standard)
-    elif output_question_format is QuestionFormat.LIST:
-        if input_question_format is QuestionFormat.TENSOR:
-            query = check_tensor_query_response(query, (QuestionFormat.TENSOR, input_answer_format), standard=False)
+        return check_tensor_query_response(query, (output_query_format, output_response_format), standard=standard)
+    elif output_query_format is QueryFormat.LIST:
+        if input_query_format is QueryFormat.TENSOR:
+            query = check_tensor_query_response(query, (QueryFormat.TENSOR, input_response_format), standard=False)
             query, response = query.coords.T, query.data
-        return check_list_query_response(query, response, (output_question_format, output_answer_format),
+        return check_list_query_response(query, response, (output_query_format, output_response_format),
                                          standard=standard)

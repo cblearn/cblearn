@@ -46,8 +46,8 @@ Low-level Dataset Utility
 
     datasets.make_all_triplet_indices
     datasets.make_random_triplet_indices
-    datasets.triplet_answers
-    datasets.noisy_triplet_answers
+    datasets.triplet_response
+    datasets.noisy_triplet_response
 
 
 :mod:`cblearn.embedding` Embedding

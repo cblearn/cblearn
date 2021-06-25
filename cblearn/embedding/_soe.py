@@ -91,7 +91,7 @@ class SOE(BaseEstimator, TripletEmbeddingMixin):
         self.algorithm = algorithm
         self.device = device
 
-    def fit(self, X: utils.Questions, y: np.ndarray = None, init: np.ndarray = None,
+    def fit(self, X: utils.Query, y: np.ndarray = None, init: np.ndarray = None,
             n_objects: Optional[int] = None) -> 'SOE':
         """Computes the embedding.
 

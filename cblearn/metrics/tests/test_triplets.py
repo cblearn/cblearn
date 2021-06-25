@@ -13,7 +13,7 @@ class DummyOrdinalEmbedding():
         return self.embedding
 
     def predict(self, triplets):
-        result = datasets.triplet_answers(triplets, self.embedding)
+        result = datasets.triplet_response(triplets, self.embedding)
         if isinstance(result, tuple):
             return result[1]
         else:
@@ -24,10 +24,10 @@ class DummyOrdinalEmbedding():
 def test_triplet_error(format):
     triplets = datasets.make_random_triplet_indices(10)
     embedding = np.random.random((10, 2))
-    triplets, bool_answers = datasets.triplet_answers(triplets, embedding, result_format='list-boolean')
-    order_triplets = datasets.triplet_answers(triplets, embedding, result_format='list-order')
+    triplets, bool_answers = datasets.triplet_response(triplets, embedding, result_format='list-boolean')
+    order_triplets = datasets.triplet_response(triplets, embedding, result_format='list-order')
 
-    test_answers = datasets.triplet_answers(triplets, embedding, result_format=format)
+    test_answers = datasets.triplet_response(triplets, embedding, result_format=format)
 
     if isinstance(test_answers, tuple):
         test_triplets, test_answers = test_answers
@@ -52,7 +52,7 @@ def test_triplet_error(format):
 def test_triplet_scorer():
     triplets = datasets.make_random_triplet_indices(10)
     embedding = np.random.random((10, 2))
-    triplets, answers = datasets.triplet_answers(triplets, embedding, result_format='list-boolean')
+    triplets, answers = datasets.triplet_response(triplets, embedding, result_format='list-boolean')
 
     estimator = DummyOrdinalEmbedding(embedding)
     assert metrics.QueryScorer(estimator, triplets, answers) == 1

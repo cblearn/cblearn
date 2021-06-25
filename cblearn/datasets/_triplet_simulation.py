@@ -9,7 +9,7 @@ from typing import Union
 
 from ._triplet_indices import make_all_triplet_indices
 from ._triplet_indices import make_random_triplet_indices
-from ._triplet_answers import noisy_triplet_answers
+from ._triplet_response import noisy_triplet_response
 from .. import utils
 
 
@@ -25,13 +25,13 @@ def make_all_triplets(embedding: np.ndarray, result_format: str, monotonic: bool
             The triplets and answers, based on format. See :func:`cblearn.utils.check_triplets`.
     """
     triplets = make_all_triplet_indices(len(embedding), monotonic)
-    return noisy_triplet_answers(triplets, embedding, result_format=result_format, **kwargs)
+    return noisy_triplet_response(triplets, embedding, result_format=result_format, **kwargs)
 
 
 def make_random_triplets(embedding: np.ndarray, result_format: str, size: Union[int, float] = 1.,
                          random_state: Union[None, int, np.random.RandomState] = None,
                          repeat: bool = True, monotonic: bool = False, make_all: int = 10000, **kwargs
-                         ) -> utils.Questions:
+                         ) -> utils.Query:
     """ Make random triplets with answers for the provided embedding or distances.
 
         >>> triplets, answers = make_random_triplets(np.random.rand(12, 2), size=1000, result_format='list-boolean')
@@ -54,4 +54,4 @@ def make_random_triplets(embedding: np.ndarray, result_format: str, size: Union[
             The triplets and answers, based on format. See :func:`cblearn.utils.check_triplets`.
     """
     triplets = make_random_triplet_indices(len(embedding), size, random_state, repeat, monotonic, make_all)
-    return noisy_triplet_answers(triplets, embedding, result_format=result_format, random_state=random_state, **kwargs)
+    return noisy_triplet_response(triplets, embedding, result_format=result_format, random_state=random_state, **kwargs)

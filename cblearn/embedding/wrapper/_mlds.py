@@ -54,7 +54,7 @@ class MLDS(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
         self.random_state = random_state
         self.method = method
 
-    def fit(self, X: utils.Questions, y: np.ndarray = None) -> 'MLDS':
+    def fit(self, X: utils.Query, y: np.ndarray = None) -> 'MLDS':
         """Computes the embedding.
 
         Args:
