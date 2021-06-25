@@ -47,7 +47,7 @@ class GNMDS(BaseEstimator, TripletEmbeddingMixin):
         >>> embedding.shape
         (15, 2)
         >>> round(estimator.score(triplets), 1)
-        0.9
+        0.8
 
         References
         ----------
