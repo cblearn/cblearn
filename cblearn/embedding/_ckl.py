@@ -52,8 +52,8 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
         ----------
         .. [1] Tamuz, O., & Liu, mu., & Belognie, S., & Shamir, O., & Kalai, A.T. (2011).
                Adaptively Learning the Crowd Kernel. International Conference on Machine Learning.
-        .. [2] Vankadara, L. et al. (2019) Insights into Ordinal Embedding Algorithms: A Systematic Evaluation
-               Arxiv Preprint, https://arxiv.org/abs/1912.01666
+        .. [2] Vankadara, L. C., Haghiri, S., Lohaus, M., Wahab, F. U., & von Luxburg, U. (2020).
+               Insights into Ordinal Embedding Algorithms: A Systematic Evaluation. ArXiv:1912.01666 [Cs, Stat].
         """
 
     def __init__(self, n_components=2, mu=0.0, verbose=False,
@@ -131,7 +131,7 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
 
 
 def _ckl_x_loss_torch(embedding, triplets, mu):
-    X = embedding[triplets]
+    X = embedding[triplets.long()]
     x_i, x_j, x_k = X[:, 0, :], X[:, 1, :], X[:, 2, :]
     nominator = (x_i - x_k).norm(p=2, dim=1) ** 2 + mu
     denominator = (x_i - x_j).norm(p=2, dim=1) ** 2 + (x_i - x_k).norm(p=2, dim=1) ** 2 + 2 * mu
@@ -139,6 +139,7 @@ def _ckl_x_loss_torch(embedding, triplets, mu):
 
 
 def _ckl_kernel_loss_torch(kernel_matrix, triplets, mu):
+    triplets = triplets.long()
     diag = kernel_matrix.diag()[:, None]
     dist = -2 * kernel_matrix + diag + diag.transpose(0, 1)
     d_ij = dist[triplets[:, 0], triplets[:, 1]].squeeze()

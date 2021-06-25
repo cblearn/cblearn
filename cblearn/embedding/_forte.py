@@ -48,8 +48,8 @@ class FORTE(BaseEstimator, TripletEmbeddingMixin):
         ----------
         .. [1] Jain, L., Jamieson, K. G., & Nowak, R. (2016). Finite Sample Prediction and
                Recovery Bounds for Ordinal Embedding. Advances in Neural Information Processing Systems, 29.
-        .. [2] Vankadara, L. et al. (2019) Insights into Ordinal Embedding Algorithms: A Systematic Evaluation
-               Arxiv Preprint, https://arxiv.org/abs/1912.01666
+        .. [2] Vankadara, L. C., Haghiri, S., Lohaus, M., Wahab, F. U., & von Luxburg, U. (2020).
+               Insights into Ordinal Embedding Algorithms: A Systematic Evaluation. ArXiv:1912.01666 [Cs, Stat].
         """
 
     def __init__(self, n_components=2, verbose=False, random_state: Union[None, int, np.random.RandomState] = None,
@@ -109,6 +109,7 @@ class FORTE(BaseEstimator, TripletEmbeddingMixin):
 
 
 def _torch_forte_loss(kernel_matrix, triplets):
+    triplets = triplets.long()
     diag = kernel_matrix.diag()[:, None]
     dist = -2 * kernel_matrix + diag + diag.transpose(0, 1)
     d_ij = dist[triplets[:, 0], triplets[:, 1]].squeeze()

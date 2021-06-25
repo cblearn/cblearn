@@ -53,8 +53,8 @@ class GNMDS(BaseEstimator, TripletEmbeddingMixin):
         ----------
         .. [1] Agarwal, S., Wills, J., Cayton, L., Lanckriet, G., Kriegman, D., & Belongie, S. (2007).
                Generalized non-metric multidimensional scaling. Artificial Intelligence and Statistics, 11–18.
-        .. [2] Vankadara, L. et al. (2019) Insights into Ordinal Embedding Algorithms: A Systematic Evaluation
-               Arxiv Preprint, https://arxiv.org/abs/1912.01666
+        .. [2] Vankadara, L. C., Haghiri, S., Lohaus, M., Wahab, F. U., & von Luxburg, U. (2020).
+               Insights into Ordinal Embedding Algorithms: A Systematic Evaluation. ArXiv:1912.01666 [Cs, Stat].
         """
 
     def __init__(self, n_components=2, lambd=0.0, verbose=False,
@@ -130,6 +130,7 @@ class GNMDS(BaseEstimator, TripletEmbeddingMixin):
 
 
 def _gnmds_kernel_loss_torch(kernel_matrix, triplets, lambd):
+    triplets = triplets.long()
     diag = kernel_matrix.diag()[:, None]
     dist = -2 * kernel_matrix + diag + diag.transpose(0, 1)
     d_ij = dist[triplets[:, 0], triplets[:, 1]].squeeze()

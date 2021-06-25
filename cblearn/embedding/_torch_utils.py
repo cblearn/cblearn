@@ -12,7 +12,7 @@ def torch_minimize_kernel(method, objective, init, **kwargs):
 
     def kernel_objective(K, *args, **kwargs):
         with torch.no_grad():
-            D, U = K.symeig(eigenvectors=True)
+            D, U = torch.linalg.eigh(K)
             D = D[-dim:].clamp(min=0)
             K[:] = U[:, -dim:].mm(D.diag()).mm(U[:, -dim:].transpose(0, 1))
         return objective(K, *args, **kwargs)

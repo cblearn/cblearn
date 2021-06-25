@@ -57,8 +57,8 @@ class SOE(BaseEstimator, TripletEmbeddingMixin):
         ----------
         .. [1] Terada, Y., & Luxburg, U. (2014). Local ordinal embedding.
                International Conference on Machine Learning, 847–855.
-        .. [2] Vankadara, L. et al. (2019) Insights into Ordinal Embedding Algorithms: A Systematic Evaluation
-               Arxiv Preprint, https://arxiv.org/abs/1912.01666.
+        .. [2] Vankadara, L. C., Haghiri, S., Lohaus, M., Wahab, F. U., & von Luxburg, U. (2020).
+               Insights into Ordinal Embedding Algorithms: A Systematic Evaluation. ArXiv:1912.01666 [Cs, Stat].
         """
 
     def __init__(self, n_components=2, margin=1, verbose=False,
