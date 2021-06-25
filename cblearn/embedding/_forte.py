@@ -40,8 +40,8 @@ class FORTE(BaseEstimator, TripletEmbeddingMixin):
         >>> embedding = estimator.fit_transform(triplets)
         >>> embedding.shape
         (15, 2)
-        >>> round(estimator.score(triplets), 1)
-        1.0
+        >>> estimator.score(triplets) > 0.6
+        True
 
 
         References
