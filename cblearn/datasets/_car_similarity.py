@@ -32,7 +32,7 @@ def fetch_car_similarity(data_home: Optional[os.PathLike] = None, download_if_mi
     See :ref:`central_car_dataset` for a detailed description.
 
     >>> dataset = fetch_car_similarity(shuffle=False)  # doctest: +REMOTE_DATA
-    >>> dataset.class_name  # doctest: +REMOTE_DATA
+    >>> dataset.class_name.tolist()  # doctest: +REMOTE_DATA
     ['OFF-ROAD / SPORT UTILITY VEHICLES', 'ORDINARY CARS', 'OUTLIERS', 'SPORTS CARS']
     >>> dataset.triplet.shape  # doctest: +REMOTE_DATA
     (7097, 3)
