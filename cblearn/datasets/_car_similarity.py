@@ -103,19 +103,19 @@ def fetch_car_similarity(data_home: Optional[os.PathLike] = None, download_if_mi
                                               29, 31, 33, 34, 43, 57],
         'OUTLIERS': [21, 23, 30, 53],
     }
-    class_names = list(sorted(class_map.keys()))
-    classes = np.empty((len(survey_data),))
-    for cls_ix, cls in enumerate(class_names):
-        classes[class_map[cls]] = cls_ix
+    class_names = np.asarray(sorted(class_map.keys()))
+    classes = np.empty(60, dtype=int)
+    for cls_ix, cls_name in enumerate(class_names):
+        classes[np.array(class_map[cls_name]) - 1] = cls_ix
 
     if shuffle:
         random_state = check_random_state(random_state)
         shuffle_ix = random_state.permutation(len(survey_data))
         survey_data = survey_data[shuffle_ix]
-        classes = classes[shuffle_ix]
 
-    triplets = survey_data[:, [2, 3, 4]].astype(int)
-    response = (survey_data[:, [1]].astype(int) == triplets).nonzero()[1]
+    raw_triplets = survey_data[:, [2, 3, 4]].astype(int)
+    triplets = raw_triplets - 1
+    response = (survey_data[:, [1]].astype(int) == raw_triplets).nonzero()[1]
     rt_ms = survey_data[:, [5]].astype(float)
     if return_triplets:
         return triplets
