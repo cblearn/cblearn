@@ -47,7 +47,7 @@ jobs:
         flake8 . --count --exit-zero --statistics --show-source
     - name: Test with pytest and measure coverage
       run: |
-        pytest cblearn --cov=cblearn --cov-report=xml
+        pytest cblearn --cov=cblearn --cov-report=xml --remote-data
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
       with:

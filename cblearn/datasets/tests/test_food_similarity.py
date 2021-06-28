@@ -4,7 +4,7 @@ import pytest
 from cblearn.datasets import fetch_food_similarity
 
 
-@pytest.mark.download
+@pytest.mark.remote_data
 def test_fetch_food(tmp_path):
     data_home = tmp_path / 'cblearn_datasets'
     bunch = fetch_food_similarity(data_home=data_home, shuffle=False)

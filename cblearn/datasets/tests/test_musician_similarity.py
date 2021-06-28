@@ -4,7 +4,7 @@ import pytest
 from cblearn.datasets import fetch_musician_similarity
 
 
-@pytest.mark.download
+@pytest.mark.remote_data
 def test_fetch_musician_similarity(tmp_path):
     data_home = tmp_path / 'cblearn_datasets'
     bunch = fetch_musician_similarity(data_home=data_home, shuffle=False)
