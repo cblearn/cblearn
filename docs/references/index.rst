@@ -99,7 +99,7 @@ Wrapper
 .. autosummary::
     :toctree: generated/
 
-    preprocessing.queries_from_columns
+    preprocessing.query_from_columns
     preprocessing.triplets_from_multiselect
     preprocessing.triplets_from_oddoneout
     preprocessing.triplets_from_mostcentral

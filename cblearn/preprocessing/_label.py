@@ -1,4 +1,4 @@
-from typing import Dict, Union, List, Tuple
+from typing import Dict, Union, List, Tuple, Optional
 
 from sklearn.base import TransformerMixin, BaseEstimator
 from sklearn.preprocessing import LabelEncoder, FunctionTransformer
@@ -95,35 +95,35 @@ class SharedColumnEncoder(TransformerMixin, BaseEstimator):
            [0.1, 0.3]])
     """
     def __init__(self, encoder):
-        self.encoder = encoder
+        self.encoder_ = encoder
 
     def fit(self, X):
         X = check_array(X, allow_nd=True, dtype=None)
-        self.encoder.fit(X.reshape(-1, *X.shape[2:]))
+        self.encoder_.fit(X.reshape(-1, *X.shape[2:]))
         return self
 
     def fit_transform(self, X):
         X = check_array(X, allow_nd=True, dtype=None)
-        long_X = self.encoder.fit_transform(X.reshape(-1, *X.shape[2:]))
+        long_X = self.encoder_.fit_transform(X.reshape(-1, *X.shape[2:]))
         return long_X.reshape(X.shape[:2])
 
     def transform(self, X):
         X = check_array(X, allow_nd=True, dtype=None)
-        return self.encoder.transform(X.reshape(-1, *X.shape[2:])).reshape(X.shape[:2])
+        return self.encoder_.transform(X.reshape(-1, *X.shape[2:])).reshape(X.shape[:2])
 
     def inverse_transform(self, X):
         X = check_array(X, allow_nd=True, dtype=None)
-        return self.encoder.inverse_transform(X.reshape(-1, *X.shape[2:])).reshape(X.shape[0], -1)
+        return self.encoder_.inverse_transform(X.reshape(-1, *X.shape[2:])).reshape(X.shape[0], -1)
 
     def _more_tags(self):
         return {}
 
 
-def queries_from_columns(data: Union[np.ndarray, "pandas.DataFrame"],  # noqa: F821  ignore pandas, not a library dep
-                         query_columns: Union[List[str], List[int]],
-                         response_columns: Union[List[str], List[int], str, int],
-                         response_map: Dict[str, Union[bool, int]],
-                         return_transformer: bool = False) \
+def query_from_columns(data: Union[np.ndarray, "pandas.DataFrame"],  # noqa: F821  ignore pandas, not a library dep
+                       query_columns: Union[List[str], List[int]],
+                       response_columns: Optional[Union[List[str], List[int], str, int]] = None,
+                       response_map: Optional[Dict[str, Union[bool, int]]] = None,
+                       return_transformer: bool = False) \
         -> Union[Tuple[np.ndarray, np.ndarray],
                  Tuple[Tuple[np.ndarray, np.ndarray], Tuple[TransformerMixin, TransformerMixin]]]:
     """ Extract queries from objects in columns or dataframes.
@@ -137,17 +137,17 @@ def queries_from_columns(data: Union[np.ndarray, "pandas.DataFrame"],  # noqa: F
         >>> frame = pd.DataFrame({'alpha1': [0.1, 0.7, 0.1], 'tau1': [0, 0, 1],
         ...                       'alpha2': [0.3, 0.3, 0.7], 'tau2': [1, 0, 0],
         ...                       'alpha3': [0.7, 0.3, 0.7], 'tau3': [0, 1, 0], 'Response': [1, 0, 0]})
-        >>> queries_from_columns(frame, ['alpha1', 'alpha2', 'alpha3'], 'Response', response_map={1: True, 0: False})
+        >>> query_from_columns(frame, ['alpha1', 'alpha2', 'alpha3'], 'Response', response_map={1: True, 0: False})
         (array([[0, 1, 2], [2, 1, 1], [0, 2, 2]]), array([ True, False, False]))
-        >>> queries_from_columns(np.array(frame), [0, 2, 4], response_columns=-1, response_map={1: True, 0: False})
+        >>> query_from_columns(np.array(frame), [0, 2, 4], response_columns=-1, response_map={1: True, 0: False})
         (array([[0, 1, 2], [2, 1, 1], [0, 2, 2]]), array([ True, False, False]))
-        >>> queries_from_columns(frame, [('alpha1', 'tau1'), ('alpha2', 'tau2'), ('alpha3', 'tau3')],
+        >>> query_from_columns(frame, [('alpha1', 'tau1'), ('alpha2', 'tau2'), ('alpha3', 'tau3')],
         ...                      response_columns='Response', response_map={1: True, 0: False})
         (array([[0, 3, 4], [4, 2, 3], [1, 4, 4]]), array([ True, False, False]))
 
         The transformers can be used to get object attributes from the object index.
 
-        >>> (q,r), (q_transform, r_transform) = queries_from_columns(
+        >>> (q,r), (q_transform, r_transform) = query_from_columns(
         ...     np.array(frame), [0, 2, 4], -1, {1: True, 0: False}, return_transformer=True)
         >>> q_transform.inverse_transform(q)
         array([[0.1, 0.3, 0.7], [0.7, 0.3, 0.3], [0.1, 0.7, 0.7]])
@@ -166,9 +166,6 @@ def queries_from_columns(data: Union[np.ndarray, "pandas.DataFrame"],  # noqa: F
             If return_transform=True, an additional tuple with transformer objects is returned.
 
     """
-    inverse_map = {v: k for k, v in response_map.items()}
-    response_enc = FunctionTransformer(func=np.vectorize(response_map.get),
-                                       inverse_func=np.vectorize(inverse_map.get), check_inverse=False)
     if not hasattr(data, 'columns'):  # is no pandas Dataframe?
         data = check_array(data, dtype=None).T
     query_data = np.swapaxes(np.stack([data[np.array(c)] for c in query_columns]), 0, 1)
@@ -177,8 +174,18 @@ def queries_from_columns(data: Union[np.ndarray, "pandas.DataFrame"],  # noqa: F
     else:
         query_enc = SharedColumnEncoder(LabelEncoder())
     query = query_enc.fit_transform(query_data)
-    response = response_enc.fit_transform(data[response_columns])
-    if return_transformer:
-        return (query, response), (query_enc, response_enc)
+
+    if response_columns:
+        inverse_map = {v: k for k, v in response_map.items()}
+        response_enc = FunctionTransformer(func=np.vectorize(response_map.get),
+                                           inverse_func=np.vectorize(inverse_map.get), check_inverse=False)
+        response = response_enc.fit_transform(data[response_columns])
+        if return_transformer:
+            return (query, response), (query_enc, response_enc)
+        else:
+            return query, response
     else:
-        return query, response
+        if return_transformer:
+            return query, query_enc
+        else:
+            return query
