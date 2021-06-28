@@ -13,10 +13,11 @@ def _unique_firstaxis(X, return_inverse: bool = False):
         Has a (slow) fallback, if the numpy array is mixed typed and
         cannot be used with numpy's unique method.
 
-    >>> _unique_firstaxis([[0.1, 'high'], [0.3, 'low'], [0.1, 'high'], [0.4, 'low']])
-    array([['0.1', 'high'], ['0.3', 'low'], ['0.4', 'low']], dtype='<U32')
-    >>> _unique_firstaxis([[0.1, 'high'], [0.3, 'low'], [0.1, 'high'], [0.4, 'low']], return_inverse=True)
-    (array([['0.1', 'high'], ['0.3', 'low'], ['0.4', 'low']], dtype='<U32'), array([0, 1, 0, 2]))
+    >>> _unique_firstaxis([[0.1, 'high'], [0.3, 'low'], [0.1, 'high'], [0.4, 'low']]).tolist()
+    [['0.1', 'high'], ['0.3', 'low'], ['0.4', 'low']]
+    >>> u, i = _unique_firstaxis([[0.1, 'high'], [0.3, 'low'], [0.1, 'high'], [0.4, 'low']], return_inverse=True)
+    >>> u.tolist(), i.tolist()
+    ([['0.1', 'high'], ['0.3', 'low'], ['0.4', 'low']], [0, 1, 0, 2])
     """
     X = check_array(X, dtype=None, ensure_2d=True)
     if X.dtype == object:
@@ -40,14 +41,12 @@ class MultiColumnLabelEncoder(LabelEncoder):
 
     >>> encoder = MultiColumnLabelEncoder()
     >>> label_data = [[0.1, 'high'], [0.3, 'low'], [0.1, 'high'], [0.1, 'low']]
-    >>> encoder.fit(label_data).transform(label_data)
-    array([0, 2, 0, 1])
-    >>> encoder.fit_transform(label_data)
-    array([0, 2, 0, 1])
-    >>> encoder.inverse_transform([2, 1, 0])
-    array([['0.3', 'low'],
-           ['0.1', 'low'],
-           ['0.1', 'high']], dtype='<U32')
+    >>> encoder.fit(label_data).transform(label_data).tolist()
+    [0, 2, 0, 1]
+    >>> encoder.fit_transform(label_data).tolist()
+    [0, 2, 0, 1]
+    >>> encoder.inverse_transform([2, 1, 0]).tolist()
+    [['0.3', 'low'], ['0.1', 'low'], ['0.1', 'high']]
     """
     def fit(self, X):
         self.classes_ = _unique_firstaxis(X)
@@ -81,18 +80,12 @@ class SharedColumnEncoder(TransformerMixin, BaseEstimator):
 
     >>> encoder = SharedColumnEncoder(LabelEncoder())
     >>> label_data = [[0.1, 0.3, 0.4], [0.4, 0.1, 0.3], [0.5, 0.3, 0.3]]
-    >>> encoder.fit(label_data).transform(label_data)
-    array([[0, 1, 2],
-           [2, 0, 1],
-           [3, 1, 1]])
-    >>> encoder.fit_transform(label_data)
-    array([[0, 1, 2],
-           [2, 0, 1],
-           [3, 1, 1]])
-    >>> encoder.inverse_transform([[2, 2], [1, 0], [0, 1]])
-    array([[0.4, 0.4],
-           [0.3, 0.1],
-           [0.1, 0.3]])
+    >>> encoder.fit(label_data).transform(label_data).tolist()
+    [[0, 1, 2], [2, 0, 1], [3, 1, 1]]
+    >>> encoder.fit_transform(label_data).tolist()
+    [[0, 1, 2], [2, 0, 1], [3, 1, 1]]
+    >>> encoder.inverse_transform([[2, 2], [1, 0], [0, 1]]).tolist()
+    [[0.4, 0.4], [0.3, 0.1], [0.1, 0.3]]
     """
     def __init__(self, encoder):
         self.encoder_ = encoder
@@ -137,20 +130,23 @@ def query_from_columns(data: Union[np.ndarray, "pandas.DataFrame"],  # noqa: F82
         >>> frame = pd.DataFrame({'alpha1': [0.1, 0.7, 0.1], 'tau1': [0, 0, 1],
         ...                       'alpha2': [0.3, 0.3, 0.7], 'tau2': [1, 0, 0],
         ...                       'alpha3': [0.7, 0.3, 0.7], 'tau3': [0, 1, 0], 'Response': [1, 0, 0]})
-        >>> query_from_columns(frame, ['alpha1', 'alpha2', 'alpha3'], 'Response', response_map={1: True, 0: False})
-        (array([[0, 1, 2], [2, 1, 1], [0, 2, 2]]), array([ True, False, False]))
-        >>> query_from_columns(np.array(frame), [0, 2, 4], response_columns=-1, response_map={1: True, 0: False})
-        (array([[0, 1, 2], [2, 1, 1], [0, 2, 2]]), array([ True, False, False]))
-        >>> query_from_columns(frame, [('alpha1', 'tau1'), ('alpha2', 'tau2'), ('alpha3', 'tau3')],
-        ...                      response_columns='Response', response_map={1: True, 0: False})
-        (array([[0, 3, 4], [4, 2, 3], [1, 4, 4]]), array([ True, False, False]))
+        >>> q, r = query_from_columns(frame, ['alpha1', 'alpha2', 'alpha3'], 'Response', response_map={1: True, 0: False})
+        >>> q.tolist(), r.tolist()
+        ([[0, 1, 2], [2, 1, 1], [0, 2, 2]], [True, False, False])
+        >>> q, r = query_from_columns(np.array(frame), [0, 2, 4], response_columns=-1, response_map={1: True, 0: False})
+        >>> q.tolist(), r.tolist()
+        ([[0, 1, 2], [2, 1, 1], [0, 2, 2]], [True, False, False])
+        >>> q, r = query_from_columns(frame, [('alpha1', 'tau1'), ('alpha2', 'tau2'), ('alpha3', 'tau3')],
+        ...                           response_columns='Response', response_map={1: True, 0: False})
+        >>> q.tolist(), r.tolist()
+        ([[0, 3, 4], [4, 2, 3], [1, 4, 4]], [True, False, False])
 
         The transformers can be used to get object attributes from the object index.
 
         >>> (q,r), (q_transform, r_transform) = query_from_columns(
         ...     np.array(frame), [0, 2, 4], -1, {1: True, 0: False}, return_transformer=True)
-        >>> q_transform.inverse_transform(q)
-        array([[0.1, 0.3, 0.7], [0.7, 0.3, 0.3], [0.1, 0.7, 0.7]])
+        >>> q_transform.inverse_transform(q).tolist()
+        [[0.1, 0.3, 0.7], [0.7, 0.3, 0.3], [0.1, 0.7, 0.7]]
 
 
         Args:
