@@ -31,11 +31,12 @@ def fetch_car_similarity(data_home: Optional[os.PathLike] = None, download_if_mi
 
     See :ref:`central_car_dataset` for a detailed description.
 
-    >>> dataset = fetch_car_similarity(shuffle=True)  # doctest: +REMOTE_DATA
+    >>> dataset = fetch_car_similarity(shuffle=False)  # doctest: +REMOTE_DATA
     >>> dataset.class_name  # doctest: +REMOTE_DATA
     ['OFF-ROAD / SPORT UTILITY VEHICLES', 'ORDINARY CARS', 'OUTLIERS', 'SPORTS CARS']
     >>> dataset.triplet.shape  # doctest: +REMOTE_DATA
     (7097, 3)
+
 
     Args:
         data_home : optional, default: None
@@ -113,8 +114,8 @@ def fetch_car_similarity(data_home: Optional[os.PathLike] = None, download_if_mi
         survey_data = survey_data[shuffle_ix]
         classes = classes[shuffle_ix]
 
-    response = survey_data[:, [1]].astype(int)
     triplets = survey_data[:, [2, 3, 4]].astype(int)
+    response = (survey_data[:, [1]].astype(int) == triplets).nonzero()[1]
     rt_ms = survey_data[:, [5]].astype(float)
     if return_triplets:
         return triplets
