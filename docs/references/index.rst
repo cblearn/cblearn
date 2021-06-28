@@ -20,8 +20,14 @@ Loaders
 .. autosummary::
     :toctree: generated/
 
-    datasets.fetch_musician_similarity
+    datasets.fetch_car_similarity
     datasets.fetch_food_similarity
+    datasets.fetch_imagenet_similarity
+    datasets.fetch_nature_scene_similarity
+    datasets.fetch_material_similarity
+    datasets.fetch_musician_similarity
+    datasets.fetch_vogue_cover_similarity
+    datasets.fetch_things_similarity
 
 
 Simulations

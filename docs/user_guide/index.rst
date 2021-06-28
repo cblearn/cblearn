@@ -29,3 +29,8 @@ Dataset loading utilities
 
 .. include:: ../../cblearn/datasets/descr/musician_similarity.rst
 .. include:: ../../cblearn/datasets/descr/food_similarity.rst
+.. include:: ../../cblearn/datasets/descr/car_similarity.rst
+.. include:: ../../cblearn/datasets/descr/imagenet_similarity.rst
+.. include:: ../../cblearn/datasets/descr/things_similarity.rst
+.. include:: ../../cblearn/datasets/descr/nature_vogue_similarity.rst
+.. include:: ../../cblearn/datasets/descr/material_similarity.rst

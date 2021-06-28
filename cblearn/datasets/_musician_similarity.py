@@ -1,9 +1,9 @@
+import csv
 from pathlib import Path
 import logging
 import joblib
 import os
 from typing import Optional, Union
-import warnings
 
 import numpy as np
 from sklearn.datasets import _base
@@ -24,7 +24,7 @@ def fetch_musician_similarity(data_home: Optional[os.PathLike] = None, download_
     """ Load the MusicSeer musician similarity dataset (triplets).
 
     ===================   =====================
-    Triplets                             213629
+    Triplets                             224792
     Objects (Musicians)                     413
     Dimensionality                      unknown
     ===================   =====================
@@ -79,12 +79,10 @@ def fetch_musician_similarity(data_home: Optional[os.PathLike] = None, download_
         logger.info('Downloading musician similarity from {} to {}'.format(ARCHIVE.url, data_home))
 
         archive_path = _base._fetch_remote(ARCHIVE, dirname=data_home)
-        data_dtype = {'names': ('judgement', 'survey', 'user', 'target', 'chosen', 'other'),
-                      'formats': ('<u4', 'U1', 'U5', '<u4', '<u4', '<u4', '<u4')}
-        with warnings.catch_warnings():
-            # some rows lack the second other index, we ignore those lines.
-            warnings.filterwarnings('ignore', message=r'^some errors were detected !\n.*got 5 columns instead of 6.*')
-            musicians_data = np.genfromtxt(archive_path, dtype=data_dtype, delimiter=' ', invalid_raise=False)
+        with open(archive_path, 'r') as f:
+            cols = ('judgement', 'survey', 'user', 'target', 'chosen', 'other')
+            musicians_data = np.array(list(csv.reader(f, delimiter=' '))[1:]).T
+            musicians_data = {k: v for k, v in zip(cols, musicians_data)}
 
         joblib.dump(musicians_data, filepath, compress=6)
         os.remove(archive_path)
@@ -93,7 +91,8 @@ def fetch_musician_similarity(data_home: Optional[os.PathLike] = None, download_
 
     if shuffle:
         random_state = check_random_state(random_state)
-        musicians_data = random_state.permutation(musicians_data)
+        ix = random_state.permutation(len(musicians_data['target']))
+        musicians_data = {k: v[ix] for k, v in musicians_data.items()}
 
     module_path = Path(__file__).parent
     artists = np.genfromtxt(module_path.joinpath('data', 'musician_names.txt'), delimiter=' ',
