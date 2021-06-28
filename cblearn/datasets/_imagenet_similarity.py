@@ -17,6 +17,7 @@ ARCHIVE = _base.RemoteFileMetadata(
     checksum=('cannot check - zip involves randomness'))
 
 logger = logging.getLogger(__name__)
+__doctest_requires__ = {'fetch_imagenet_similarity': ['h5py']}
 
 
 def fetch_imagenet_similarity(data_home: Optional[os.PathLike] = None, download_if_missing: bool = True,

@@ -9,6 +9,9 @@ from cblearn.embedding._base import TripletEmbeddingMixin
 from cblearn.embedding.wrapper._r_base import RWrapperMixin
 
 
+__doctest_requires__ = {'SOE': ['rpy2']}
+
+
 class SOE(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
     """ A soft ordinal embedding estimator, wrapping an R implementation.
 
