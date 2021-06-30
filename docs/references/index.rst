@@ -52,8 +52,8 @@ Low-level Dataset Utility
 
     datasets.make_all_triplet_indices
     datasets.make_random_triplet_indices
-    datasets.triplet_answers
-    datasets.noisy_triplet_answers
+    datasets.triplet_response
+    datasets.noisy_triplet_response
 
 
 :mod:`cblearn.embedding` Embedding
@@ -94,9 +94,10 @@ Wrapper
 .. autosummary::
     :toctree: generated/
 
-    metrics.triplet_error
+    metrics.query_accuracy
+    metrics.query_error
     metrics.procrustes_distance
-    metrics.TripletScorer
+    metrics.QueryScorer
 
 :mod:`cblearn.preprocessing` Preprocessing
 ==========================================
@@ -126,6 +127,7 @@ Wrapper
 
     utils.data_format
     utils.check_format
-    utils.check_triplet_questions
-    utils.check_triplet_answers
+    utils.check_query
+    utils.check_query_response
+    utils.check_response
     utils.check_size

@@ -51,7 +51,7 @@ def fetch_musician_similarity(data_home: Optional[os.PathLike] = None, download_
                 Each row corresponding a triplet constraint.
                 The columns represent the target, choosen and other musician index.
             judgement_id : np.ndarray, shape (n_triplets, )
-                Id of survey questions.
+                Id of survey Query.
             survey_or_game : np.ndarray, shape (n_triplets,)
                 Letter 'S' or 'G' indicating if comparison origins from survey or game.
             user : np.ndarray, shape (n_triplets, )

@@ -1,9 +1,9 @@
-from typing import Union, Tuple
+from typing import Union
 
 import scipy
 import sparse
 import numpy as np
 
 
-Questions = Union[np.ndarray, sparse.COO, scipy.sparse.spmatrix]
-Answers = Union[Questions, Tuple[Questions, np.ndarray]]
+Query = Union[np.ndarray, sparse.COO, scipy.sparse.spmatrix]
+Response = Union[Query, np.ndarray]
