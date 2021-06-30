@@ -46,9 +46,29 @@ Find more details in the [installation instructions](https://cblearn.readthedocs
 
 In the [User Guide](https://cblearn.readthedocs.io/en/latest/user_guide/index.html) you find a detailed introduction.
 
-## Algorithms
+## Features
 
-### Embedding
+### Datasets
+
+*cblearn* provides utility methods to simplify the loading and conversation
+of your comparison datasets. In addition, there are 
+functions that download and load multiple real world comparisons.
+
+| Dataset  | Query | #Object | #Response | #Triplet |
+| --- | --- | ---:| ---:| ---:|
+| Vogue Cover | Odd-out Triplet | 60 | 1,107 | 2,214 | 
+| Nature Scene | Odd-out Triplet | 120 | 3,355 | 6,710 | 
+| Car | Most-Central Triplet | 60 | 7,097 | 14,194 | 
+| Material | Standard Triplet | 100 | 104,692 |104,692 | 
+| Food | Standard Triplet | 100 | 190,376 |190,376 | 
+| Musician | Standard Triplet | 413 | 224,792 |224,792 | 
+| Things Image Testset | Odd-out Triplet | 1,854 | 146,012 | 292,024 | 
+| ImageNet Images v0.1 | Rank 2 from 8 | 1,000 | 25,273 | 328,549 | 
+| ImageNet Images v0.2 | Rank 2 from 8 | 50,000 | 384,277 | 5M | 
+
+
+### Embedding Algorithms
+
 | Algorithm                   | Default | Pytorch (GPU) | Reference Wrapper |
 | --------------------------- |  :---:  | :-----------: | :---------------: |
 | Crowd Kernel Learning (CKL) | planned | X             |                   |
@@ -57,6 +77,7 @@ In the [User Guide](https://cblearn.readthedocs.io/en/latest/user_guide/index.ht
 | Maximum-Likelihood Difference Scaling (MLDS) | planned |              | [MLDS (R)](https://cran.r-project.org/web/packages/MLDS/index.html)|
 | Soft Ordinal Embedding (SOE) | X | X             | [loe (R)](https://cran.r-project.org/web/packages/loe/index.html) |
 | Stochastic Triplet Embedding (STE/t-STE) | planned | planned             | planned |
+
 ## Contribute
 
 We are happy about your contributions.
