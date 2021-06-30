@@ -65,6 +65,19 @@ functions that download and load multiple real world comparisons.
 | Things Image Testset | Odd-out Triplet | 1,854 | 146,012 | 292,024 | 
 | ImageNet Images v0.1 | Rank 2 from 8 | 1,000 | 25,273 | 328,549 | 
 | ImageNet Images v0.2 | Rank 2 from 8 | 50,000 | 384,277 | 5M | 
+
+
+### Embedding Algorithms
+
+| Algorithm                   | Default | Pytorch (GPU) | Reference Wrapper |
+| --------------------------- |  :---:  | :-----------: | :---------------: |
+| Crowd Kernel Learning (CKL) | planned | X             |                   |
+| FORTE | planned | X             |                   |
+| GNMDS | planned | X             |                   |
+| Maximum-Likelihood Difference Scaling (MLDS) | planned |              | [MLDS (R)](https://cran.r-project.org/web/packages/MLDS/index.html)|
+| Soft Ordinal Embedding (SOE) | X | X             | [loe (R)](https://cran.r-project.org/web/packages/loe/index.html) |
+| Stochastic Triplet Embedding (STE/t-STE) | planned | planned             | planned |
+
 ## Contribute
 
 We are happy about your contributions.
