@@ -7,7 +7,7 @@
 
 Comparison-based Learning are the Machine Learning algorithms to use, when training data
 are ordinal comparisons instead of Euclidean points. 
-Triplet comparisons can be gathered e.g. from human studies with questions like 
+Triplet comparisons can be gathered e.g. from human studies with Query like 
 "Which of the following bands is most similar to Queen?".
 
 This library provides an easy to use interface to comparison-based learning algorithms.

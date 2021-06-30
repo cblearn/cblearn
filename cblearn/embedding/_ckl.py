@@ -89,7 +89,7 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
         self.backend = backend
         self.device = device
 
-    def fit(self, X: utils.Questions, y: np.ndarray = None, init: np.ndarray = None,
+    def fit(self, X: utils.Query, y: np.ndarray = None, init: np.ndarray = None,
             n_objects: Optional[int] = None) -> 'CKL':
         """Computes the embedding.
 
@@ -100,7 +100,7 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
         Returns:
             self.
         """
-        triplets = utils.check_triplet_answers(X, y, result_format='list-order')
+        triplets = utils.check_query_response(X, y, result_format='list-order')
         if not n_objects:
             n_objects = len(np.unique(triplets))
         random_state = check_random_state(self.random_state)

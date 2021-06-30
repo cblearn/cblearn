@@ -29,7 +29,7 @@ triplets_spmatrix = sparse.COO(np.transpose(triplets_explicit), answers_numeric,
 
 
 def test_check_query():
-    """ Test the conversation between array and matrix format for questions. """
+    """ Test the conversation between array and matrix format for Query. """
     triplets = utils.check_query(triplets_ordered)  # query should be in standard form.
     np.testing.assert_equal(triplets, triplets_explicit)
 

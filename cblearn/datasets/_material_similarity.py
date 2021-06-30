@@ -9,7 +9,7 @@ import zipfile
 import numpy as np
 from sklearn.datasets import _base
 from sklearn.utils import check_random_state, Bunch
-from cblearn.utils import check_triplet_answers
+from cblearn.utils import check_query_response
 
 
 ARCHIVE = _base.RemoteFileMetadata(
@@ -103,22 +103,22 @@ def fetch_material_similarity(data_home: Optional[os.PathLike] = None, download_
 
     train_triplets = np.array(train_data['answers'])
     train_agreement = np.array(train_data['agreement'])
-    train_triplets_1, train_response_1 = check_triplet_answers(train_triplets[train_agreement[:, 0] > 0],
-                                                               train_agreement[train_agreement[:, 0] > 0][:, 0],
-                                                               result_format='list-count')
-    train_triplets_2, train_response_2 = check_triplet_answers(train_triplets[train_agreement[:, 1] > 0],
-                                                               train_agreement[train_agreement[:, 1] > 0][:, 1],
-                                                               result_format='list-count')
+    train_triplets_1, train_response_1 = check_query_response(train_triplets[train_agreement[:, 0] > 0],
+                                                              train_agreement[train_agreement[:, 0] > 0][:, 0],
+                                                              result_format='list-count')
+    train_triplets_2, train_response_2 = check_query_response(train_triplets[train_agreement[:, 1] > 0],
+                                                              train_agreement[train_agreement[:, 1] > 0][:, 1],
+                                                              result_format='list-count')
     train_triplets, train_response = np.r_[train_triplets_1, train_triplets_2], np.r_[train_response_1, train_response_2]
 
     test_triplets = np.array(test_data['answers'])
     test_agreement = np.array(test_data['agreement'])
-    test_triplets_1, test_response_1 = check_triplet_answers(test_triplets[test_agreement[:, 0] > 0],
-                                                             test_agreement[test_agreement[:, 0] > 0][:, 0],
-                                                             result_format='list-count')
-    test_triplets_2, test_response_2 = check_triplet_answers(test_triplets[test_agreement[:, 1] > 0],
-                                                             test_agreement[test_agreement[:, 1] > 0][:, 1],
-                                                             result_format='list-count')
+    test_triplets_1, test_response_1 = check_query_response(test_triplets[test_agreement[:, 0] > 0],
+                                                            test_agreement[test_agreement[:, 0] > 0][:, 0],
+                                                            result_format='list-count')
+    test_triplets_2, test_response_2 = check_query_response(test_triplets[test_agreement[:, 1] > 0],
+                                                            test_agreement[test_agreement[:, 1] > 0][:, 1],
+                                                            result_format='list-count')
     test_triplets, test_response = np.r_[test_triplets_1, test_triplets_2], np.r_[test_response_1, test_response_2]
 
     if shuffle:
