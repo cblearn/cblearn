@@ -20,8 +20,14 @@ Loaders
 .. autosummary::
     :toctree: generated/
 
-    datasets.fetch_musician_similarity
+    datasets.fetch_car_similarity
     datasets.fetch_food_similarity
+    datasets.fetch_imagenet_similarity
+    datasets.fetch_nature_scene_similarity
+    datasets.fetch_material_similarity
+    datasets.fetch_musician_similarity
+    datasets.fetch_vogue_cover_similarity
+    datasets.fetch_things_similarity
 
 
 Simulations
@@ -91,6 +97,22 @@ Wrapper
     metrics.triplet_error
     metrics.procrustes_distance
     metrics.TripletScorer
+
+:mod:`cblearn.preprocessing` Preprocessing
+==========================================
+
+.. automodule:: cblearn.preprocessing
+
+.. currentmodule:: cblearn
+
+.. autosummary::
+    :toctree: generated/
+
+    preprocessing.query_from_columns
+    preprocessing.triplets_from_multiselect
+    preprocessing.triplets_from_oddoneout
+    preprocessing.triplets_from_mostcentral
+
 
 :mod:`cblearn.utils` Utility
 ============================

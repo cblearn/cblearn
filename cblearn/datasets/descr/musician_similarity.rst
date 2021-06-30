@@ -15,7 +15,7 @@ Such, for each user judgement multiple triplets were created with the remaining 
 **Data Set Characteristics:**
 
     ===================   =====================
-    Triplets                             213629
+    Triplets                             224792
     Objects (Musicians)                     413
     Dimensionality                      unknown
     ===================   =====================

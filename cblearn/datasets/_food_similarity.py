@@ -65,9 +65,8 @@ def fetch_food_similarity(data_home: Optional[os.PathLike] = None, download_if_m
     if not data_home.exists():
         data_home.mkdir()
 
-    triplet_filepath = Path(_base._pkl_filepath(data_home, 'food_similarity_triplets.pkz'))
-    image_filepath = Path(_base._pkl_filepath(data_home, 'food_similarity_images.pkz'))
-    if not triplet_filepath.exists() or not image_filepath.exists():
+    filepath = Path(_base._pkl_filepath(data_home, 'food_similarity.pkz'))
+    if not filepath.exists():
         if not download_if_missing:
             raise IOError("Data not found and `download_if_missing` is False")
 
@@ -82,12 +81,10 @@ def fetch_food_similarity(data_home: Optional[os.PathLike] = None, download_if_m
                                       if name.startswith('food100-dataset/images/')
                                       and name.endswith('.jpg')])
 
-        joblib.dump(triplets, triplet_filepath, compress=6)
-        joblib.dump(image_names, image_filepath, compress=6)
+        joblib.dump((triplets, image_names), filepath, compress=6)
         os.remove(archive_path)
     else:
-        triplets = joblib.load(triplet_filepath)
-        image_names = joblib.load(image_filepath)
+        triplets, image_names = joblib.load(filepath)
 
     image_names = np.sort(image_names)
     triplets = np.searchsorted(image_names, triplets)

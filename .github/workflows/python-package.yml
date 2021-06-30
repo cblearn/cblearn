@@ -32,6 +32,7 @@ jobs:
       run: |
         python3 -m pip install --upgrade pip
         pip install -e .[r_wrapper,tests,docs,torch]
+        pip install h5py
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
@@ -47,7 +48,7 @@ jobs:
         flake8 . --count --exit-zero --statistics --show-source
     - name: Test with pytest and measure coverage
       run: |
-        pytest cblearn --cov=cblearn --cov-report=xml
+        pytest cblearn --cov=cblearn --cov-report=xml --remote-data
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
       with:
