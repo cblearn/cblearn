@@ -8,20 +8,22 @@ from scipy.spatial import distance_matrix
 
 from cblearn import utils
 from cblearn.embedding._base import TripletEmbeddingMixin
-from cblearn.utils import assert_torch_is_available, torch_minimize_lbfgs
+from cblearn.embedding._torch_utils import assert_torch_is_available, torch_minimize
 
 
 class SOE(BaseEstimator, TripletEmbeddingMixin):
-    """ Soft Ordinal Embedding algorithm (SOE).
+    """ Soft Ordinal Embedding backend (SOE).
 
         SOE [1]_ is minimizing the soft objective as a smooth relaxation of the triplet error.
 
-        This estimator supports multiple implementations which can be selected by the `algorithm` parameter.
-        The majorizing algorithm for SOE is described in the paper original paper [1]_.
+        This estimator supports multiple implementations which can be selected by the `backend` parameter.
+        The majorizing backend for SOE is described in the paper original paper.
 
-        An alternative implementation is using backpropagation, like descibed in [2]_.
-        This one can run not only on CPU, but also GPU with CUDA. For this, it depends
-        on the pytorch package (see :ref:`extras_install`).
+        The *torch* backend uses the ADAM optimizer and backpropagation [2]_.
+        It can executed on CPU, but also CUDA GPUs.
+
+        .. note::
+            The *torch* backend requires the *pytorch* python package (see :ref:`extras_install`).
 
         Attributes:
             embedding_: Final embedding, shape (n_objects, n_components)
@@ -41,54 +43,58 @@ class SOE(BaseEstimator, TripletEmbeddingMixin):
         >>> embedding = estimator.fit_transform(triplets, n_objects=15)
         >>> embedding.shape
         (15, 2)
-        >>> estimator.score(triplets)
+        >>> round(estimator.score(triplets), 1)
         1.0
 
         The following is running on the CUDA GPU, if available (but requires pytorch installed).
 
-        >>> estimator = SOE(n_components=2, algorithm="backprop", random_state=seed)
+        >>> estimator = SOE(n_components=2, backend="torch", random_state=seed)
         >>> embedding = estimator.fit_transform(triplets, n_objects=15)
-        >>> estimator.score(triplets)
-        1.0
+        >>> round(estimator.score(triplets), 1) > 0.6
+        True
 
         References
         ----------
         .. [1] Terada, Y., & Luxburg, U. (2014). Local ordinal embedding.
                International Conference on Machine Learning, 847–855.
-        .. [2] Vankadara, L. et al. (2019) Insights into Ordinal Embedding Algorithms: A Systematic Evaluation
-               Arxiv Preprint, https://arxiv.org/abs/1912.01666
+        .. [2] Vankadara, L. C., Haghiri, S., Lohaus, M., Wahab, F. U., & von Luxburg, U. (2020).
+               Insights into Ordinal Embedding Algorithms: A Systematic Evaluation. ArXiv:1912.01666 [Cs, Stat].
         """
 
-    def __init__(self, n_components=2, margin=1, max_iter=1000, verbose=False,
-                 random_state: Union[None, int, np.random.RandomState] = None,
-                 algorithm: str = "majorizing", device: str = "auto"):
+    def __init__(self, n_components=2, margin=1, verbose=False,
+                 random_state: Union[None, int, np.random.RandomState] = None, max_iter=1000,
+                 backend: str = "scipy", learning_rate=1, batch_size=50_000,  device: str = "auto"):
         """ Initialize the estimator.
 
         Args:
             n_components :
                 The dimension of the embedding.
-            margin:
-                Scale parameter which only takes strictly positive value.
+            margin: Scale parameter which only takes strictly positive value.
                 Defines the intended minimal difference of distances in the embedding space between
                 for any triplet.
-            max_iter:
-                Maximum number of optimization iterations.
             verbose: boolean, default=False
                 Enable verbose output.
             random_state:
-                The seed of the pseudo random number generator used to initialize the optimization.
-            algorithm:
-                The algorithm used to optimize the soft objective. {"majorizing", "backprop"}
+             The seed of the pseudo random number generator used to initialize the optimization.
+            max_iter:
+                Maximum number of optimization iterations.
+            backend: The backend used to optimize the objective. {"scipy", "torch"}
+            learning_rate: Learning rate of the gradient-based optimizer.
+                           If None, then 100 is used, or 1 if kernel=True.
+                           Only used with *torch* backend, else ignored.
+            batch_size: Batch size of stochastic optimization. Only used with the *torch* backend, else ignored.
             device: The device on which pytorch computes. {"auto", "cpu", "cuda"}
                 "auto" chooses cuda (GPU) if available, but falls back on cpu if not.
-                This parameter is only used if "backprop" algorithm is used.
+                Only used with the *torch* backend, else ignored.
         """
         self.n_components = n_components
         self.margin = margin
         self.max_iter = max_iter
         self.verbose = verbose
         self.random_state = random_state
-        self.algorithm = algorithm
+        self.backend = backend
+        self.learning_rate = learning_rate
+        self.batch_size = batch_size
         self.device = device
 
     def fit(self, X: utils.Query, y: np.ndarray = None, init: np.ndarray = None,
@@ -105,21 +111,21 @@ class SOE(BaseEstimator, TripletEmbeddingMixin):
         triplets = utils.check_query_response(X, y, result_format='list-order')
         if not n_objects:
             n_objects = len(np.unique(triplets))
+        random_state = check_random_state(self.random_state)
         if init is None:
-            random_state = check_random_state(self.random_state)
             init = random_state.multivariate_normal(np.zeros(self.n_components), np.eye(self.n_components),
                                                     size=n_objects)
 
-        if self.algorithm == "backprop":
+        if self.backend == "torch":
             assert_torch_is_available()
-            result = torch_minimize_lbfgs(_soe_loss_torch, init, args=(triplets.astype(int), self.margin),
-                                          device=self.device, max_iter=self.max_iter)
-        elif self.algorithm == "majorizing":
-            result = minimize(_soe_loss, init.ravel(), args=(init.shape, triplets, self.margin),
-                              method='L-BFGS-B', jac=_soe_majorizing_grad,
-                              options=dict(maxiter=self.max_iter, disp=self.verbose))
+            result = torch_minimize('adam', _soe_loss_torch, init, data=(triplets.astype(int),), args=(self.margin,),
+                                    device=self.device, max_iter=self.max_iter, lr=self.learning_rate,
+                                    seed=random_state.randint(1))
+        elif self.backend == "scipy":
+            result = minimize(_soe_loss, init.ravel(), args=(init.shape, triplets, self.margin), method='L-BFGS-B',
+                              jac=_soe_majorizing_grad, options=dict(maxiter=self.max_iter, disp=self.verbose))
         else:
-            raise ValueError(f"Unknown SOE algorithm '{self.algorithm}'. Try 'majorizing' or 'backprop' instead.")
+            raise ValueError(f"Unknown backend '{self.backend}'. Try 'scipy' or 'torch' instead.")
 
         if self.verbose and not result.success:
             print(f"SOE's optimization failed with reason: {result.message}.")
