@@ -18,17 +18,17 @@ class SOE(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
             embedding_: Final embedding, shape (n_objects, n_components)
             stress_: Final value of the SOE stress corresponding to the embedding.
 
-        Examples:
+
         >>> from cblearn import datasets
         >>> import doctest; doctest.ELLIPSIS_MARKER = "-output from R-"
         >>> triplets = datasets.make_random_triplets(np.random.rand(15, 2), result_format='list-order', size=1000)
         >>> triplets.shape, np.unique(triplets).shape
         ((1000, 3), (15,))
-        >>> estimator = SOE(verbose=False)
-        >>> embedding = estimator.fit_transform(triplets)  # doctest: +ELLIPSIS
+        >>> estimator = SOE(verbose=True).fit(triplets) # doctest: +ELLIPSIS
         -output from R-
-        >>> embedding.shape
+        >>> estimator.embedding_.shape
         (15, 2)
+
 
         References
         ----------
@@ -43,7 +43,7 @@ class SOE(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
             n_components:
                 The dimension of the embedding.
             n_init:
-                Number of times the BFGS algorithm will be run with different initializations.
+                Number of times the BFGS backend will be run with different initializations.
                 The final result will be the output of the run with the smallest final stress.
             margin:
                 Scale parameter which only takes strictly positive value.

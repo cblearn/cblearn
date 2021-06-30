@@ -46,6 +46,17 @@ Find more details in the [installation instructions](https://cblearn.readthedocs
 
 In the [User Guide](https://cblearn.readthedocs.io/en/latest/user_guide/index.html) you find a detailed introduction.
 
+## Algorithms
+
+### Embedding
+| Algorithm                   | Default | Pytorch (GPU) | Reference Wrapper |
+| --------------------------- |  :---:  | :-----------: | :---------------: |
+| Crowd Kernel Learning (CKL) | planned | X             |                   |
+| FORTE | planned | X             |                   |
+| GNMDS | planned | X             |                   |
+| Maximum-Likelihood Difference Scaling (MLDS) | planned |              | [MLDS (R)](https://cran.r-project.org/web/packages/MLDS/index.html)|
+| Soft Ordinal Embedding (SOE) | X | X             | [loe (R)](https://cran.r-project.org/web/packages/loe/index.html) |
+| Stochastic Triplet Embedding (STE/t-STE) | planned | planned             | planned |
 ## Contribute
 
 We are happy about your contributions.
