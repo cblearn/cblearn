@@ -61,8 +61,6 @@ def torch_minimize(method,
         else:
             device = "cpu"
 
-    X = torch.tensor(init, requires_grad=True).to(device)
-
     data = [torch.tensor(d).to(device) for d in data]
     args = [torch.tensor(a).to(device) for a in args]
     factr = 1e7 * np.finfo(float).eps
@@ -77,6 +75,7 @@ def torch_minimize(method,
         'l-bfgs-b': torch.optim.LBFGS,
         'adam': torch.optim.Adam,
     }
+    X = torch.tensor(init, requires_grad=True, device=device)
     if method.lower() in optimizers:
         optimizer = optimizers[method.lower()]([X], **kwargs)
     else:
