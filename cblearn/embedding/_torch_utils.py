@@ -103,8 +103,8 @@ def torch_minimize(method,
         message = f"{method} did not converge."
 
     return scipy.optimize.OptimizeResult(
-        x=X.cpu().detach().numpy(), fun=loss, nit=n_iter,
-        success=success, message=message)
+        x=X.cpu().detach().numpy(), fun=loss.cpu().detach().numpy()[0], 
+        nit=n_iter, success=success, message=message)
 
 
 def assert_torch_is_available() -> None:
