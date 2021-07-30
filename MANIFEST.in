@@ -1,0 +1,14 @@
+# include files in sdist bundle
+include *.rst
+recursive-include docs *
+recursive-include examples *
+recursive-include cblearn/datasets *.csv *.csv.gz *.rst *.jpg *.txt *.arff.gz *.json.gz
+include LICENSE
+include README.md
+include pyproject.toml
+include readthedocs.yml
+include .flake8
+include MANIFEST.in
+
+# exclude from sdist
+## recursive-exclude folder *
