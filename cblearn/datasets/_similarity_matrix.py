@@ -122,7 +122,7 @@ def fetch_similarity_matrix(name: str, data_home: Optional[os.PathLike] = None, 
         data_dict = joblib.load(filepath)
 
     module_path = Path(__file__).parent
-    with module_path.joinpath('descr', 'similarity_matrix_dataset.rst').open() as rst_file:
+    with module_path.joinpath('descr', 'similarity_matrix.rst').open() as rst_file:
         fdescr = rst_file.read()
 
     return Bunch(**data_dict,

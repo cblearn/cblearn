@@ -34,3 +34,4 @@ Dataset loading utilities
 .. include:: ../../cblearn/datasets/descr/things_similarity.rst
 .. include:: ../../cblearn/datasets/descr/nature_vogue_similarity.rst
 .. include:: ../../cblearn/datasets/descr/material_similarity.rst
+.. include:: ../../cblearn/datasets/descr/similarity_matrix.rst
