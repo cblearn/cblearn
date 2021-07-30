@@ -6,6 +6,7 @@ from ._nature_vogue_similarity import fetch_vogue_cover_similarity
 from ._things_similarity import fetch_things_similarity
 from ._imagenet_similarity import fetch_imagenet_similarity
 from ._car_similarity import fetch_car_similarity
+from ._similarity_matrix import fetch_similarity_matrix
 
 from ._triplet_simulation import make_all_triplets
 from ._triplet_simulation import make_random_triplets

@@ -28,6 +28,7 @@ Loaders
     datasets.fetch_musician_similarity
     datasets.fetch_vogue_cover_similarity
     datasets.fetch_things_similarity
+    datasets.fetch_similarity_matrix
 
 
 Simulations
