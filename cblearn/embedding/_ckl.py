@@ -3,6 +3,8 @@ from typing import Optional, Union
 from sklearn.base import BaseEstimator
 from sklearn.utils import check_random_state
 import numpy as np
+from scipy.optimize import minimize
+from scipy.spatial import distance
 
 from cblearn import utils
 from cblearn.embedding._base import TripletEmbeddingMixin
@@ -42,7 +44,7 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
         (15, 2)
         >>> round(estimator.score(triplets), 1) > 0.6
         True
-        >>> estimator = CKL(n_components=2, kernel=True)
+        >>> estimator = CKL(n_components=2, backend='torch', kernel=True)
         >>> embedding = estimator.fit_transform(triplets)
         >>> embedding.shape
         (15, 2)
@@ -58,7 +60,7 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
 
     def __init__(self, n_components=2, mu=0.0, verbose=False,
                  random_state: Union[None, int, np.random.RandomState] = None, max_iter=2000,
-                 backend: str = 'torch', kernel: bool = False, learning_rate=None, batch_size=50000,
+                 backend: str = 'scipy', kernel: bool = False, learning_rate=None, batch_size=50000,
                  device: str = "auto"):
         """ Initialize the estimator.
 
@@ -108,26 +110,56 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
             init = random_state.multivariate_normal(
                 np.zeros(self.n_components), np.eye(self.n_components), size=n_objects)
 
-        if self.backend != 'torch':
-            raise ValueError(f"Invalid backend '{self.backend}'")
+        if self.backend == 'torch':
+           _torch_utils.assert_torch_is_available()
+           if self.kernel:
+               result = _torch_utils.torch_minimize_kernel(
+                   'adam', _ckl_kernel_loss_torch, init, data=[triplets.astype(int)], args=(self.mu,),
+                   device=self.device, max_iter=self.max_iter, batch_size=self.batch_size, lr=self.learning_rate or 100,
+                   seed=random_state.randint(1))
+           else:
+               result = _torch_utils.torch_minimize(
+                   'adam', _ckl_x_loss_torch, init, data=(triplets.astype(int),), args=(self.mu,),
+                   device=self.device, max_iter=self.max_iter, lr=self.learning_rate or 1,
+                   seed=random_state.randint(1))
+        elif self.backend == "scipy":
+            if self.kernel:
+                raise ValueError(f"Kernel objective is not available for backend {self.backend}.")
 
-        _torch_utils.assert_torch_is_available()
-        if self.kernel:
-            result = _torch_utils.torch_minimize_kernel(
-                'adam', _ckl_kernel_loss_torch, init, data=[triplets.astype(int)], args=(self.mu,),
-                device=self.device, max_iter=self.max_iter, batch_size=self.batch_size, lr=self.learning_rate or 100,
-                seed=random_state.randint(1))
+            result = minimize(_ckl_x_loss, init.ravel(), args=(init.shape, triplets, self.mu), method='L-BFGS-B',
+                          jac=True, options=dict(maxiter=self.max_iter, disp=self.verbose))
         else:
-            result = _torch_utils.torch_minimize(
-                'adam', _ckl_x_loss_torch, init, data=(triplets.astype(int),), args=(self.mu,),
-                device=self.device, max_iter=self.max_iter, lr=self.learning_rate or 1,
-                seed=random_state.randint(1))
+            raise ValueError(f"Unknown backend '{self.backend}'. Try 'scipy' or 'torch' instead.")
 
         if self.verbose and not result.success:
             print(f"CKL's optimization failed with reason: {result.message}.")
         self.embedding_ = result.x.reshape(-1, self.n_components)
         self.stress_, self.n_iter_ = result.fun, result.nit
         return self
+
+
+def _ckl_x_loss(x, x_shape, triplets, mu, float_min=np.finfo(float).tiny):
+    X = x.reshape(x_shape)
+    n_objects, n_dim = X.shape
+    D = distance.squareform(distance.pdist(X, 'sqeuclidean'))
+
+    I, J, K = tuple(triplets.T)
+    nom = mu + D[I, K]
+    den = 2 * mu + D[I, K] + D[I, J]
+    loss = -(np.log(np.maximum(nom, float_min)) - np.log(np.maximum(den, float_min))).sum()
+
+    loss_grad = np.empty_like(X)
+    for dim in range(n_dim):
+        triplet_grads = [
+            2 / nom * (X[I, dim] - X[K, dim]) - 2 / den * ((X[I, dim] - X[J, dim]) + (X[I, dim] - X[K, dim])),
+            2 / den * (X[I, dim] - X[J, dim]),
+            -2 / nom * (X[I, dim] - X[K, dim]) + 2 / den * (X[I, dim] - X[K, dim]),
+            ]
+        loss_grad[:, dim] = -np.bincount(triplets[:, 0], triplet_grads[0], n_objects)
+        loss_grad[:, dim] -= np.bincount(triplets[:, 1], triplet_grads[1], n_objects)
+        loss_grad[:, dim] -= np.bincount(triplets[:, 2], triplet_grads[2], n_objects)
+
+    return loss, loss_grad.ravel()
 
 
 def _ckl_x_loss_torch(embedding, triplets, mu):

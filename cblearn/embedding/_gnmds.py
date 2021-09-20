@@ -3,6 +3,8 @@ from typing import Optional, Union
 from sklearn.base import BaseEstimator
 from sklearn.utils import check_random_state
 import numpy as np
+from scipy.spatial import distance
+from scipy.optimize import minimize
 
 from cblearn import utils
 from cblearn.embedding._base import TripletEmbeddingMixin
@@ -42,7 +44,11 @@ class GNMDS(BaseEstimator, TripletEmbeddingMixin):
         >>> embedding = estimator.fit_transform(triplets, n_objects=15)
         >>> round(estimator.score(triplets), 1) > 0.6
         True
-        >>> estimator = GNMDS(n_components=2, kernel=True)
+        >>> estimator = GNMDS(n_components=2, backend='torch')
+        >>> embedding = estimator.fit_transform(triplets, n_objects=15)
+        >>> round(estimator.score(triplets), 1) > 0.6
+        True
+        >>> estimator = GNMDS(n_components=2, backend='torch', kernel=True)
         >>> embedding = estimator.fit_transform(triplets, n_objects=15)
         >>> embedding.shape
         (15, 2)
@@ -58,7 +64,7 @@ class GNMDS(BaseEstimator, TripletEmbeddingMixin):
         """
 
     def __init__(self, n_components=2, lambd=0.0, verbose=False,
-                 random_state: Union[None, int, np.random.RandomState] = None, max_iter=2000, backend: str = 'torch',
+                 random_state: Union[None, int, np.random.RandomState] = None, max_iter=2000, backend: str = 'scipy',
                  kernel: bool = False, learning_rate=10, batch_size=50_000, device: str = "auto"):
         """ Initialize the estimator.
 
@@ -69,7 +75,7 @@ class GNMDS(BaseEstimator, TripletEmbeddingMixin):
             verbose: Enable verbose output.
             random_state: The seed of the pseudo random number generator used to initialize the optimization.
             max_iter: Maximum number of optimization iterations.
-            backend: The optimization backend for fitting. {"torch"}
+            backend: The optimization backend for fitting. {"scipy", "torch"}
             kernel: Whether to optimize the kernel or the embedding (default).
             learning_rate: Learning rate of the gradient-based optimizer.
                            Only used with *torch* backend, else ignored.
@@ -108,25 +114,53 @@ class GNMDS(BaseEstimator, TripletEmbeddingMixin):
             init = random_state.multivariate_normal(np.zeros(self.n_components), np.eye(self.n_components),
                                                     size=n_objects)
 
-        if self.backend != 'torch':
-            raise ValueError(f"Invalid backend '{self.backend}'")
+        if self.backend == 'torch':
+            _torch_utils.assert_torch_is_available()
+            if self.kernel:
+                result = _torch_utils.torch_minimize_kernel(
+                    'adam', _gnmds_kernel_loss_torch, init, data=(triplets.astype(int),), args=(self.lambd,),
+                    device=self.device, max_iter=self.max_iter, batch_size=self.batch_size, seed=random_state.randint(1),
+                    lr=self.learning_rate)
+            else:
+                result = _torch_utils.torch_minimize('adam', _gnmds_x_loss_torch, init, data=(triplets.astype(int),),
+                                                     args=(self.lambd,), device=self.device, max_iter=self.max_iter,
+                                                     seed=random_state.randint(1), lr=self.learning_rate)
+        elif self.backend == "scipy":
+            if self.kernel:
+                raise ValueError(f"Kernel objective is not available for backend {self.backend}.")
 
-        _torch_utils.assert_torch_is_available()
-        if self.kernel:
-            result = _torch_utils.torch_minimize_kernel(
-                'adam', _gnmds_kernel_loss_torch, init, data=(triplets.astype(int),), args=(self.lambd,),
-                device=self.device, max_iter=self.max_iter, batch_size=self.batch_size, seed=random_state.randint(1),
-                lr=self.learning_rate)
+            result = minimize(_gnmds_x_grad, init.ravel(), args=(init.shape, triplets, self.lambd), method='L-BFGS-B',
+                              jac=True, options=dict(maxiter=self.max_iter, disp=self.verbose))
         else:
-            result = _torch_utils.torch_minimize('adam', _gnmds_x_loss_torch, init, data=(triplets.astype(int),),
-                                                 args=(self.lambd,), device=self.device, max_iter=self.max_iter,
-                                                 seed=random_state.randint(1), lr=self.learning_rate)
+            raise ValueError(f"Unknown backend '{self.backend}'. Try 'scipy' or 'torch' instead.")
 
         if self.verbose and not result.success:
             print(f"GNMDS's optimization failed with reason: {result.message}.")
         self.embedding_ = result.x.reshape(-1, self.n_components)
         self.stress_, self.n_iter_ = result.fun, result.nit
         return self
+
+
+def _gnmds_x_grad(x, x_shape, triplets, lambd):
+    X = x.reshape(x_shape)  # scipy minimize expects a flat x.
+    n_objects, n_dim = X.shape
+    D = distance.squareform(distance.pdist(X, 'sqeuclidean'))
+
+    I, J, K = tuple(triplets.T)
+    slack = np.maximum(D[I, J] + 1 - D[I, K], 0)
+    loss = slack.sum() + lambd * (X**2).sum()
+
+    loss_grad = np.empty_like(X)
+    triplets = triplets[slack > 0]
+    I, J, K = tuple(triplets.T)
+    for dim in range(X.shape[1]):
+        loss_grad[:, dim] = np.bincount(triplets[:, 0], 2 * (X[I, dim] - X[J, dim])
+                                        - 2 * (X[I, dim] - X[K, dim]), n_objects)
+        loss_grad[:, dim] += np.bincount(triplets[:, 1], -2 * (X[I, dim] - X[J, dim]), n_objects)
+        loss_grad[:, dim] += np.bincount(triplets[:, 2], 2 * (X[I, dim] - X[K, dim]), n_objects)
+    loss_grad = loss_grad + lambd * 2 * X
+
+    return loss, loss_grad.ravel()
 
 
 def _gnmds_kernel_loss_torch(kernel_matrix, triplets, lambd):
@@ -138,11 +172,13 @@ def _gnmds_kernel_loss_torch(kernel_matrix, triplets, lambd):
     return (d_ij - d_ik).clamp(min=0).sum() + lambd * kernel_matrix.trace()
 
 
-def _gnmds_x_loss_torch(embedding, triplets, lambd):
+def _gnmds_x_loss_torch(embedding, triplets, lambd, p=2.):
     import torch  # Pytorch is an optional dependency
 
     X = embedding[triplets.long()]
-    anchor, positive, negative = X[:, 0, :], X[:, 1, :], X[:, 2, :]
-    triplet_loss = torch.nn.functional.triplet_margin_loss(
-        anchor, positive, negative, margin=lambd, p=2, reduction='none')
-    return (triplet_loss**2).sum()
+    I, J, K = X[:, 0, :], X[:, 1, :], X[:, 2, :]
+    sqnorm_near = torch.linalg.vector_norm(I - J, ord=p, dim=1)**2
+    sqnorm_far = torch.linalg.vector_norm(I - K, ord=p, dim=1)**2
+    loss = (sqnorm_near + 1  - sqnorm_far).clamp(min=0).sum()
+
+    return loss + lambd * (X**2).sum()
