@@ -26,7 +26,7 @@ def make_all_triplet_indices(n_objects: int, monotonic: bool) -> np.ndarray:
     triplets = np.fromiter(triplet_iter, int).reshape(-1, 3)
 
     if monotonic:
-        return triplets
+        return triplets[:, [1, 0, 2]]
     else:
         return np.r_[triplets[:, [1, 0, 2]], triplets, triplets[:, [2, 0, 1]]]
 
@@ -50,7 +50,7 @@ def make_random_triplet_indices(n_objects: int, size: Union[int, float] = 1.,
         size: Either absolute or relative number of triplets to generate.
         random_state: Seed for random sampling.
         repeat: Sample with repetitions
-        monotonic: Sample triplets (j, i, k), such that j < i < k.
+        monotonic: Sample triplets (i, j, k), such that j < i < k.
         make_all: Choose from all triplets instead of iterative sampling,
                   if the difference between all triplets to the requested number is smaller than this value.
     Returns:

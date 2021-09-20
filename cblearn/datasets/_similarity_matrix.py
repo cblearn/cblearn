@@ -116,7 +116,7 @@ def fetch_similarity_matrix(name: str, data_home: Optional[os.PathLike] = None, 
                     _this_filepath = basepath.joinpath(f'{_this_name}.pkz')
                     joblib.dump(_this_dict, _this_filepath, compress=6)
                 if name == _this_name:
-                    data_dict =  _this_dict
+                    data_dict = _this_dict
         os.remove(archive_path)
     else:
         data_dict = joblib.load(filepath)
