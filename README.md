@@ -71,12 +71,12 @@ functions that download and load multiple real world comparisons.
 
 | Algorithm                   | Default | Pytorch (GPU) | Reference Wrapper |
 | --------------------------- |  :---:  | :-----------: | :---------------: |
-| Crowd Kernel Learning (CKL) | planned | X             |                   |
-| FORTE | planned | X             |                   |
-| GNMDS | planned | X             |                   |
-| Maximum-Likelihood Difference Scaling (MLDS) | planned |              | [MLDS (R)](https://cran.r-project.org/web/packages/MLDS/index.html)|
-| Soft Ordinal Embedding (SOE) | X | X             | [loe (R)](https://cran.r-project.org/web/packages/loe/index.html) |
-| Stochastic Triplet Embedding (STE/t-STE) | planned | planned             | planned |
+| Crowd Kernel Learning (CKL) | X       | X             |                   |
+| FORTE                       |         | X             |                   |
+| GNMDS                       | X       | X             |                   |
+| Maximum-Likelihood Difference Scaling (MLDS) | X |              | [MLDS (R)](https://cran.r-project.org/web/packages/MLDS/index.html)|
+| Soft Ordinal Embedding (SOE) | X      | X             | [loe (R)](https://cran.r-project.org/web/packages/loe/index.html) |
+| Stochastic Triplet Embedding (STE/t-STE) | X       | X  |   |
 
 ## Contribute
 

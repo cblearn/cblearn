@@ -4,6 +4,16 @@ import numpy as np
 import scipy
 
 
+def torch_device(device: str) -> str:
+    import torch
+
+    if device == "auto":
+        if torch.cuda.is_available():
+            return "cuda"
+        else:
+            return "cpu"
+
+
 def torch_minimize_kernel(method, objective, init, **kwargs):
     import torch
 
@@ -55,11 +65,7 @@ def torch_minimize(method,
     """
     import torch
 
-    if device == "auto":
-        if torch.cuda.is_available():
-            device = "cuda"
-        else:
-            device = "cpu"
+    device = torch_device(device)
 
     data = [torch.tensor(d).to(device) for d in data]
     args = [torch.tensor(a).to(device) for a in args]
@@ -104,7 +110,7 @@ def torch_minimize(method,
 
     return scipy.optimize.OptimizeResult(
         x=X.cpu().detach().numpy(), fun=loss.cpu().detach().numpy(), 
-        nit=n_iter, success=success, message=message)
+        nit=n_iter + 1, success=success, message=message)
 
 
 def assert_torch_is_available() -> None:

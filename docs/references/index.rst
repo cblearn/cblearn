@@ -71,6 +71,10 @@ Low-level Dataset Utility
     embedding.FORTE
     embedding.GNMDS
     embedding.SOE
+    embedding.STE
+    embedding.OENN
+    embedding.MLDS
+
 
 Wrapper
 -------
