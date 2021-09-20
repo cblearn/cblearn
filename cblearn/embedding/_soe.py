@@ -12,7 +12,7 @@ from cblearn.embedding._torch_utils import assert_torch_is_available, torch_mini
 
 
 class SOE(BaseEstimator, TripletEmbeddingMixin):
-    """ Soft Ordinal Embedding backend (SOE).
+    """ Soft Ordinal Embedding (SOE).
 
         SOE [1]_ is minimizing the soft objective as a smooth relaxation of the triplet error.
 
@@ -123,7 +123,7 @@ class SOE(BaseEstimator, TripletEmbeddingMixin):
                                     seed=random_state.randint(1))
         elif self.backend == "scipy":
             result = minimize(_soe_loss, init.ravel(), args=(init.shape, triplets, self.margin), method='L-BFGS-B',
-                              jac=_soe_majorizing_grad, options=dict(maxiter=self.max_iter, disp=self.verbose))
+                              jac=True, options=dict(maxiter=self.max_iter, disp=self.verbose))
         else:
             raise ValueError(f"Unknown backend '{self.backend}'. Try 'scipy' or 'torch' instead.")
 
@@ -146,24 +146,17 @@ def _soe_loss_torch(embedding, triplets, margin):
 
 
 def _soe_loss(x, x_shape, triplets, margin):
-    """ Equation (1) of Terada & Luxburg (2014) """
-    X = x.reshape(x_shape)
-    X_dist = distance_matrix(X, X)
-    ij_dist = X_dist[triplets[:, 0], triplets[:, 1]]
-    kl_dist = X_dist[triplets[:, 0], triplets[:, 2]]
-    stress = np.maximum(ij_dist + margin - kl_dist, 0) ** 2
-    return stress.sum()
-
-
-def _soe_majorizing_grad(x, x_shape, triplets, margin):
-    """ Gradient of majorizating function (2) of Terada & Luxburg (2014)
-        as described in the supplementary material 2.1."""
+    """ Loss equation (1) of Terada & Luxburg (2014)
+     Gradient of majorizating function (2) of Terada & Luxburg (2014)
+        as described in the supplementary material 2.1.
+     """
     X = x.reshape(x_shape)
     X_dist = distance_matrix(X, X)
     ij_dist = X_dist[triplets[:, 0], triplets[:, 1]]
     kl_dist = X_dist[triplets[:, 0], triplets[:, 2]]
     ij_dist, kl_dist = np.maximum(ij_dist, 0.0000001), np.maximum(kl_dist, 0.0000001)
     differences = ij_dist + margin - kl_dist
+    stress = (np.maximum(differences, 0) ** 2).sum()
 
     is_diff_positive = differences > 0  # Case 1, 2.1.1
     ij_dist_valid, kl_dist_valid = ij_dist[is_diff_positive, np.newaxis], kl_dist[is_diff_positive, np.newaxis]
@@ -178,4 +171,5 @@ def _soe_majorizing_grad(x, x_shape, triplets, margin):
     np.add.at(grad, i, double_dist * (Xij - Xil + np.where(i_is_l, - Xil, 0)))
     np.add.at(grad, j, double_dist * -Xij)
     np.add.at(grad, k, double_dist * Xil)
-    return grad.ravel()
+
+    return stress, grad.ravel()
