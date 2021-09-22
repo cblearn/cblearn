@@ -69,6 +69,9 @@ templates_path = ['_templates']
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
+rst_prolog = """.. attention::
+    cblearn is work in progress. The API is still changing and a errors are known. Please help us by posting an issue on Github.
+"""
 
 # -- Options for HTML output -------------------------------------------------
 
