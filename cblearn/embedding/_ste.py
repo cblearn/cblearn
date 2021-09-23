@@ -44,14 +44,14 @@ class STE(BaseEstimator, TripletEmbeddingMixin):
         >>> embedding = estimator.fit_transform(triplets, n_objects=15)
         >>> embedding.shape
         (15, 2)
-        >>> round(estimator.score(triplets), 1)
-        0.9
+        >>> estimator.score(triplets) > 0.8
+        True
 
         The following is running on the CUDA GPU, if available (but requires pytorch installed).
 
         >>> estimator = STE(n_components=2, backend="torch", random_state=seed)
         >>> embedding = estimator.fit_transform(triplets, n_objects=15)
-        >>> estimator.score(triplets) > 0.6
+        >>> estimator.score(triplets) > 0.8
         True
 
         References

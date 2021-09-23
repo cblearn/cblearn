@@ -126,15 +126,19 @@ class OENN(BaseEstimator, TripletEmbeddingMixin):
         assert_torch_is_available()
         import torch  # torch is an optional dependency - import at runtime
 
+        seed = random_state.randint(1)
+        torch.manual_seed(seed)
+        if torch.cuda.is_available():
+            torch.cuda.manual_seed_all(seed)
+
         device = torch_device(self.device)
         emb_net = self._make_emb_net(self.encoding_.shape[1], layer_width).to(device)
         optimizer = torch.optim.Adam(emb_net.parameters(), lr=self.learning_rate)
         criterion = torch.nn.TripletMarginLoss(margin=1, p=2).to(device)
         triplets = torch.tensor(triplets.astype(int), device=device)
         encoding = torch.tensor(self.encoding_, dtype=float, device=device)
-        g = torch.manual_seed(random_state.randint(1))
         dataloader = torch.utils.data.DataLoader(torch.utils.data.TensorDataset(triplets),
-                                                 batch_size=self.batch_size, shuffle=True, generator=g)
+                                                 batch_size=self.batch_size, shuffle=True)
 
         loss = float("inf")
         losses = []

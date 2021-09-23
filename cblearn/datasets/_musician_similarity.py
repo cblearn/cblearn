@@ -12,7 +12,7 @@ from sklearn.utils import check_random_state, Bunch
 
 ARCHIVE = _base.RemoteFileMetadata(
     filename='musicseer-results-2002-10-15.txt',
-    url='https://www.ee.columbia.edu/~dpwe/research/musicsim/musicseer.org/results/musicseer-results-2002-10-15.txt',
+    url='https://www.labrosa.org/projects/musicsim/musicseer.org/results/musicseer-results-2002-10-15.txt',
     checksum=('149bc77d872d35cbd139833d29b788545873c4d1160a57a59f5ad8b9507bbad0'))
 
 logger = logging.getLogger(__name__)
@@ -24,7 +24,7 @@ def fetch_musician_similarity(data_home: Optional[os.PathLike] = None, download_
     """ Load the MusicSeer musician similarity dataset (triplets).
 
     ===================   =====================
-    Triplets                             224792
+    Triplets                             224.792
     Objects (Musicians)                     413
     Dimensionality                      unknown
     ===================   =====================
