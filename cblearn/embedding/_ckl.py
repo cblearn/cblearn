@@ -111,23 +111,23 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
                 np.zeros(self.n_components), np.eye(self.n_components), size=n_objects)
 
         if self.backend == 'torch':
-           _torch_utils.assert_torch_is_available()
-           if self.kernel:
-               result = _torch_utils.torch_minimize_kernel(
-                   'adam', _ckl_kernel_loss_torch, init, data=[triplets.astype(int)], args=(self.mu,),
-                   device=self.device, max_iter=self.max_iter, batch_size=self.batch_size, lr=self.learning_rate or 100,
-                   seed=random_state.randint(1))
-           else:
-               result = _torch_utils.torch_minimize(
-                   'adam', _ckl_x_loss_torch, init, data=(triplets.astype(int),), args=(self.mu,),
-                   device=self.device, max_iter=self.max_iter, lr=self.learning_rate or 1,
-                   seed=random_state.randint(1))
+            _torch_utils.assert_torch_is_available()
+            if self.kernel:
+                result = _torch_utils.torch_minimize_kernel(
+                    'adam', _ckl_kernel_loss_torch, init, data=[triplets.astype(int)], args=(self.mu,),
+                    device=self.device, max_iter=self.max_iter, batch_size=self.batch_size, lr=self.learning_rate or 100,
+                    seed=random_state.randint(1))
+            else:
+                result = _torch_utils.torch_minimize(
+                    'adam', _ckl_x_loss_torch, init, data=(triplets.astype(int),), args=(self.mu,),
+                    device=self.device, max_iter=self.max_iter, lr=self.learning_rate or 1,
+                    seed=random_state.randint(1))
         elif self.backend == "scipy":
             if self.kernel:
                 raise ValueError(f"Kernel objective is not available for backend {self.backend}.")
 
             result = minimize(_ckl_x_loss, init.ravel(), args=(init.shape, triplets, self.mu), method='L-BFGS-B',
-                          jac=True, options=dict(maxiter=self.max_iter, disp=self.verbose))
+                              jac=True, options=dict(maxiter=self.max_iter, disp=self.verbose))
         else:
             raise ValueError(f"Unknown backend '{self.backend}'. Try 'scipy' or 'torch' instead.")
 

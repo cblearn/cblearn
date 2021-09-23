@@ -1,13 +1,8 @@
-import numpy as np
-from scipy.spatial import distance
-
 from typing import Optional, Union
 
+import numpy as np
 from sklearn.base import BaseEstimator
 from sklearn.utils import check_random_state
-import numpy as np
-from scipy.optimize import minimize
-from scipy.spatial import distance_matrix
 
 from cblearn import utils
 from cblearn.embedding._base import TripletEmbeddingMixin
@@ -58,7 +53,7 @@ class OENN(BaseEstimator, TripletEmbeddingMixin):
 
     def __init__(self, n_components=2, verbose=False, random_state: Union[None, int, np.random.RandomState] = None,
                  max_iter=1000, learning_rate=0.005, layer_width='auto', batch_size=50_000,  device: str = "auto"):
-        """ Initialize the estimator.
+        r""" Initialize the estimator.
 
         Args:
             n_components :
@@ -86,15 +81,15 @@ class OENN(BaseEstimator, TripletEmbeddingMixin):
         self.device = device
 
     def _make_emb_net(self, input_dim: int, layer_width: int, hidden_layers: int = 3):
-       import torch
+        import torch
 
-       return torch.nn.Sequential(
-           torch.nn.Linear(input_dim, layer_width),
-           torch.nn.ReLU(),
-           *sum([(torch.nn.Linear(layer_width, layer_width), torch.nn.ReLU())
-                 for _ in range(hidden_layers - 1)], tuple()),
-           torch.nn.Linear(layer_width, self.n_components)
-       ).double()
+        return torch.nn.Sequential(
+            torch.nn.Linear(input_dim, layer_width),
+            torch.nn.ReLU(),
+            *sum([(torch.nn.Linear(layer_width, layer_width), torch.nn.ReLU())
+                  for _ in range(hidden_layers - 1)], tuple()),
+            torch.nn.Linear(layer_width, self.n_components)
+        ).double()
 
     def fit(self, X: utils.Query, y: np.ndarray = None,
             encoding: Optional[np.ndarray] = None, n_objects: Optional[int] = None, eps: float = 1e-6) -> 'OENN':
@@ -158,10 +153,10 @@ class OENN(BaseEstimator, TripletEmbeddingMixin):
 
             losses.append(loss.cpu().detach().numpy())
             if abs(prev_loss - loss) / max(abs(loss), abs(prev_loss), 1) < eps:
-                 break
+                break
         else:
             success = False
-            message = f"Adam optimizer did not converge."
+            message = "Adam optimizer did not converge."
 
         if self.verbose and not success:
             print(f"OENN's optimization failed with reason: {message}.")
@@ -172,5 +167,3 @@ class OENN(BaseEstimator, TripletEmbeddingMixin):
         self.n_iter_ = n_iter + 1
 
         return self
-
-

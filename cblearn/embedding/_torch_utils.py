@@ -109,7 +109,7 @@ def torch_minimize(method,
         message = f"{method} did not converge."
 
     return scipy.optimize.OptimizeResult(
-        x=X.cpu().detach().numpy(), fun=loss.cpu().detach().numpy(), 
+        x=X.cpu().detach().numpy(), fun=loss.cpu().detach().numpy(),
         nit=n_iter + 1, success=success, message=message)
 
 

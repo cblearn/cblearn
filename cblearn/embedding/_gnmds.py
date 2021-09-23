@@ -180,6 +180,6 @@ def _gnmds_x_loss_torch(embedding, triplets, lambd, p=2.):
     I, J, K = X[:, 0, :], X[:, 1, :], X[:, 2, :]
     sqnorm_near = torch.linalg.vector_norm(I - J, ord=p, dim=1)**2
     sqnorm_far = torch.linalg.vector_norm(I - K, ord=p, dim=1)**2
-    loss = (sqnorm_near + 1  - sqnorm_far).clamp(min=0).sum()
+    loss = (sqnorm_near + 1 - sqnorm_far).clamp(min=0).sum()
 
     return loss + lambd * (X**2).sum()

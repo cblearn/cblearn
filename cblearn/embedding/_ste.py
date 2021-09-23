@@ -203,9 +203,3 @@ class TSTE(STE):
         heavy_tailed = True
         return super(STE, self).__init__(n_components, heavy_tailed, verbose, random_state, max_iter, backend,
                                          learning_rate, batch_size, device)
-
-
-
-
-
-

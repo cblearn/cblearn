@@ -4,7 +4,6 @@ import numpy as np
 from sklearn.base import BaseEstimator
 from sklearn.utils import check_random_state
 from sklearn.linear_model import LogisticRegression
-import numpy as np
 from scipy.stats import norm
 from scipy.optimize import minimize
 
@@ -94,7 +93,8 @@ class MLDS(BaseEstimator, TripletEmbeddingMixin):
             X01[rows, quads[:, 3]] += 1
             X01[rows, quads[:, 1]] -= 1
             X01[rows, quads[:, 2]] -= 1
-            glm = LogisticRegression(verbose=self.verbose, max_iter=self.max_iter, fit_intercept=False, random_state=random_state)
+            glm = LogisticRegression(verbose=self.verbose, max_iter=self.max_iter,
+                                     fit_intercept=False, random_state=random_state)
             glm.fit(X01, answer.astype(int))
             self.embedding_ = glm.coef_.reshape(-1, 1)
             self.log_likelihood_ = glm.predict_log_proba(X01)[rows, answer.astype(int)].mean()
