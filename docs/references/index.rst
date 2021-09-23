@@ -72,6 +72,7 @@ Low-level Dataset Utility
     embedding.GNMDS
     embedding.SOE
     embedding.STE
+    embedding.TSTE
     embedding.OENN
     embedding.MLDS
 

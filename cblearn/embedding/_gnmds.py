@@ -76,11 +76,12 @@ class GNMDS(BaseEstimator, TripletEmbeddingMixin):
             random_state: The seed of the pseudo random number generator used to initialize the optimization.
             max_iter: Maximum number of optimization iterations.
             backend: The optimization backend for fitting. {"scipy", "torch"}
-            kernel: Whether to optimize the kernel or the embedding (default).
+            kernel: Whether to optimize in kernel or embedding (default) space.
             learning_rate: Learning rate of the gradient-based optimizer.
                            Only used with *torch* backend, else ignored.
             batch_size: Batch size of stochastic optimization. Only used with *torch* backend, else ignored.
-            device: The device on which pytorch computes. {"auto", "cpu", "cuda"}
+            device:
+                 The device on which pytorch computes. {"auto", "cpu", "cuda"}
                 "auto" chooses cuda (GPU) if available, but falls back on cpu if not.
                 Only used with the *torch* backend, else ignored.
         """

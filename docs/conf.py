@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.abspath('..'))
 
 project = 'cblearn'
 author = 'David-Elias Künstle, Leena Suresh, Siyavash Haghiri, Michael Perrot, Debarghya Ghoshdastidari, Ulrike von Luxburg'
-copyright = f'2020, {author}' 
+copyright = f'2021, {author}'
 
 # -- General configuration ---------------------------------------------------
 
@@ -41,9 +41,11 @@ extensions = [
 autosummary_generate = True  # generate stub files for summarized entries
 autodoc_default_options = {
     'members': True,
-    'inherited-members': True
+    'inherited-members': True,
+    'class-doc-from': 'class',
 }
 autodoc_typehints = 'description'
+autodoc_typehints_description_target = 'documented'
 
 sphinx_gallery_conf = {
      'examples_dirs': '../examples',   # path to your example scripts

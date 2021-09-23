@@ -13,10 +13,10 @@ from cblearn.embedding._torch_utils import assert_torch_is_available, torch_mini
 
 
 class STE(BaseEstimator, TripletEmbeddingMixin):
-    """ Stochastic Triplet Embedding algorithm (t-STE / STE).
+    """ Stochastic Triplet Embedding algorithm (STE / t-STE).
 
         STE [1]_ maximizes the probability, that the triplets are satisfied.
-        The default variant t-STE is using the heavy tailed Student-t-kernel instead of a Gaussian kernel.
+        The variant t-STE is using the heavy tailed Student-t-kernel instead of a Gaussian kernel.
 
         This estimator supports multiple implementations which can be selected by the `backend` parameter.
         The *scipy* backend uses the L-BSGS-B optimizer.
@@ -62,7 +62,7 @@ class STE(BaseEstimator, TripletEmbeddingMixin):
                Insights into Ordinal Embedding Algorithms: A Systematic Evaluation. ArXiv:1912.01666 [Cs, Stat].
         """
 
-    def __init__(self, n_components=2, heavy_tailed=True, verbose=False,
+    def __init__(self, n_components=2, heavy_tailed=False, verbose=False,
                  random_state: Union[None, int, np.random.RandomState] = None, max_iter=1000,
                  backend: str = "scipy", learning_rate=1, batch_size=50_000,  device: str = "auto"):
         """ Initialize the estimator.
@@ -71,7 +71,8 @@ class STE(BaseEstimator, TripletEmbeddingMixin):
             n_components :
                 The dimension of the embedding.
             heavy_tailed:
-                t-STE is using the heavy-tailed student-t kernel, otherwise STE is using the Gaussian kernel.
+                If false, STE is using the Gaussian kernel,
+                If true, t-STE is using the heavy-tailed student-t kernel.
             verbose: boolean, default=False
                 Enable verbose output.
             random_state:
@@ -189,6 +190,19 @@ def _ste_x_grad(x, x_shape, triplets, heavy_tailed):
     loss_grad = -loss_grad
 
     return loss, loss_grad.ravel()
+
+
+class TSTE(STE):
+    """ t-Distributed Stochastic Triplet Embedding (t-STE)
+
+    Variant of :class:`STE`, that assumes t-student distributed distances
+    which leads to better optimization properties."""
+    def __init__(self, n_components=2, verbose=False,
+                 random_state: Union[None, int, np.random.RandomState] = None, max_iter=1000,
+                 backend: str = "scipy", learning_rate=1, batch_size=50_000,  device: str = "auto"):
+        heavy_tailed = True
+        return super(STE, self).__init__(n_components, heavy_tailed, verbose, random_state, max_iter, backend,
+                                         learning_rate, batch_size, device)
 
 
 
