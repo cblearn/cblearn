@@ -107,7 +107,7 @@ class OENN(BaseEstimator, TripletEmbeddingMixin):
         triplets = utils.check_query_response(X, y, result_format='list-order')
         random_state = check_random_state(self.random_state)
         if n_objects is None:
-            n_objects = len(np.unique(triplets))
+            n_objects = triplets.max() + 1
         if encoding is None:
             input_dim = int(np.ceil(np.log(n_objects))) + 1
             self.encoding_ = np.random.normal(0, 1, (n_objects, input_dim))

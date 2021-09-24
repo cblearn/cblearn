@@ -83,7 +83,7 @@ class MLDS(BaseEstimator, TripletEmbeddingMixin):
             This estimator
         """
         random_state = check_random_state(self.random_state)
-        n_objects = len(np.unique(X))
+        n_objects = X.max() + 1
 
         triplets, answer = utils.check_query_response(X, y, result_format='list-boolean')
         quads = triplets[:, [1, 0, 0, 2]]

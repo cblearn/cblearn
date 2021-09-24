@@ -104,7 +104,7 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
         """
         triplets = utils.check_query_response(X, y, result_format='list-order')
         if not n_objects:
-            n_objects = len(np.unique(triplets))
+            n_objects = triplets.max() + 1
         random_state = check_random_state(self.random_state)
         if init is None:
             init = random_state.multivariate_normal(
