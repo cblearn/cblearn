@@ -9,20 +9,21 @@ In a web-based survey or game, the user was presented a target musician and mult
 most similar to the target.
 Such, for each user judgement multiple triplets were created with the remaining others.
 
+
 .. _This dataset contains triplets: https://labrosa.ee.columbia.edu/projects/musicsim/musicseer.org/results/
 .. _MusicSeer similarity survey: http://musicseer.com
 
 **Data Set Characteristics:**
 
     ===================   =====================
-    Triplets                             224792
-    Objects (Musicians)                     413
+    Triplets                            131.970
+    Objects (Artists)                       448
     Dimensionality                      unknown
     ===================   =====================
 
-.. Note:
-    The original dataset, published 2002-10-15, contains 224793 triplets.
-    We omit in this dataset the triplets with missing values for the last triplet index.
+This is is based on the original dataset, that was used in the ISMIR paper that is referenced below with 138.338 triplets
+and 413 artists, but make some modifications. We drop triplets that are missing the third (other) entry.
+Some artists in the triplets are missing in the provided name list, we call them 'unknown_0', 'unknown_1', etc.
 
 This dataset can be downloaded using the :func:`cblearn.datasets.fetch_musician_similarity`.
 

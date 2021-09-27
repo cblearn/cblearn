@@ -11,9 +11,9 @@ from sklearn.utils import check_random_state, Bunch
 
 
 ARCHIVE = _base.RemoteFileMetadata(
-    filename='musicseer-results-2002-10-15.txt',
-    url='https://www.labrosa.org/projects/musicsim/musicseer.org/results/musicseer-results-2002-10-15.txt',
-    checksum=('149bc77d872d35cbd139833d29b788545873c4d1160a57a59f5ad8b9507bbad0'))
+    filename='musicseer-results-2002-04-29.txt',
+    url='https://www.labrosa.org/projects/musicsim/musicseer.org/results/musicseer-results-2002-04-29.txt',
+    checksum=('4506fc16a8f9a30a92207720bc599602b514de20e94494f67eb7a1e348401e2d'))
 
 logger = logging.getLogger(__name__)
 
@@ -24,8 +24,8 @@ def fetch_musician_similarity(data_home: Optional[os.PathLike] = None, download_
     """ Load the MusicSeer musician similarity dataset (triplets).
 
     ===================   =====================
-    Triplets                             224.792
-    Objects (Musicians)                     413
+    Triplets                            131.970
+    Objects (Artists)                       448
     Dimensionality                      unknown
     ===================   =====================
 
@@ -56,8 +56,10 @@ def fetch_musician_similarity(data_home: Optional[os.PathLike] = None, download_
                 Letter 'S' or 'G' indicating if comparison origins from survey or game.
             user : np.ndarray, shape (n_triplets, )
                 Array of the user ids, answering the triplet question
-            artists : np.ndarray, shape (413,)
+            artist_name : np.ndarray, shape (413,)
                 Names of artists, corresponding to the triplet indices.
+            artist_id : np.ndarray, shape (413,)
+                Ids of artists, corresponding to the triplet indices.
             DESCR : string
                 Description of the dataset.
         triplets : numpy array (n_triplets, 3)
@@ -81,7 +83,7 @@ def fetch_musician_similarity(data_home: Optional[os.PathLike] = None, download_
         archive_path = _base._fetch_remote(ARCHIVE, dirname=data_home)
         with open(archive_path, 'r') as f:
             cols = ('judgement', 'survey', 'user', 'target', 'chosen', 'other')
-            musicians_data = np.array(list(csv.reader(f, delimiter=' '))[1:]).T
+            musicians_data = np.array(list(csv.reader(f, delimiter=' '))[1:-2]).T
             musicians_data = {k: v for k, v in zip(cols, musicians_data)}
 
         joblib.dump(musicians_data, filepath, compress=6)
@@ -98,19 +100,27 @@ def fetch_musician_similarity(data_home: Optional[os.PathLike] = None, download_
     artists = np.genfromtxt(module_path.joinpath('data', 'musician_names.txt'), delimiter=' ',
                             dtype={'names': ('name', 'id'), 'formats': ('U29', '<i8')})
 
-    triplets = np.c_[musicians_data['target'], musicians_data['chosen'], musicians_data['other']]
-    artists.sort(order=['id'], axis=0)
-    triplets = np.searchsorted(artists['id'], triplets)
+    triplet_filter = musicians_data['other'] != ''   # remove bi-tuples.
+    triplet_ids = np.c_[musicians_data['target'], musicians_data['chosen'], musicians_data['other']]
+    triplet_ids = triplet_ids[triplet_filter].astype(int)
+
+    all_ids, triplets = np.unique(triplet_ids, return_inverse=True)
+    triplets = triplets.reshape(triplet_ids.shape)
 
     if return_triplets:
         return triplets
+
+    ids_to_names = {id: n for id, n in zip(artists['id'], artists['name'])}
+    for ix, id in enumerate(sorted(np.setdiff1d(all_ids, artists['id']))):
+        ids_to_names[int(id)] = f"unknown_{ix}"
 
     with module_path.joinpath('descr', 'musician_similarity.rst').open() as rst_file:
         fdescr = rst_file.read()
 
     return Bunch(data=triplets,
-                 judgement_id=musicians_data['judgement'],
-                 survey_or_game=musicians_data['survey'],
-                 user=musicians_data['user'],
-                 artists=artists['name'],
+                 judgement_id=musicians_data['judgement'][triplet_filter],
+                 survey_or_game=musicians_data['survey'][triplet_filter],
+                 user=musicians_data['user'][triplet_filter],
+                 artist_name=np.asarray([ids_to_names[id] for id in all_ids]),
+                 artist_id=all_ids,
                  DESCR=fdescr)
