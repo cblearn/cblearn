@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+r"""
+Psychophysics with ordinal embedding
+====================================
+
+
+"""
 # ---
 # jupyter:
 #   jupytext:
