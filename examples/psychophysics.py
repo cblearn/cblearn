@@ -81,7 +81,7 @@ triplet_factor = 10
 
 X_true = np.random.normal(0, 1, (n_objects, dim))
 
-n_triplets = int(triplet_factor * n_dim * n_objects * np.log(n_objects))
+n_triplets = int(triplet_factor * dim * n_objects * np.log(n_objects))
 print(f"# Triplets = {n_triplets}")
 triplets = datasets.make_random_triplets(X_true, size=n_triplets, noise='normal', noise_options={'scale': noise}, result_format='list-order')
 triplets_test = datasets.make_random_triplets(X_true, size=10000, noise='normal', noise_options={'scale': noise}, result_format='list-order')
