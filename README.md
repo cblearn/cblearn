@@ -51,7 +51,7 @@ In the [User Guide](https://cblearn.readthedocs.io/en/latest/user_guide/index.ht
 
 ### Datasets
 
-*cblearn* provides utility methods to simplify the loading and conversation
+*cblearn* provides utility methods to simplify the loading and conversion
 of your comparison datasets. In addition, there are 
 functions that download and load multiple real world comparisons.
 
