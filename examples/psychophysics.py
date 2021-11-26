@@ -102,6 +102,6 @@ if X_true.shape == X_est.shape:
     plt.plot(X_true[:, 0], X_true[:, 1], 'or', label='SOE', ms=10)
     text_args = dict(fontsize=9, horizontalalignment='center', verticalalignment='center')
     for i in range(n_objects):
-        plt.text(*X_est[i] , str(i), **text_args)
-        plt.text(*X_true[i] , str(i), **text_args)
+        plt.text(X_est[i, 0], X_est[i, 1], str(i), **text_args)
+        plt.text(X_true[i, 0], X_true[i, 1], str(i), **text_args)
     plt.legend();
