@@ -17,7 +17,7 @@ class SOE(BaseEstimator, TripletEmbeddingMixin):
         SOE [1]_ is minimizing the soft objective as a smooth relaxation of the triplet error.
 
         This estimator supports multiple implementations which can be selected by the `backend` parameter.
-        The majorizing backend for SOE is described in the paper original paper.
+        The majorizing backend for SOE is described in the original paper.
 
         The *torch* backend uses the ADAM optimizer and backpropagation [2]_.
         It can executed on CPU, but also CUDA GPUs.
@@ -102,8 +102,8 @@ class SOE(BaseEstimator, TripletEmbeddingMixin):
         """Computes the embedding.
 
         Args:
-            X: The training input samples, shape (n_samples, 3)
-            y: Ignored
+            X: The training input samples (triplets), shape (n_samples, 3)
+            y: Responses to the triplets, either numeric (see format 'list-count') or boolean ('list-boolean'), shape (n_samples). If this argument is omitted, X is interpreted as format 'list-order'.
             init: Initial embedding for optimization
         Returns:
             self.
