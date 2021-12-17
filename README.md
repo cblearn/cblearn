@@ -23,7 +23,7 @@ from cblearn.embedding import SOE
 from cblearn.metrics import QueryScorer
 
 X = load_iris().data
-triplets, responses = make_random_triplets(X, size=1000)
+triplets, responses = make_random_triplets(X, "list-boolean", size=1000)
 
 estimator = SOE(n_components=2)
 scores = cross_val_score(estimator, triplets, responses, scoring=QueryScorer, cv=5)
