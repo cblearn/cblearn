@@ -78,11 +78,11 @@ def fetch_imagenet_similarity(data_home: Optional[os.PathLike] = None, download_
                 Whether the selection is ranked in similarity to the reference.
             session_id : (n_query,)
                 Ids of the survey session for query recording.
-            stimulus_id : (n_query,)
-                Ids of the image stimulus (object).
-            class_id : (n_query,)
-                Imagenet class assigned to each image.
-            class_label : (50000,)
+            stimulus_id : (50.000,)
+                Ids of the images.
+            class_id : (50.000,)
+                ImageNet class assigned to each image.
+            class_label : (50.000,)
                 WordNet labels of the classes.
             DESCR : string
                 Description of the dataset.
