@@ -80,6 +80,8 @@ def fetch_imagenet_similarity(data_home: Optional[os.PathLike] = None, download_
                 Ids of the survey session for query recording.
             stimulus_id : (50.000,)
                 Ids of the images.
+            stimulus_filepath : (50.000,)
+                Filepaths of images.
             class_id : (50.000,)
                 ImageNet class assigned to each image.
             class_label : (1.000,)
