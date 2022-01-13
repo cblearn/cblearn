@@ -82,7 +82,7 @@ def fetch_imagenet_similarity(data_home: Optional[os.PathLike] = None, download_
                 Ids of the images.
             class_id : (50.000,)
                 ImageNet class assigned to each image.
-            class_label : (50.000,)
+            class_label : (1.000,)
                 WordNet labels of the classes.
             DESCR : string
                 Description of the dataset.
