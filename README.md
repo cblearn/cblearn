@@ -23,7 +23,7 @@ from cblearn.embedding import SOE
 from cblearn.metrics import QueryScorer
 
 X = load_iris().data
-triplets, responses = make_random_triplets(X, size=1000)
+triplets, responses = make_random_triplets(X, "list-boolean", size=1000)
 
 estimator = SOE(n_components=2)
 scores = cross_val_score(estimator, triplets, responses, scoring=QueryScorer, cv=5)
@@ -51,7 +51,7 @@ In the [User Guide](https://cblearn.readthedocs.io/en/latest/user_guide/index.ht
 
 ### Datasets
 
-*cblearn* provides utility methods to simplify the loading and conversation
+*cblearn* provides utility methods to simplify the loading and conversion
 of your comparison datasets. In addition, there are 
 functions that download and load multiple real world comparisons.
 

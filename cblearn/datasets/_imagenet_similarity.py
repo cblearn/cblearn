@@ -78,11 +78,13 @@ def fetch_imagenet_similarity(data_home: Optional[os.PathLike] = None, download_
                 Whether the selection is ranked in similarity to the reference.
             session_id : (n_query,)
                 Ids of the survey session for query recording.
-            stimulus_id : (n_query,)
-                Ids of the image stimulus (object).
-            class_id : (n_query,)
-                Imagenet class assigned to each image.
-            class_label : (50000,)
+            stimulus_id : (50.000,)
+                Ids of the images.
+            stimulus_filepath : (50.000,)
+                Filepaths of images.
+            class_id : (50.000,)
+                ImageNet class assigned to each image.
+            class_label : (1.000,)
                 WordNet labels of the classes.
             DESCR : string
                 Description of the dataset.
@@ -133,7 +135,8 @@ def fetch_imagenet_similarity(data_home: Optional[os.PathLike] = None, download_
 
     data.pop('trial_type')
     catalog['class_map_label'] = catalog['class_map_label'].astype(str)
-
+    catalog['stimulus_filepath'] = catalog['stimulus_filepath'].astype(str)
+    
     if shuffle:
         random_state = check_random_state(random_state)
         ix = random_state.permutation(len(data['stimulus_set']))
@@ -152,6 +155,7 @@ def fetch_imagenet_similarity(data_home: Optional[os.PathLike] = None, download_
                  is_ranked=bool(np.unique(data['is_ranked'])),
                  session_id=data['session_id'],
                  stimulus_id=catalog['stimulus_id'],
+                 stimulus_filepath=catalog['stimulus_filepath'],
                  class_id=catalog['class_id'],
                  class_label=catalog['class_map_label'][1:],
                  DESCR=fdescr)
