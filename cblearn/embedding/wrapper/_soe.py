@@ -45,9 +45,6 @@ class SOE(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
         Args:
             n_components:
                 The dimension of the embedding.
-            n_init:
-                Number of times the BFGS backend will be run with different initializations.
-                The final result will be the output of the run with the smallest final stress.
             margin:
                 Scale parameter which only takes strictly positive value.
             max_iter:
@@ -58,7 +55,6 @@ class SOE(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
                 The seed of the pseudo random number generator used to initialize the optimization.
         """
         self.n_components = n_components
-        self.n_init = n_init
         self.margin = margin
         self.max_iter = max_iter
         self.verbose = verbose
@@ -91,23 +87,19 @@ class SOE(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
         quadruplets = triplets[:, [1, 0, 0, 2]]  # type: ignore
         quadruplets = quadruplets.astype(np.int32) + 1  # R is 1-indexed, int32
 
-        if not init:
+        if init is None:
             init = 'rand'
-            n_init = self.n_init
-        else:
-            n_init = 1
         if not n_objects:
             n_objects = len(np.unique(quadruplets))
 
         self.stress_ = np.infty
-        for i_init in range(n_init):
-            soe_result = loe.SOE(CM=quadruplets, N=n_objects, p=self.n_components, c=self.margin,
-                                 maxit=self.max_iter, report=report_every, iniX=init,
-                                 rnd=quadruplets.shape[0])
-            i_stress = soe_result.rx2("str")[0]
-            if i_stress < self.stress_:
-                self.stress_ = i_stress
-                self.embedding_ = np.asarray(soe_result.rx2("X"))
+        soe_result = loe.SOE(CM=quadruplets, N=n_objects, p=self.n_components, c=self.margin,
+                             maxit=self.max_iter, report=report_every, iniX=init,
+                             rnd=quadruplets.shape[0])
+        i_stress = soe_result.rx2("str")[0]
+        if i_stress < self.stress_:
+            self.stress_ = i_stress
+            self.embedding_ = np.asarray(soe_result.rx2("X"))
 
         return self
 
