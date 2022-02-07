@@ -94,7 +94,7 @@ class SOE(BaseEstimator, TripletEmbeddingMixin):
         """
         self.n_components = n_components
         self.margin = margin
-        self.n_init_ = n_init
+        self.n_init = n_init
         self.max_iter = max_iter
         self.restart_optim = restart_optim
         self.verbose = verbose
@@ -123,7 +123,7 @@ class SOE(BaseEstimator, TripletEmbeddingMixin):
         random_state = check_random_state(self.random_state)
         if init is None:
             inits = (random_state.multivariate_normal(np.zeros(self.n_components),
-                     np.eye(self.n_components), size=n_objects) for _ in range(self.n_init_))
+                     np.eye(self.n_components), size=n_objects) for _ in range(self.n_init))
         else:
             init = np.array(init)
             if init.ndim == 3:
