@@ -15,15 +15,38 @@ def generate_gmm_data(n, means: np.ndarray, std: float, seed: int):
 
 
 def test_chc_performance():
+    """Checks if chc can cluster a very simple problem."""
     seed = 2
     xs, ys = generate_gmm_data(
         10, np.array([[1, 0], [-1, 0]]), 0.2, seed)
-    chc = ComparisonHC(2)
     t, r = make_random_triplets(xs, result_format="list-boolean", size=5000, random_state=seed)
-    y_chc = chc.fit_predict(t, r)
-    score = normalized_mutual_info_score(y_chc, ys) > 0.99
+    estimator = ComparisonHC(2)
+
+    # testing score method
+    y_pred = estimator.fit_predict(t, r)
+    score = normalized_mutual_info_score(y_pred, ys)
     assert score > 0.99
-    assert score == chc.score((t, r), ys)
+
+
+def test_chc_score_equalities():
+    """Checks if the different methods of obtaining a clustering in ComparisonHC
+    give the same output."""
+    seed = 2
+    xs, ys = generate_gmm_data(
+        10, np.array([[1, 0], [-1, 0]]), 0.2, seed)
+    t, r = make_random_triplets(xs, result_format="list-boolean", size=5000, random_state=seed)
+    estimator = ComparisonHC(2)
+    y_pred = estimator.fit_predict(t, r)
+    score = normalized_mutual_info_score(y_pred, ys)
+    assert score == estimator.score((t, r), ys)
+
+    # testing score on unified triplets
+    unified_triplets = unify_triplet_order(t, r)
+    y_pred_unified = estimator.fit_predict(unified_triplets)
+    score_unified = normalized_mutual_info_score(y_pred_unified, ys)
+    assert score_unified == score
+    assert np.all(y_pred == y_pred_unified)
+    assert score_unified == estimator.score(unified_triplets, ys)
 
 
 def test_quadruplet_generation():
