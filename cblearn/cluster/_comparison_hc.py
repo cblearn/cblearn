@@ -591,7 +591,7 @@ def flatten(l: List[list]) -> list:
 
 
 class ComparisonHC():
-    """ ComparisonHC
+    """ComparisonHC.
 
     ComparisonHC[1] is an hierarchical clustering algorithm that calculates
     clusters on triplet data without computing an intermediate embedding.
@@ -619,6 +619,7 @@ class ComparisonHC():
 
 
     Examples:
+
     >>> from sklearn.datasets import make_blobs
     >>> from sklearn.metrics import normalized_mutual_info_score
     >>> from cblearn.datasets import make_random_triplets
@@ -626,15 +627,17 @@ class ComparisonHC():
     >>> import numpy as np
     >>> means = np.array([[1,0], [-1, 0]])
     >>> stds = 0.2 * np.ones(means.shape)
-    >>> xs, ys = make_blobs(n_samples=[10, 10], centers=means, cluster_std=stds, n_features=2, random_state=2)
+    >>> xs, ys = make_blobs(n_samples=[10, 10], centers=means, cluster_std=stds, 
+    ...                     n_features=2, random_state=2)
     >>> estimator = ComparisonHC(2)
-    >>> t, r = make_random_triplets(xs, result_format="list-boolean", size=5000, random_state=2)
-    >>> y_pred = estimator.fit_predict(t, r)
-    >>> print(f"NMI of ComparisonHC: {normalized_mutual_info_score(y_pred, ys)}")
+    >>> t, r = make_random_triplets(xs, result_format="list-boolean", size=5000, 
+    ...                             random_state=2)
+    >>> estimator.score((t, r), ys)
+    1.0
 
     References
     ----------
-    .. [1] Ghoshdastidar, D., Perrot, M., von Luxburg, U. (2019). Foundations of Comparison-Based Hierarchical Clustering.
+    [1] Ghoshdastidar, D., Perrot, M., von Luxburg, U. (2019). Foundations of Comparison-Based Hierarchical Clustering.
             Advances in Neural Information Processing Systems 32.
     """
 
