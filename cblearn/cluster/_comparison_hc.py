@@ -645,7 +645,7 @@ class ComparisonHC():
         """
         Initialize the estimator.
 
-        Parameters:
+        Args:
             num_clusters: Number of clusters desired in the final clustering.
         """
         self.num_clusters = num_clusters
@@ -655,6 +655,7 @@ class ComparisonHC():
         Returns the normalized mutual information score between
         the clustering predicted by the clustering algorithm on X,
         when the true labels are given by Y.
+
         Args:
             X: The input query of any form. Might be a tuple, if triplets and responses are necessary.
             y: The ground truth labels to compre against.
