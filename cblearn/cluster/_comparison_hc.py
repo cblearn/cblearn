@@ -626,8 +626,7 @@ class ComparisonHC():
     >>> import numpy as np
     >>> means = np.array([[1,0], [-1, 0]])
     >>> stds = 0.2 * np.ones(means.shape)
-    >>> xs, ys = make_blobs(n_samples=[10, 10], centers=means, cluster_std=stds, n_features=2,
-    >>>                   random_state=2)
+    >>> xs, ys = make_blobs(n_samples=[10, 10], centers=means, cluster_std=stds, n_features=2, random_state=2)
     >>> estimator = ComparisonHC(2)
     >>> t, r = make_random_triplets(xs, result_format="list-boolean", size=5000, random_state=2)
     >>> y_pred = estimator.fit_predict(t, r)
