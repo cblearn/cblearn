@@ -1,5 +1,4 @@
-from enum import Enum
-from typing import Optional, Union, ValuesView
+from typing import Optional, Union, List, Tuple
 from cblearn import utils
 import time
 import numpy as np
@@ -7,8 +6,6 @@ from sklearn.metrics import normalized_mutual_info_score
 import numpy as np
 from abc import ABCMeta, abstractmethod
 import time
-import itertools
-import random
 
 import time
 import itertools
@@ -588,7 +585,7 @@ def reduce_triplets(triplets: np.ndarray, responses: Optional[np.ndarray] = None
     return np.unique(reduced_triplets, axis=0)
 
 
-def flatten(l: list[list]) -> list:
+def flatten(l: List[list]) -> list:
     # sum can essentially be used as a mapReduce / flatMap ;)
     return sum(l, [])
 
@@ -651,7 +648,7 @@ class ComparisonHC():
         """
         self.num_clusters = num_clusters
 
-    def score(self, X: Union[np.ndarray, tuple[np.ndarray,  np.ndarray]], y: np.ndarray) -> float:
+    def score(self, X: Union[np.ndarray, Tuple[np.ndarray,  np.ndarray]], y: np.ndarray) -> float:
         """
         Returns the normalized mutual information score between
         the clustering predicted by the clustering algorithm on X,
