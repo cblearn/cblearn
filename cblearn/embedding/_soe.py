@@ -117,9 +117,9 @@ class SOE(BaseEstimator, TripletEmbeddingMixin):
         Returns:
             self.
         """
-        triplets = utils.check_query_response(X, y, result_format='list-order')
+        queries = utils.check_query_response(X, y, result_format='list-order')
         if not n_objects:
-            n_objects = triplets.max() + 1
+            n_objects = queries.max() + 1
         random_state = check_random_state(self.random_state)
         if init is None:
             inits = (random_state.multivariate_normal(np.zeros(self.n_components),
@@ -135,12 +135,17 @@ class SOE(BaseEstimator, TripletEmbeddingMixin):
         for init in inits:
             if self.backend == "torch":
                 assert_torch_is_available()
-                result = torch_minimize('adam', _soe_loss_torch, init, data=(triplets.astype(int),), args=(self.margin,),
+                if queries.shape[1] != 3:
+                    raise ValueError(f"Expect triplets of shape (n_triplets, 3), got {queries.shape}.")
+                result = torch_minimize('adam', _soe_loss_torch, init, data=(queries.astype(int),), args=(self.margin,),
                                         device=self.device, max_iter=self.max_iter, lr=self.learning_rate,
                                         seed=random_state.randint(1))
             elif self.backend == "scipy":
-                quadruplets = triplets[:, [1, 0, 0, 2]]
-                result = minimize(_soe_loss, init.ravel(), args=(init.shape, quadruplets, self.margin), method='BFGS',
+                if queries.shape[1] == 3:
+                    queries = queries[:, [0, 1, 0, 2]]
+                elif queries.shape[1] != 4:
+                    raise ValueError(f"Expect triplets or quadruplets of shape (n_queries, 3/4), got {queries.shape}.")
+                result = minimize(_soe_loss, init.ravel(), args=(init.shape, queries, self.margin), method='L-BFGS-B',
                                   jac=True, options=dict(maxiter=self.max_iter, disp=self.verbose))
 
             else:
@@ -180,7 +185,7 @@ def _soe_loss(x, x_shape, quadruplet, margin):
     differences = ij_dist + margin - kl_dist
     stress = (np.maximum(differences, 0) ** 2)
 
-    ### GRADIENT ###
+    ### GRADIENT ###delta_time =
     is_diff_positive = differences > 0  # Case 1, 2.1.1
     ij_dist_valid = np.maximum(ij_dist[is_diff_positive, np.newaxis], 0.0000001)
     kl_dist_valid = np.maximum(kl_dist[is_diff_positive, np.newaxis], 0.0000001)
@@ -196,7 +201,7 @@ def _soe_loss(x, x_shape, quadruplet, margin):
     Xik = (X[i] - X[k]) / kl_dist_valid  # if i == l
     Xil = (X[i] - X[l]) / kl_dist_valid  # if k == l
     Xjk = (X[j] - X[k]) / kl_dist_valid  # if j == l
-    Xjl = (X[j] - X[l]) / kl_dist_valid  # if
+    Xjl = (X[j] - X[l]) / kl_dist_valid
     Xkl = (X[k] - X[l]) / kl_dist_valid
 
     grad = np.zeros_like(X)
