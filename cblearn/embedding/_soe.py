@@ -19,6 +19,10 @@ class SOE(BaseEstimator, TripletEmbeddingMixin):
         This estimator supports multiple implementations which can be selected by the `backend` parameter.
         The majorizing backend for SOE is described in the paper original paper.
 
+        This class restarts the optimizition from multiple random initializations to increase the probability of
+        good results in low-dimensional embeddings. This behaviour multiplies computation time when fitting
+        the embeding but can be disabled by `SOE(n_components, n_init=1)`.
+
         The *torch* backend uses the ADAM optimizer and backpropagation [2]_.
         It can executed on CPU, but also CUDA GPUs.
 
