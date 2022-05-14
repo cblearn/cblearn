@@ -18,7 +18,7 @@ cblearn and its dependencies can be installed using `pip`:
 
 .. code-block:: bash
 
-    $ pip install git+ssh://git@github.com/dekuenstle/cblearn.git
+    $ pip install git+https://github.com/dekuenstle/cblearn.git
 
 .. _extras_install:
 
@@ -34,7 +34,7 @@ wrapping paper author's original implementation in R-lang:
 
 .. code-block:: bash
 
-    $ pip install git+ssh://git@github.com/dekuenstle/cblearn.git[torch,wrapper]
+    $ pip install git+https://github.com/dekuenstle/cblearn.git[torch,wrapper]
 
 ======= =============================================================
 Extras  Description
