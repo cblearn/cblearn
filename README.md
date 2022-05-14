@@ -32,7 +32,7 @@ triplets = make_random_triplets(X, result_format="list-order", size=1000)
 estimator = SOE(n_components=2)
 # Measure the fit with scikit-learn's cross-validation
 scores = cross_val_score(estimator, triplets, cv=5)
-print(f"The 5-fold CV triplet error is {sum(scores) / len(scores)}.")data
+print(f"The 5-fold CV triplet error is {sum(scores) / len(scores)}.")
 
 # Estimate the scale on all triplets
 embedding = estimator.fit_transform(triplets)
@@ -46,7 +46,7 @@ Please try the [Examples](https://cblearn.readthedocs.io/en/latest/generated_exa
 cblearn required Python 3.7 or newer. The easiest way to install is using `pip`:
 
 ```
-pip install https://github.com/dekuenstle/cblearn.git
+pip install git+https://github.com/dekuenstle/cblearn.git
 ```
 Find more details in the [installation instructions](https://cblearn.readthedocs.io/en/latest/install.html).
 
