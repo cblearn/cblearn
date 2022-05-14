@@ -8,8 +8,13 @@
 
 Comparison-based Learning are the Machine Learning algorithms to use, when training data
 are ordinal comparisons instead of Euclidean points. 
-Triplet comparisons can be gathered e.g. from human studies with Query like 
-"Which of the following bands is most similar to Queen?".
+
+**VSS 2022: Please find an example of psychophysical scaling with triplets [here](https://readthedocs.org/projects/cblearn/generated_examples/plot_psychophysical_scales.html)**
+
+Triplet comparisons from human observers are useful to model the perceived similarity of objects.
+These human triplets are collected in studies, asking questions like 
+"Which of the following bands is most similar to Queen?" or 
+"Which color appears most similar to the reference?".
 
 This library provides an easy to use interface to comparison-based learning algorithms.
 It plays hand-in-hand with scikit-learn:
@@ -23,13 +28,15 @@ from cblearn.embedding import SOE
 from cblearn.metrics import QueryScorer
 
 X = load_iris().data
-triplets, responses = make_random_triplets(X, "list-boolean", size=1000)
+triplets = make_random_triplets(X, result_format="list-order", size=1000)
 
 estimator = SOE(n_components=2)
-scores = cross_val_score(estimator, triplets, responses, scoring=QueryScorer, cv=5)
-print(f"The 5-fold CV triplet error is {sum(scores) / len(scores)}.")
+# Measure the fit with scikit-learn's cross-validation
+scores = cross_val_score(estimator, triplets, cv=5)
+print(f"The 5-fold CV triplet error is {sum(scores) / len(scores)}.")data
 
-embedding = estimator.fit_transform(triplets, responses)
+# Estimate the scale on all triplets
+embedding = estimator.fit_transform(triplets)
 print(f"The embedding has shape {embedding.shape}.")
 ```
 
