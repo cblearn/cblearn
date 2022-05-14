@@ -6,15 +6,14 @@
 [![Test Coverage](https://codecov.io/gh/dekuenstle/cblearn/branch/master/graph/badge.svg?token=P9JRT6OK6O)](https://codecov.io/gh/dekuenstle/cblearn)
 [![Documentation](https://readthedocs.org/projects/cblearn/badge/?version=latest)](https://cblearn.readthedocs.io/en/latest/?badge=latest)
 
-Comparison-based Learning are the Machine Learning algorithms to use, when training data
-are ordinal comparisons instead of Euclidean points. 
+Comparison-based Learning algorithms are the Machine Learning algorithms to use when training data contains similarity comparisons ("A and B are more similar than C and D") instead of data points. 
 
-**VSS 2022: Please find an example of psychophysical scaling with triplets [here](https://readthedocs.org/projects/cblearn/generated_examples/plot_psychophysical_scales.html)**
+**:eyes: VSS 2022: Please find an example of psychophysical scaling with triplets [here](https://readthedocs.org/projects/cblearn/generated_examples/plot_psychophysical_scales.html) :eyes:**
 
-Triplet comparisons from human observers are useful to model the perceived similarity of objects.
+Triplet comparisons from human observers help model the perceived similarity of objects.
 These human triplets are collected in studies, asking questions like 
 "Which of the following bands is most similar to Queen?" or 
-"Which color appears most similar to the reference?".
+"Which colour appears most similar to the reference?".
 
 This library provides an easy to use interface to comparison-based learning algorithms.
 It plays hand-in-hand with scikit-learn:
@@ -52,15 +51,14 @@ pip install https://github.com/dekuenstle/cblearn.git
 Find more details in the [installation instructions](https://cblearn.readthedocs.io/en/latest/install.html).
 
 
-In the [User Guide](https://cblearn.readthedocs.io/en/latest/user_guide/index.html) you find a detailed introduction.
+In the [User Guide](https://cblearn.readthedocs.io/en/latest/user_guide/index.html), you find a detailed introduction.
 
 ## Features
 
 ### Datasets
 
 *cblearn* provides utility methods to simplify the loading and conversion
-of your comparison datasets. In addition, there are 
-functions that download and load multiple real world comparisons.
+of your comparison datasets. In addition, some functions download and load multiple real-world comparisons.
 
 | Dataset  | Query | #Object | #Response | #Triplet |
 | --- | --- | ---:| ---:| ---:|
@@ -88,11 +86,17 @@ functions that download and load multiple real world comparisons.
 
 ## Contribute
 
-We are happy about your contributions.
+We are happy about your bug reports, questions or suggestions as Github Issues and code or documentation contributions as Github Pull Requests. 
 Please see our [Contributor Guide](https://cblearn.readthedocs.io/en/latest/contributor_guide/index.html). 
 
-## License
+## Authors and Acknowledgement
 *cblearn* was initiated by current and former members of the [Theory of Machine Learning group](http://www.tml.cs.uni-tuebingen.de/index.php) of Prof. Dr. Ulrike von Luxburg at the University of Tübingen.
-The main development is realised by [David-Elias Künstle](http://www.tml.cs.uni-tuebingen.de/team/kuenstle/index.php).
+The leading developer is [David-Elias Künstle](http://www.tml.cs.uni-tuebingen.de/team/kuenstle/index.php).
+
+We would like to thank all the contributors here on Github.
+This work has been supported by the Machine Learning Cluster of Excellence, funded by EXC number 2064/1 – Project number 390727645. The authors would like to thank the International Max Planck Research School for Intelligent Systems (IMPRS-IS) for supporting David-Elias Künstle. 
+
+## License
 
 This library is free to use under the [MIT License](https://github.com/dekuenstle/cblearn/blob/master/LICENSE) conditions.
+Please reference this library appropriately if it contributes to your scientific publication. We would also appreciate a short email (optionally) to see how our library is being used. 
