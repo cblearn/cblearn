@@ -202,4 +202,4 @@ class TSTE(STE):
                  backend: str = "scipy", learning_rate=1, batch_size=50_000,  device: str = "auto"):
         heavy_tailed = True
         return super().__init__(n_components, heavy_tailed, verbose, random_state, max_iter, backend,
-                                         learning_rate, batch_size, device)
+                                learning_rate, batch_size, device)

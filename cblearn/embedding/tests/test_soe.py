@@ -29,7 +29,6 @@ def test_soe_repeat():
     assert stat.pvalue < 0.05
 
 
-
 @pytest.mark.parametrize('n,d', [(20, 1), (50, 2), (100, 3)])
 def test_soe_gradient(n, d):
     """ Test the gradient of the SOE loss function by comparing with local loss differences. """

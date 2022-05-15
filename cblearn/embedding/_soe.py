@@ -181,7 +181,7 @@ def _soe_loss(x, x_shape, quadruplet, margin):
     """ Loss equation (1) of Terada & Luxburg (2014)
      and Gradient of the loss function.
      """
-    ### OBJECTIVE ###
+    # OBJECTIVE #
     X = x.reshape(x_shape)
     X_dist = distance_matrix(X, X)
     ij_dist = X_dist[quadruplet[:, 0], quadruplet[:, 1]]
@@ -189,7 +189,7 @@ def _soe_loss(x, x_shape, quadruplet, margin):
     differences = ij_dist + margin - kl_dist
     stress = (np.maximum(differences, 0) ** 2)
 
-    ### GRADIENT ###delta_time =
+    # GRADIENT #
     is_diff_positive = differences > 0  # Case 1, 2.1.1
     ij_dist_valid = np.maximum(ij_dist[is_diff_positive, np.newaxis], 0.0000001)
     kl_dist_valid = np.maximum(kl_dist[is_diff_positive, np.newaxis], 0.0000001)

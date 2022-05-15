@@ -136,7 +136,7 @@ def fetch_imagenet_similarity(data_home: Optional[os.PathLike] = None, download_
     data.pop('trial_type')
     catalog['class_map_label'] = catalog['class_map_label'].astype(str)
     catalog['stimulus_filepath'] = catalog['stimulus_filepath'].astype(str)
-    
+
     if shuffle:
         random_state = check_random_state(random_state)
         ix = random_state.permutation(len(data['stimulus_set']))
