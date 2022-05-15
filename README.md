@@ -37,7 +37,7 @@ Please try the [Examples](https://cblearn.readthedocs.io/en/latest/generated_exa
 
 ## Getting Started
 
-cblearn required Python 3.7 or newer. The easiest way to install is using `pip`:
+cblearn required Python 3.8 or newer. The easiest way to install is using `pip`:
 
 ```
 pip install https://github.com/dekuenstle/cblearn.git
