@@ -2,13 +2,18 @@
 Installation
 ============
 
-cblearn requires Python 3.7 or newer.
+cblearn requires Python 3.8 or newer.
 We recommend using Anaconda_ to install Python and
 dependencies in separated environments.
 We support Linux (tested on Ubuntu 20.4), Windows and Mac OS.
 Examples in this installation guide Linux shell commands.
 
 .. _Anaconda: https://docs.anaconda.com/anaconda/install/
+
+```
+conda create -n cblearn python==3.8
+conda activate cblearn
+```
 
 -----------------
 User Installation
@@ -25,9 +30,10 @@ cblearn and its dependencies can be installed using `pip`:
 Extras Requirements
 ===================
 
-The installation routine above tries to only install a minimal set of required packages.
-Some of cblearn's features depend on extra dependencies.
-These can be installed by adding them comma-separated in squared brackets to the pip command.
+The installation routine above installs a minimal set of required packages, sufficient
+for most uses.
+However, some features require more packages that can be installed by adding 
+an `option` to the install command..
 
 For example, to use estimators on GPU, based on pytorch, and estimators
 wrapping paper author's original implementation in R-lang:

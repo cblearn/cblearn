@@ -8,7 +8,7 @@
 
 Comparison-based Learning algorithms are the Machine Learning algorithms to use when training data contains similarity comparisons ("A and B are more similar than C and D") instead of data points. 
 
-**:eyes: VSS 2022: Please find an example of psychophysical scaling with triplets [here](https://readthedocs.org/projects/cblearn/generated_examples/plot_psychophysical_scales.html) :eyes:**
+**:eyes: VSS 2022: Please find an example of psychophysical scaling with triplets and ordinal embedding [here](https://cblearn.readthedocs.io/en/latest/generated_examples/plot_psychophysical_scales.html) :eyes:**
 
 Triplet comparisons from human observers help model the perceived similarity of objects.
 These human triplets are collected in studies, asking questions like 
@@ -43,15 +43,10 @@ Please try the [Examples](https://cblearn.readthedocs.io/en/latest/generated_exa
 
 ## Getting Started
 
-cblearn required Python 3.7 or newer. The easiest way to install is using `pip`:
+Install cblearn as described [here](https://cblearn.readthedocs.io/en/latest/install.html) and try the [examples](https://cblearn.readthedocs.io/en/latest/generated_examples/index.html).
 
-```
-pip install git+https://github.com/dekuenstle/cblearn.git
-```
-Find more details in the [installation instructions](https://cblearn.readthedocs.io/en/latest/install.html).
-
-
-In the [User Guide](https://cblearn.readthedocs.io/en/latest/user_guide/index.html), you find a detailed introduction.
+Find a theoretical introduction to comparison-based learning, the datatypes, 
+algorithms, and datasets in the [User Guide](https://cblearn.readthedocs.io/en/latest/user_guide/index.html).
 
 ## Features
 
