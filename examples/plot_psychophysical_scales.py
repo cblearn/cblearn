@@ -106,7 +106,7 @@ Train Accuracy = {soe.score(triplets):.2f}
 Test  Accuracy = {soe.score(triplets_test):.2f}
 CV    Accuracy = {cross_val_score(soe, triplets, cv=10).mean():.2f}""")
 
-if X_true.shape == X_est.shape:
+if X_est.shape[1] == 2:
     # align scale and rotation
     X_true, X_est, disparity = procrustes(X_true, X_est)
     print(f"Mean Square Difference = {disparity / n_objects:.5f}")
