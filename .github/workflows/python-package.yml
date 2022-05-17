@@ -58,4 +58,4 @@ jobs:
         env_vars: OS,PYTHON
     - name: Build the documentation
       run: |
-        python setup.py build_sphinx
+        cd docs && make html
