@@ -48,15 +48,15 @@ class MultiColumnLabelEncoder(LabelEncoder):
     >>> encoder.inverse_transform([2, 1, 0]).tolist()
     [['0.3', 'low'], ['0.1', 'low'], ['0.1', 'high']]
     """
-    def fit(self, X):
+    def fit(self, X, y=None):
         self.classes_ = _unique_firstaxis(X)
         return self
 
-    def fit_transform(self, X):
+    def fit_transform(self, X, y=None):
         self.classes_, indices = _unique_firstaxis(X, return_inverse=True)
         return indices
 
-    def transform(self, X):
+    def transform(self, X, y=None):
         # This method is a modified copy of scikit-learn's implementation
         # of sklearn.preprocessing.LabelEncoder.transform (3-clause BSC licensed).
         check_is_fitted(self)
@@ -71,7 +71,7 @@ class MultiColumnLabelEncoder(LabelEncoder):
             ix[c_ix] = i
         return ix
 
-    def inverse_transform(self, X):
+    def inverse_transform(self, X, y=None):
         return LabelEncoder.inverse_transform(self, X)
 
 
@@ -90,21 +90,21 @@ class SharedColumnEncoder(TransformerMixin, BaseEstimator):
     def __init__(self, encoder):
         self.encoder_ = encoder
 
-    def fit(self, X):
+    def fit(self, X, y=None):
         X = check_array(X, allow_nd=True, dtype=None)
         self.encoder_.fit(X.reshape(-1, *X.shape[2:]))
         return self
 
-    def fit_transform(self, X):
+    def fit_transform(self, X, y=None):
         X = check_array(X, allow_nd=True, dtype=None)
         long_X = self.encoder_.fit_transform(X.reshape(-1, *X.shape[2:]))
         return long_X.reshape(X.shape[:2])
 
-    def transform(self, X):
+    def transform(self, X, y=None):
         X = check_array(X, allow_nd=True, dtype=None)
         return self.encoder_.transform(X.reshape(-1, *X.shape[2:])).reshape(X.shape[:2])
 
-    def inverse_transform(self, X):
+    def inverse_transform(self, X, y=None):
         X = check_array(X, allow_nd=True, dtype=None)
         return self.encoder_.inverse_transform(X.reshape(-1, *X.shape[2:])).reshape(X.shape[0], -1)
 

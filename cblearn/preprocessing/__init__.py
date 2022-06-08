@@ -3,3 +3,4 @@ from cblearn.preprocessing._query import triplets_from_oddoneout
 from cblearn.preprocessing._query import triplets_from_mostcentral
 
 from cblearn.preprocessing._label import query_from_columns
+from cblearn.preprocessing._label import SharedColumnEncoder, MultiColumnLabelEncoder

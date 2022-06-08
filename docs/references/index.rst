@@ -119,6 +119,8 @@ Wrapper
     preprocessing.triplets_from_multiselect
     preprocessing.triplets_from_oddoneout
     preprocessing.triplets_from_mostcentral
+    preprocessing.SharedLabelEncoder
+    preprocessing.MultiColumnLabelEncoder
 
 
 :mod:`cblearn.utils` Utility
