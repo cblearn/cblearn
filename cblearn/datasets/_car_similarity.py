@@ -27,6 +27,8 @@ def fetch_car_similarity(data_home: Optional[os.PathLike] = None, download_if_mi
     Triplets                               7097
     Objects (Cars)                           60
     Query                  3 cars, most-central
+    Sessions                                146
+    Queries per Session                   30-50
     ===================   =====================
 
     See :ref:`central_car_dataset` for a detailed description.
@@ -36,7 +38,9 @@ def fetch_car_similarity(data_home: Optional[os.PathLike] = None, download_if_mi
     ['OFF-ROAD / SPORT UTILITY VEHICLES', 'ORDINARY CARS', 'OUTLIERS', 'SPORTS CARS']
     >>> dataset.triplet.shape  # doctest: +REMOTE_DATA
     (7097, 3)
-
+    >>> rounds, round_count = np.unique(dataset.survey_round, return_counts=True)
+    >>> len(rounds), round_count.min(), round_count.max()
+    (146, 30, 50)
 
     Args:
         data_home : optional, default: None
@@ -59,8 +63,10 @@ def fetch_car_similarity(data_home: Optional[os.PathLike] = None, download_if_mi
                 The columns represent the three indices shown per most-central question.
             response : ndarray, shape (n_triplets, )
                 The car per question (0, 1, or 2) that was selected as "most-central".
-            rt_ms : ndarray, shape (n_triplets, )
-                Reaction time of the response in milliseconds.
+            survey_round: Survey rounds, grouping responses from a participant during a session.
+                     Some participants responded in multiple rounds at different times.
+            rt : ndarray, shape (n_triplets, )
+                Reaction time of the response in seconds.
             class_id : np.ndarray (60, )
                 The class assigned to each object.
             class_name : list (4)
@@ -116,7 +122,8 @@ def fetch_car_similarity(data_home: Optional[os.PathLike] = None, download_if_mi
     raw_triplets = survey_data[:, [2, 3, 4]].astype(int)
     triplets = raw_triplets - 1
     response = (survey_data[:, [1]].astype(int) == raw_triplets).nonzero()[1]
-    rt_ms = survey_data[:, [5]].astype(float)
+    survey_round = survey_data[:, [0]].astype(int)
+    rt = survey_data[:, [5]].astype(float)
     if return_triplets:
         return triplets
 
@@ -126,7 +133,8 @@ def fetch_car_similarity(data_home: Optional[os.PathLike] = None, download_if_mi
 
     return Bunch(triplet=triplets,
                  response=response,
-                 rt_ms=rt_ms,
+                 survey_round=survey_round,
+                 rt=rt,
                  class_id=classes,
                  class_name=class_names,
                  DESCR=fdescr)
