@@ -63,9 +63,10 @@ def fetch_car_similarity(data_home: Optional[os.PathLike] = None, download_if_mi
                 The columns represent the three indices shown per most-central question.
             response : ndarray, shape (n_triplets, )
                 The car per question (0, 1, or 2) that was selected as "most-central".
-            survey_round: Survey rounds, grouping responses from a participant during a session.
-                     Some participants responded in multiple rounds at different times.
-            rt : ndarray, shape (n_triplets, )
+            survey_round : ndarray of int, shape (n_triplets, )
+                Survey rounds, grouping responses from a participant during a session.
+                Some participants responded in multiple rounds at different times.
+            rt : ndarray of float, shape (n_triplets, )
                 Reaction time of the response in seconds.
             class_id : np.ndarray (60, )
                 The class assigned to each object.
