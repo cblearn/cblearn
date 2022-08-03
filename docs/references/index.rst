@@ -89,6 +89,19 @@ Wrapper
     wrapper.MLDS
     wrapper.SOE
 
+:mod:`cblearn.cluster` Cluster
+==========================================
+
+.. automodule:: cblearn.cluster
+
+.. currentmodule:: cblearn
+
+.. autosummary::
+    :toctree: generated/
+
+    cluster.ComparisonHC
+
+
 
 :mod:`cblearn.metrics` Metrics
 ==============================
@@ -121,7 +134,6 @@ Wrapper
     preprocessing.triplets_from_mostcentral
     preprocessing.SharedLabelEncoder
     preprocessing.MultiColumnLabelEncoder
-
 
 :mod:`cblearn.utils` Utility
 ============================
