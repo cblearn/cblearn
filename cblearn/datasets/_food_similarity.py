@@ -75,7 +75,7 @@ def fetch_food_similarity(data_home: Optional[os.PathLike] = None, download_if_m
         archive_path = _base._fetch_remote(ARCHIVE, dirname=data_home)
         with zipfile.ZipFile(archive_path) as zf:
             with zf.open('food100-dataset/all-triplets.csv', 'r') as f:
-                triplets = np.loadtxt(f, dtype=str, delimiter='; ')
+                triplets = np.loadtxt(f, dtype=str, delimiter=';')
 
             image_names = np.asarray([name[len('food100-dataset/'):] for name in zf.namelist()
                                       if name.startswith('food100-dataset/images/')
