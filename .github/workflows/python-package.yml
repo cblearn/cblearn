@@ -45,7 +45,7 @@ jobs:
         # print warnings if other style errors are found.
         #    see .flake8 config file for selected/ignored rules.
         #    warnings can be found in the action logs
-        pythen -m flake8 . --count --exit-zero --statistics --show-source
+        python -m flake8 . --count --exit-zero --statistics --show-source
     - name: Test with pytest and measure coverage
       run: |
         pytest cblearn --cov=cblearn --cov-report=xml --remote-data
