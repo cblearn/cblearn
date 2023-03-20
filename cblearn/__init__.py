@@ -1,3 +1,2 @@
-from ._version import __version__
-
-__all__ = ['__version__']
+from . import _version
+__version__ = _version.get_versions()['version']
