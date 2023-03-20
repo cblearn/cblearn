@@ -95,4 +95,8 @@ Usually after some iterations, your changes will be merged to the ``master`` bra
 .. _this open source license: https://github.com/dekuenstle/cblearn/blob/master/LICENSE
 
 
+Versions should be semantic and follow PIP440_: The version indicates ``major.minor.fix``;
+breaking changes are just allowed with major version steps. 
+A new version is indicated with a Github release tag, which trigger continuous deployment to PyPI via Github Actions.
 
+.. _PIP440: https://peps.python.org/pep-0440/
