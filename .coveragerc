@@ -3,8 +3,7 @@ cover_pylib = false
 omit =
     */site-packages/*
     */tests/*
-ignore:
-    - "*/_version.py"
+    */_version.py
 
 [report]
 exclude_lines =
