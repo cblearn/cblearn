@@ -23,7 +23,7 @@ cblearn and its dependencies can be installed using `pip`:
 
 .. code-block:: bash
 
-    $ pip install git+https://github.com/dekuenstle/cblearn.git
+    $ pip install cblearn
 
 
 .. _extras_install:
