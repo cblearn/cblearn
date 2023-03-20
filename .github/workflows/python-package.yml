@@ -33,19 +33,23 @@ jobs:
         python3 -m pip install --upgrade pip
         pip install -e .[r_wrapper,tests,docs,torch]
         pip install h5py
-    - name: Lint with flake8
-      run: |
+
+    - name: flake8 Lint Errors
+      uses: py-actions/flake8@v2
+      with:
+        args: --count --select=E9,F63,F7,F82 --show-source --statistics
         # stop the build if there are Python syntax errors or undefined names
         #    E9: Runtime errors (syntax, indentation, io)
         #    F63: Wrong use of operators and always-true assertion tests
         #    F7: Wrong position of statements (break, continue, return, ...)
         #    F82: Undefined (variable) name
-        python -m flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        #
+    - name: flake8 Lint Warnings
+      uses: py-actions/flake8@v2
+      with:
+        args: --count --exit-zero --statistics --show-source
         # print warnings if other style errors are found.
         #    see .flake8 config file for selected/ignored rules.
         #    warnings can be found in the action logs
-        python -m flake8 . --count --exit-zero --statistics --show-source
     - name: Test with pytest and measure coverage
       run: |
         pytest cblearn --cov=cblearn --cov-report=xml --remote-data
