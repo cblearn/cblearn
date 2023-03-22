@@ -1,6 +1,7 @@
 # Changelog
 
-## 0.0.1 / 0.0.2
+## 0.1.0
 
-- Versioning and publishing to PyPI
-- Drop support for python 3.8, test 3.10
+- Support python 3.9 and 3.10.
+- Introduce semantic versioning
+- Publish to PyPI
