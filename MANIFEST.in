@@ -9,6 +9,8 @@ include pyproject.toml
 include readthedocs.yml
 include .flake8
 include MANIFEST.in
+include versioneer.py
+include cblearn/_version.py
 
 # exclude from sdist
 ## recursive-exclude folder *

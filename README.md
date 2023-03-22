@@ -1,10 +1,11 @@
 # cblearn
 ## Comparison-based Machine Learning in Python
 :warning: **cblearn** is **work in progress**. The API can change and bugs appear. Please help us by posting an [issue]( https://github.com/dekuenstle/cblearn/issues/new) :construction:
- 
+
+[![PyPI version](https://img.shields.io/pypi/v/cblearn.svg)](https://pypi.python.org/pypi/cblearn)
+[![Documentation](https://readthedocs.org/projects/cblearn/badge/?version=latest)](https://cblearn.readthedocs.io/en/latest/?badge=latest)
 [![Unit tests](https://github.com/dekuenstle/cblearn/workflows/Python%20package/badge.svg)](https://github.com/dekuenstle/cblearn/actions)
 [![Test Coverage](https://codecov.io/gh/dekuenstle/cblearn/branch/master/graph/badge.svg?token=P9JRT6OK6O)](https://codecov.io/gh/dekuenstle/cblearn)
-[![Documentation](https://readthedocs.org/projects/cblearn/badge/?version=latest)](https://cblearn.readthedocs.io/en/latest/?badge=latest)
 
 Comparison-based Learning algorithms are the Machine Learning algorithms to use when training data contains similarity comparisons ("A and B are more similar than C and D") instead of data points. 
 
