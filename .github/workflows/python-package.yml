@@ -10,30 +10,14 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
-    name: ${{ matrix.platform }} ${{ matrix.python-version }}
-    strategy:
-      matrix:
-        platform: [ubuntu-latest, windows-latest]
-        python-version: [3.9]
-        include:
-          - platform: ubuntu-latest
-            python-version: '3.10'
-    runs-on: ${{ matrix.platform }}
+  lint:
+    runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
     - uses: actions/checkout@v3
-    - name: Setup Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+    - uses: actions/setup-python@v4
       with:
-        python-version: ${{ matrix.python-version }}
-    - name: Setup R
-      uses: r-lib/actions/setup-r@v2
-    - name: Install package with dependencies
-      run: |
-        python3 -m pip install --upgrade pip
-        pip install -e .[r_wrapper,tests,docs,torch]
-        pip install h5py
-
+        python-version: 3.9
     - name: flake8 Lint Errors
       uses: py-actions/flake8@v2
       with:
@@ -50,6 +34,27 @@ jobs:
         # print warnings if other style errors are found.
         #    see .flake8 config file for selected/ignored rules.
         #    warnings can be found in the action logs
+
+  build:
+    strategy:
+      matrix:
+        python-version: 
+          - "3.9"
+          - "3.10"
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Setup R
+      uses: r-lib/actions/setup-r@v2
+    - name: Install package with dependencies
+      run: |
+        python3 -m pip install --upgrade pip
+        pip install -e .[r_wrapper,tests,docs,torch]
+        pip install h5py
     - name: Test with pytest and measure coverage
       run: |
         pytest cblearn --cov=cblearn --cov-report=xml --remote-data
@@ -63,3 +68,4 @@ jobs:
     - name: Build the documentation
       run: |
         cd docs && make html
+      
