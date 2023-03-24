@@ -32,7 +32,7 @@ def test_issparse():
     assert not issparse(triplets_spmatrix, answers_binary)
     assert not issparse(triplets_explicit, answers_binary)
 
-    
+
 def test_assparse():
     assert (assparse(triplets_spmatrix) == triplets_spmatrix).all()
     assert (assparse(triplets_spmatrix.reshape((4, -1)).to_scipy_sparse()) == triplets_spmatrix).all()
@@ -41,7 +41,7 @@ def test_assparse():
     with pytest.raises(ValueError):
         assparse(triplets_ordered)
     with pytest.raises(ValueError):
-        assparse(triplets_explicit, answers_binary) 
+        assparse(triplets_explicit, answers_binary)
 
 
 def test_asdense():
@@ -53,19 +53,27 @@ def test_asdense():
     np.testing.assert_allclose(triplets_explicit, X)
     np.testing.assert_allclose(answers_numeric, y)
 
-    X = asdense(triplets_ordered)
+    X, y = asdense(triplets_ordered)
     np.testing.assert_allclose(triplets_ordered, X)
-       
-       
+    assert y is None
+
+
 def test_canonical_X_y():
-    X_base = np.array([[1, 2, 3, 4],
+    X_base = np.array([[2, 7, 2, 5],
+                       [1, 2, 3, 4],
                        [2, 1, 4, 3],
                        [4, 3, 2, 1]])
 
-    X, y = canonical_X_y(X_base, np.array([0, 1, 2]))
-    np.testing.assert_equal(X, [[1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]])
-    np.testing.assert_equal(y, [0, 0, 1])
+    X, y = canonical_X_y(X_base, np.array([1, 0, 1, 2]))
+    np.testing.assert_equal(X, [[2, 2, 5, 7], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]])
+    np.testing.assert_equal(y, [3, 0, 0, 1])
 
-    X, y = canonical_X_y(X_base.reshape(-1, 2, 2), np.array([0, 1, 0]))
-    np.testing.assert_equal(X.reshape(-1, 4), [[1, 2, 3, 4], [2, 1, 4, 3], [2, 1, 4, 3]])
-    np.testing.assert_equal(y, [0, 1, 1])
+    X = canonical_X_y(X_base.reshape((-1, 2, 2)), axis=2)
+    np.testing.assert_equal(X, [[[2, 7], [2, 5]],
+                                [[1, 2], [3, 4]],
+                                [[1, 2], [3, 4]],
+                                [[3, 4], [1, 2]]])
+
+    with pytest.raises(ValueError):
+        # y is just supported with 2d X
+        canonical_X_y(X_base.reshape((-1, 2, 2)), y=np.array([0, 0, 1, 0]))

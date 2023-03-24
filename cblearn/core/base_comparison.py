@@ -21,7 +21,7 @@ def issparse(X: Comparison, y: Optional[ArrayLike] = None) -> bool:
         sparse: `True` if X is a sparse array or matrix,
                 `False` otherwise.
     """
-    return isinstance(X, SparseComparison) and y is None
+    return isinstance(X, (SparseArray, spmatrix)) and y is None
 
 
 def _unroll_X_y(X: ArrayLike, y: ArrayLike) -> tuple[NDArray[np.int_], NDArray[np.int_]]:
@@ -35,26 +35,26 @@ def _unroll_X_y(X: ArrayLike, y: ArrayLike) -> tuple[NDArray[np.int_], NDArray[n
 
 
 def asdense(X: Comparison, y: Optional[ArrayLike] = None,
-            multi_output: bool = False, min_features: int = 3)-> tuple[NDArray[np.int_], NDArray[np.int_]]:
+            multi_output: bool = False, min_features: int = 3) -> tuple[NDArray[np.int_], NDArray[np.int_]]:
     """ Convert X and y to arrays.
 
     Args:
         X: array-like or sparse matrix. Input data.
         y: array-like or sparse matrix, default=None. Targets.
         multi_output: Whether to allow multiple targets.
-        min_features: Minimum number of features. 
+        min_features: Minimum number of features.
 
     Returns:
         (comparisons, responses)
     """
     if issparse(X, y):
-        X = as_coo(X)
+        X = assparse(X)
         X, y = X.coords.T, X.data
         X, y = _unroll_X_y(X, y)
     if y is None:
         return check_array(X, dtype=int, ensure_2d=True, ensure_min_features=min_features), None
     else:
-        return check_X_y(X, y, dtype=int, 
+        return check_X_y(X, y, dtype=int,
                          ensure_2d=True,
                          multi_output=multi_output,
                          ensure_min_features=min_features)
@@ -67,7 +67,6 @@ def assparse(X: Comparison, y: Optional[ArrayLike] = None) -> COO:
         X: array-like or sparse matrix. Input data.
         y: array-like or sparse matrix, default=None. Targets in {-1, 1}.
             Must be provided for dense input as it is not possible to infer.
-            
 
     Returns:
         sparse_comparisons
@@ -87,12 +86,12 @@ def assparse(X: Comparison, y: Optional[ArrayLike] = None) -> COO:
         if len(X.shape) == 2:
             # 2d scipy.sparse to multi-dim sparse
             n_dim = int(np.ceil(np.log(np.product(X.shape)) / np.log(X.shape[0])))
-            X = X.reshape(n_dim * (X.shape[0],) )
+            X = X.reshape(n_dim * (X.shape[0], ))
     elif not issparse(X, y):
-        raise ValueError(f"X must be from {SparseComparison}")  
+        raise ValueError(f"X must be from {SparseComparison}")
 
     # force square matrix
-    if not all(n == X.shape[0] for n in X.shape[1:]):  
+    if not all(n == X.shape[0] for n in X.shape[1:]):
         X = X.reshape(len(X.shape) * (max(X.shape),))
 
     return X
@@ -104,9 +103,9 @@ def canonical_X_y(X: ArrayLike, y: Optional[ArrayLike] = None, axis=1) -> tuple[
     if y is None:
         return X_sorted
     else:
-        shape = len(ind.shape) * [1,]
+        shape = len(ind.shape) * [1, ]
         shape[0] = ind.shape[0]
         shape[axis] = -1
-        indind = np.argsort(ind, axis=axis)
-        y_sorted = np.take_along_axis(indind, y.reshape(shape), axis=axis)[..., 0].reshape(y.shape)
+        ind_order = np.argsort(ind, axis=axis)
+        y_sorted = np.take_along_axis(ind_order, y.reshape(shape), axis=axis).reshape(y.shape)
         return X_sorted, y_sorted
