@@ -9,7 +9,7 @@ import zipfile
 import numpy as np
 from sklearn.datasets import _base
 from sklearn.utils import check_random_state, Bunch
-from cblearn.utils import check_query_response
+from cblearn.core import unroll_X_y
 
 
 ARCHIVE = _base.RemoteFileMetadata(
@@ -27,7 +27,7 @@ def fetch_material_similarity(data_home: Optional[os.PathLike] = None, download_
 
     ===================   =====================
     Triplets Train/Test            22801 / 3000
-    Responses                     92892 / 11800
+    Responses                    928921 / 11800
     Objects (Materials)                     100
     ===================   =====================
 
@@ -100,26 +100,33 @@ def fetch_material_similarity(data_home: Optional[os.PathLike] = None, download_
         os.remove(archive_path)
     else:
         (train_data, test_data, material_names) = joblib.load(filepath)
-
+    
+    # Data description:
+    # from https://github.com/mlagunas/material-appearance-similarity/blob/
+    #           b0980aebf58ca06857099bf5b80bfd665cea69d3/userstudy_sampling/README.md
+    # answers is a np.array of integers with size (N, 3) containing all the
+    # triplets answered until now in the user studies (N). The triplets are
+    # stored as first the reference, and then the pair that the participants
+    # choose from. The array stores,  the class (as an integer) of each stimuli for each triplet.
+    # Note that the class is an integer with maximum value len(input_data). Therefore, answers[0, 0] 
+    # gives me the class of the reference stimulus of the triplet with index 0. if I access 
+    # input_data[answers[0, 0]], I am getting the url of that element.
+    # agreement is a np.array of size (N, 2) that stores the number of users
+    # that answered each pair. agreement[x, 0] corresponds to the number of
+    # users that have answered the stimuli answers[x, 1].
     train_triplets = np.array(train_data['answers'])
     train_agreement = np.array(train_data['agreement'])
-    train_triplets_1, train_response_1 = check_query_response(train_triplets[train_agreement[:, 0] > 0],
-                                                              train_agreement[train_agreement[:, 0] > 0][:, 0],
-                                                              result_format='list-count')
-    train_triplets_2, train_response_2 = check_query_response(train_triplets[train_agreement[:, 1] > 0],
-                                                              train_agreement[train_agreement[:, 1] > 0][:, 1],
-                                                              result_format='list-count')
+    train_triplets_1, train_response_1 = unroll_X_y(train_triplets, train_agreement[:, 0], include_undecided=False)
+    train_triplets_2, train_response_2 = unroll_X_y(train_triplets, -train_agreement[:, 1], include_undecided=False)
     train_triplets, train_response = np.r_[train_triplets_1, train_triplets_2], np.r_[train_response_1, train_response_2]
+    assert len(train_triplets) == train_agreement.sum(), (len(train_triplets), train_agreement.sum())
 
     test_triplets = np.array(test_data['answers'])
     test_agreement = np.array(test_data['agreement'])
-    test_triplets_1, test_response_1 = check_query_response(test_triplets[test_agreement[:, 0] > 0],
-                                                            test_agreement[test_agreement[:, 0] > 0][:, 0],
-                                                            result_format='list-count')
-    test_triplets_2, test_response_2 = check_query_response(test_triplets[test_agreement[:, 1] > 0],
-                                                            test_agreement[test_agreement[:, 1] > 0][:, 1],
-                                                            result_format='list-count')
+    test_triplets_1, test_response_1 = unroll_X_y(test_triplets, test_agreement[:, 0], include_undecided=False)
+    test_triplets_2, test_response_2 = unroll_X_y(test_triplets, -test_agreement[:, 1], include_undecided=False)
     test_triplets, test_response = np.r_[test_triplets_1, test_triplets_2], np.r_[test_response_1, test_response_2]
+    assert len(test_triplets) == test_agreement.sum()
 
     if shuffle:
         random_state = check_random_state(random_state)

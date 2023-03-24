@@ -24,9 +24,11 @@ def issparse(X: Comparison, y: Optional[ArrayLike] = None) -> bool:
     return isinstance(X, (SparseArray, spmatrix)) and y is None
 
 
-def _unroll_X_y(X: ArrayLike, y: ArrayLike) -> tuple[NDArray[np.int_], NDArray[np.int_]]:
+def unroll_X_y(X: ArrayLike, y: ArrayLike, include_undecided=True) -> tuple[NDArray[np.int_], NDArray[np.int_]]:
     """ Repeat entries, whose responses are multiple of -1 or 1. """
-    frequency = np.maximum(1, np.abs(y))  # max to not loose "undecided" (0) responses
+    frequency = np.abs(y).astype(int)
+    if include_undecided:
+        frequency = np.maximum(1, frequency)  # max to not loose "undecided" (0) responses
     if np.all(frequency == 1):
         return X, y
     else:
@@ -50,7 +52,7 @@ def asdense(X: Comparison, y: Optional[ArrayLike] = None,
     if issparse(X, y):
         X = assparse(X)
         X, y = X.coords.T, X.data
-        X, y = _unroll_X_y(X, y)
+        X, y = unroll_X_y(X, y)
     if y is None:
         return check_array(X, dtype=int, ensure_2d=True, ensure_min_features=min_features), None
     else:

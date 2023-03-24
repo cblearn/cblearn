@@ -2,6 +2,7 @@ from .base_comparison import issparse
 from .base_comparison import asdense
 from .base_comparison import assparse
 from .base_comparison import canonical_X_y
+from .base_comparison import unroll_X_y
 from .base_comparison import Comparison, SparseComparison
 
 from .check_comparison import check_triplets
