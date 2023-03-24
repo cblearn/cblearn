@@ -110,7 +110,7 @@ class STE(BaseEstimator, TripletEmbeddingMixin):
         Returns:
             self.
         """
-        triplets = utils.check_query_response(X, y, result_format='list-order')
+        triplets = super()._prepare_data(X, y, return_y=False, quadruplets=False)
         if not n_objects:
             n_objects = triplets.max() + 1
         random_state = check_random_state(self.random_state)

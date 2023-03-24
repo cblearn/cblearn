@@ -48,12 +48,6 @@ class GNMDS(BaseEstimator, TripletEmbeddingMixin):
         >>> embedding = estimator.fit_transform(triplets, n_objects=15)
         >>> round(estimator.score(triplets), 1) > 0.6
         True
-        >>> estimator = GNMDS(n_components=2, backend='torch', kernel=True)
-        >>> embedding = estimator.fit_transform(triplets, n_objects=15)
-        >>> embedding.shape
-        (15, 2)
-        >>> round(estimator.score(triplets), 1) > 0.6
-        True
 
         References
         ----------
@@ -65,7 +59,7 @@ class GNMDS(BaseEstimator, TripletEmbeddingMixin):
 
     def __init__(self, n_components=2, lambd=0.0, verbose=False,
                  random_state: Union[None, int, np.random.RandomState] = None, max_iter=2000, backend: str = 'scipy',
-                 kernel: bool = False, learning_rate=10, batch_size=50_000, device: str = "auto"):
+                 learning_rate=10, batch_size=50_000, device: str = "auto"):
         """ Initialize the estimator.
 
         Args:
@@ -76,7 +70,6 @@ class GNMDS(BaseEstimator, TripletEmbeddingMixin):
             random_state: The seed of the pseudo random number generator used to initialize the optimization.
             max_iter: Maximum number of optimization iterations.
             backend: The optimization backend for fitting. {"scipy", "torch"}
-            kernel: Whether to optimize in kernel or embedding (default) space.
             learning_rate: Learning rate of the gradient-based optimizer.
                            Only used with *torch* backend, else ignored.
             batch_size: Batch size of stochastic optimization. Only used with *torch* backend, else ignored.
@@ -89,7 +82,6 @@ class GNMDS(BaseEstimator, TripletEmbeddingMixin):
         self.max_iter = max_iter
         self.verbose = verbose
         self.random_state = random_state
-        self.kernel = kernel
         self.device = device
         self.lambd = lambd
         self.learning_rate = learning_rate
@@ -107,7 +99,7 @@ class GNMDS(BaseEstimator, TripletEmbeddingMixin):
         Returns:
             self.
         """
-        triplets = utils.check_query_response(X, y, result_format='list-order')
+        triplets = super()._prepare_data(X, y, return_y=False, quadruplets=False)
         if not n_objects:
             n_objects = triplets.max() + 1
         random_state = check_random_state(self.random_state)
@@ -117,19 +109,10 @@ class GNMDS(BaseEstimator, TripletEmbeddingMixin):
 
         if self.backend == 'torch':
             _torch_utils.assert_torch_is_available()
-            if self.kernel:
-                result = _torch_utils.torch_minimize_kernel(
-                    'adam', _gnmds_kernel_loss_torch, init, data=(triplets.astype(int),), args=(self.lambd,),
-                    device=self.device, max_iter=self.max_iter, batch_size=self.batch_size, seed=random_state.randint(1),
-                    lr=self.learning_rate)
-            else:
-                result = _torch_utils.torch_minimize('adam', _gnmds_x_loss_torch, init, data=(triplets.astype(int),),
-                                                     args=(self.lambd,), device=self.device, max_iter=self.max_iter,
-                                                     seed=random_state.randint(1), lr=self.learning_rate)
+            result = _torch_utils.torch_minimize('adam', _gnmds_x_loss_torch, init, data=(triplets.astype(int),),
+                                                 args=(self.lambd,), device=self.device, max_iter=self.max_iter,
+                                                 seed=random_state.randint(1), lr=self.learning_rate)
         elif self.backend == "scipy":
-            if self.kernel:
-                raise ValueError(f"Kernel objective is not available for backend {self.backend}.")
-
             result = minimize(_gnmds_x_grad, init.ravel(), args=(init.shape, triplets, self.lambd), method='L-BFGS-B',
                               jac=True, options=dict(maxiter=self.max_iter, disp=self.verbose))
         else:
