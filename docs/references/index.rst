@@ -6,6 +6,21 @@ API Reference
 
 This is the class and function reference of cblearn.
 
+:mod:`cblearn` Core
+============================
+
+.. automodule:: cblearn
+
+.. currentmodule:: cblearn
+
+.. autosummary::
+    :toctree: generated/
+
+    check_triplets
+    check_quadruplets
+    check_pivot_comparisons
+    check_robin_comparisons
+
 
 :mod:`cblearn.datasets` Datasets
 ================================
