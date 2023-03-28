@@ -4,6 +4,7 @@ from numpy.typing import ArrayLike
 import numpy as np
 from sklearn.base import TransformerMixin, ClassifierMixin
 from sklearn.utils.validation import check_is_fitted, column_or_1d
+from scipy.special import expit
 
 import cblearn as cbl
 from cblearn import Comparison
@@ -14,8 +15,11 @@ class TripletEmbeddingMixin(TransformerMixin, ClassifierMixin):
     def _more_tags(self):
         return {
             'requires_positive_X': True,
-            'requires_positive_y': True,
-            'X_types': ['categorical'],
+            'requires_positive_y': False,
+            'binary_only': True,
+            'preserves_dtype': [],  # transform(X) does not preserve dtype
+            'poor_score': True,  # non-triplet inputs are not meaningful
+            'X_types': ['triplets', '2darray']  # 2darray is not true, but required to run sklearn tests
         }
 
     def _prepare_data(self, X: Comparison, y: ArrayLike, quadruplets=False, return_y=True,
@@ -35,6 +39,7 @@ class TripletEmbeddingMixin(TransformerMixin, ClassifierMixin):
         else:
             y = column_or_1d(y, warn=True)
             self.classes_, y = np.unique(y, return_inverse=True)
+            y = np.array([-1, 1])[y]
 
         if quadruplets:
             return cbl.check_quadruplets(X, y, return_y=return_y)
@@ -60,6 +65,15 @@ class TripletEmbeddingMixin(TransformerMixin, ClassifierMixin):
 
         return np.take(self.classes_, indices, axis=0)
 
+    def predict_proba(self, X):
+        """Probability estimation.
+        Positive class probabilities are computed as
+        1. / (1. + np.exp(-self.decision_function(X)));
+        """
+        prob = self.decision_function(X)
+        expit(prob, out=prob)
+        return np.vstack([1 - prob, prob]).T
+
     def score(self, X: Comparison, y: ArrayLike = None, sample_weight=None) -> float:
         """ Triplet score on the estimated embedding.
 
@@ -70,5 +84,9 @@ class TripletEmbeddingMixin(TransformerMixin, ClassifierMixin):
         Returns.
             Fraction of correct triplets.
         """
-        X, y = cbl.check_triplets(X, y, return_y=True)
+        # TODO: enable quadruplet support to score, requires quadruplet decision function
+        if 'quadruplets' in self._get_tags()['X_types'] and False:
+            X, y = cbl.check_quadruplets(X, y, return_y=True)
+        else:
+            X, y = cbl.check_triplets(X, y, return_y=True)
         return ClassifierMixin.score(self, X, y, sample_weight=None)

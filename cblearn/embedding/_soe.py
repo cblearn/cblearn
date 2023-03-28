@@ -108,6 +108,11 @@ class SOE(BaseEstimator, TripletEmbeddingMixin):
         self.batch_size = batch_size
         self.device = device
 
+    def _more_tags(self):
+        tags = TripletEmbeddingMixin()._more_tags()
+        tags['X_types'].append('quadruplets')
+        return tags
+
     def fit(self, X: utils.Query, y: np.ndarray = None,
             init: np.ndarray = None,
             n_objects: Optional[int] = None) -> 'SOE':
@@ -128,8 +133,8 @@ class SOE(BaseEstimator, TripletEmbeddingMixin):
             n_objects = X.max() + 1
         random_state = check_random_state(self.random_state)
         if init is None:
-            inits = (random_state.multivariate_normal(np.zeros(self.n_components),
-                     np.eye(self.n_components), size=n_objects) for _ in range(self.n_init))
+            inits = [random_state.multivariate_normal(np.zeros(self.n_components),
+                     np.eye(self.n_components), size=n_objects) for _ in range(self.n_init)]
         else:
             init = np.array(init)
             if init.ndim == 3:

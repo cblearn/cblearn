@@ -72,6 +72,10 @@ class MLDS(BaseEstimator, TripletEmbeddingMixin):
                           + np.log(np.maximum((1 - prob) ** (1 - answer), float_min)))
         return log_likelihood.sum()
 
+    def _more_tags(self):
+        tags = TripletEmbeddingMixin()._more_tags()
+        return tags
+
     def fit(self, X: utils.Query, y: np.ndarray = None) -> 'MLDS':
         """Computes the embedding.
 

@@ -137,6 +137,10 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
         self.stress_, self.n_iter_ = result.fun, result.nit
         return self
 
+    def _more_tags(self):
+        tags = TripletEmbeddingMixin()._more_tags()
+        return tags
+
 
 def _ckl_x_loss(x, x_shape, triplets, mu, float_min=np.finfo(float).tiny):
     X = x.reshape(x_shape)

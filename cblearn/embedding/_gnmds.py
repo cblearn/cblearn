@@ -88,6 +88,10 @@ class GNMDS(BaseEstimator, TripletEmbeddingMixin):
         self.batch_size = batch_size
         self.backend = backend
 
+    def _more_tags(self):
+        tags = TripletEmbeddingMixin()._more_tags()
+        return tags
+
     def fit(self, X: utils.Query, y: np.ndarray = None, init: np.ndarray = None,
             n_objects: Optional[int] = None) -> 'GNMDS':
         """Computes the embedding.

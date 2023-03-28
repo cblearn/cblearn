@@ -26,7 +26,7 @@ def test_triplet_error():
 def test_triplet_scorer():
     triplets = datasets.make_random_triplet_indices(10)
     embedding = np.random.random((10, 2))
-    triplets, answers = datasets.triplet_response(triplets, embedding, result_format='list-boolean')
+    triplets, answers = datasets.triplet_response(triplets, embedding, result_format='list-count')
 
     estimator = DummyOrdinalEmbedding(embedding)
     assert metrics.QueryScorer(estimator, triplets, answers) == 1

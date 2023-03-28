@@ -80,6 +80,10 @@ class OENN(BaseEstimator, TripletEmbeddingMixin):
         self.batch_size = batch_size
         self.device = device
 
+    def _more_tags(self):
+        tags = TripletEmbeddingMixin()._more_tags()
+        return tags
+
     def _make_emb_net(self, input_dim: int, layer_width: int, hidden_layers: int = 3):
         import torch
 
