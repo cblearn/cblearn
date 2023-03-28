@@ -73,6 +73,7 @@ def check_triplets(X: Comparison, y: Optional[ArrayLike] = None,
     if canonical and return_y:
         if y is None:
             raise ValueError("canonical=True requires y to be provided.")
+        X = X.copy()
         X[:, 1:], y = canonical_X_y(X[:, 1:], y)
 
     if not return_y and y is not None:
@@ -116,19 +117,20 @@ def check_pivot_comparisons(X: Comparison, y: Optional[ArrayLike] = None,
     if canonical:
         if y is None:
             raise ValueError("canonical=True requires y to be provided.")
+        X = X.copy()
         X[:, 1:], y = canonical_X_y(X[:, 1:], y)
 
     if not return_y and y is not None:
         # order is important: AFTER canonical
-        old_X = X.copy()
+        new_X = X.copy()
         all_rows = np.arange(X.shape[0])
         other_mask = np.ones_like(X, dtype=bool)
         other_mask[:, 0] = False  # pivot column
         for col, col_y in enumerate(y.reshape(X.shape[0], -1).T):
             other_mask[all_rows, col_y + 1] = False
-            X[all_rows, col + 1] = old_X[all_rows, col_y + 1]
-        X[all_rows, (col + 2):] = old_X[other_mask].reshape(X.shape[0], -1)
-        y = None
+            new_X[all_rows, col + 1] = X[all_rows, col_y + 1]
+        new_X[all_rows, (col + 2):] = X[other_mask].reshape(X.shape[0], -1)
+        X, y = new_X, None
 
     if y is None:
         return X
