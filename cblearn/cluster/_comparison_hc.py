@@ -15,7 +15,7 @@ import sparse
 import numpy as np
 from sklearn.base import BaseEstimator, ClusterMixin
 
-from cblearn import utils
+import cblearn as cbl
 
 
 def flatten(l: List[list]) -> list:
@@ -75,15 +75,14 @@ def closest_clusters(clusters, comparisons, n_objects: int):
 
     Given a list of clusters, this method is deterministic.
 
-    Args: 
-        clusters : A list containing at least two clusters.
+    Args:
+        clusters: A list containing at least two clusters.
         comparisons: Quadruplets in sparse format
         n_objects: number of examples in clusters/comparisons
 
     Returns:
-        i: The index of the first of the two closest clusters.  
+        i: The index of the first of the two closest clusters.
         j: The index of the second of the two closest clusters.
-
     """
     n_clusters = len(clusters)
 
@@ -166,7 +165,7 @@ class ComparisonHC(ClusterMixin, BaseEstimator):
     >>> import numpy as np
     >>> means = np.array([[1,0], [-1, 0]])
     >>> stds = 0.2 * np.ones(means.shape)
-    >>> xs, ys = make_blobs(n_samples=[10, 10], centers=means, cluster_std=stds, 
+    >>> xs, ys = make_blobs(n_samples=[10, 10], centers=means, cluster_std=stds,
     ...                     n_features=2, random_state=2)
     >>> estimator = ComparisonHC(2)
     >>> t = make_random_triplets(xs, result_format="list-order", size=5000, random_state=2)
@@ -176,7 +175,7 @@ class ComparisonHC(ClusterMixin, BaseEstimator):
 
     References
     ----------
-    .. [1] Ghoshdastidar, D., Perrot, M., von Luxburg, U. (2019). 
+    .. [1] Ghoshdastidar, D., Perrot, M., von Luxburg, U. (2019).
            Foundations of Comparison-Based Hierarchical Clustering.
            Advances in Neural Information Processing Systems 32.
     """
@@ -195,11 +194,9 @@ class ComparisonHC(ClusterMixin, BaseEstimator):
 
         E.g. if quad[0, 5, 4, 6] == 1, then quad[4, 6, 0, 5] == -1
         """
-        triplets = utils.check_query_response(X, y, result_format='tensor-count')
-        triplets = triplets.clip(-1, 1)  # remove repeated triplets
-        quads = sparse.COO(triplets.coords[[0, 1, 0, 2], :], triplets.data, (len(triplets),) * 4)
-        quads = quads + sparse.COO(triplets.coords[[0, 2, 0, 1], :], -1 * triplets.data, (len(triplets),) * 4)
-        return quads
+        quads = cbl.check_quadruplets(X, y, sparse=True)
+        rev_quads = sparse.COO(quads.coords[[2, 3, 0, 1], :], -1 * quads.data, shape=quads.shape)
+        return quads + rev_quads
 
     def _fit_dendrogram(self, init_clusters, quadruplets, n_objects):
         n_clusters = len(init_clusters)  # != self.n_clusters, which is number of predicted clusters
@@ -241,7 +238,7 @@ class ComparisonHC(ClusterMixin, BaseEstimator):
         """
         quads = self._triplets_to_quadruplets(X, y)
         n_objects = len(quads)
-    
+
         if init_clusters is None:
             init_clusters = [[i] for i in range(n_objects)]
         self.clusters_ = init_clusters

@@ -3,6 +3,7 @@ from cblearn.cluster import ComparisonHC
 from sklearn.metrics import normalized_mutual_info_score
 from sklearn.datasets import make_blobs
 import numpy as np
+import pytest
 
 
 def generate_gmm_data(n, means: np.ndarray, std: float, seed: int):
@@ -13,11 +14,12 @@ def generate_gmm_data(n, means: np.ndarray, std: float, seed: int):
                       random_state=seed, shuffle=False)
 
 
+@pytest.mark.filterwarnings("ignore:DeprecationWarning")
 def test_chc_quadruplet_generation():
     chc = ComparisonHC(2)
 
     triplets = np.array([[0, 1, 2], [1, 2, 3], [2, 3, 4]])
-    responses = np.array([1, 1, 0]).astype(bool)
+    responses = np.array([1, 1, -1])
     quad_responses = chc._triplets_to_quadruplets(triplets, responses)
     assert quad_responses[0, 1, 0, 2] == 1
     assert quad_responses[1, 2, 1, 3] == 1
