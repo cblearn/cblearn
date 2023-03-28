@@ -100,7 +100,7 @@ def fetch_material_similarity(data_home: Optional[os.PathLike] = None, download_
         os.remove(archive_path)
     else:
         (train_data, test_data, material_names) = joblib.load(filepath)
-    
+
     # Data description:
     # from https://github.com/mlagunas/material-appearance-similarity/blob/
     #           b0980aebf58ca06857099bf5b80bfd665cea69d3/userstudy_sampling/README.md
@@ -108,8 +108,8 @@ def fetch_material_similarity(data_home: Optional[os.PathLike] = None, download_
     # triplets answered until now in the user studies (N). The triplets are
     # stored as first the reference, and then the pair that the participants
     # choose from. The array stores,  the class (as an integer) of each stimuli for each triplet.
-    # Note that the class is an integer with maximum value len(input_data). Therefore, answers[0, 0] 
-    # gives me the class of the reference stimulus of the triplet with index 0. if I access 
+    # Note that the class is an integer with maximum value len(input_data). Therefore, answers[0, 0]
+    # gives me the class of the reference stimulus of the triplet with index 0. if I access
     # input_data[answers[0, 0]], I am getting the url of that element.
     # agreement is a np.array of size (N, 2) that stores the number of users
     # that answered each pair. agreement[x, 0] corresponds to the number of
