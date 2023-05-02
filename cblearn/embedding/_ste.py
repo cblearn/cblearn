@@ -34,7 +34,7 @@ class STE(BaseEstimator, TripletEmbeddingMixin):
         Examples:
 
         >>> from cblearn import datasets
-        >>> seed = np.random.RandomState(42)
+        >>> seed = np.random.RandomState(40)
         >>> true_embedding = seed.rand(15, 2)
         >>> triplets = datasets.make_random_triplets(true_embedding, result_format='list-order',
         ...                                          size=1000, random_state=seed)
