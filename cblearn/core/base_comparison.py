@@ -100,6 +100,15 @@ def assparse(X: Comparison, y: Optional[ArrayLike] = None) -> COO:
 
 
 def canonical_X_y(X: ArrayLike, y: Optional[ArrayLike] = None, axis=1) -> tuple[ArrayLike, ArrayLike] | ArrayLike:
+    """ Sort column entries of X and adapt y accordingly.
+
+    Args:
+        X: Comparisons (indices).
+        y: Object indices of the column
+
+    Returns:
+        X_sorted, y_sorted
+    """
     ind = np.argsort(X, axis=axis)
     X_sorted = np.take_along_axis(X, ind, axis=axis)
     if y is None:

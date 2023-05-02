@@ -8,4 +8,4 @@ from .base_comparison import Comparison, SparseComparison
 from .check_comparison import check_triplets
 from .check_comparison import check_quadruplets
 from .check_comparison import check_pivot_comparisons
-from .check_comparison import check_robin_comparisons
+from .check_comparison import check_pairwise_comparisons

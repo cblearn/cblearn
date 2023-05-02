@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 import sparse
 
-from cblearn import check_quadruplets, check_triplets, check_pivot_comparisons, check_robin_comparisons
+from cblearn import check_quadruplets, check_triplets, check_pivot_comparisons, check_pairwise_comparisons
 
 
 X_triplet = [[0, 1, 2],
@@ -130,21 +130,21 @@ def test_check_pivot_comparisons():
 
 
 def test_check_robin_comparisons():
-    X, y = check_robin_comparisons(X_triplet, y_index)
+    X, y = check_pairwise_comparisons(X_triplet, y_index)
     np.testing.assert_equal(X, X_robin_canonical)
     np.testing.assert_equal(y, y_robin_index)
 
-    X, y = check_robin_comparisons(X_triplet_ordered)
+    X, y = check_pairwise_comparisons(X_triplet_ordered)
     np.testing.assert_equal(X, X_robin_canonical)
     np.testing.assert_equal(y, [0, 0, 0, 2])
 
-    X = check_robin_comparisons(X_triplet, y_index, return_y=False)
+    X = check_pairwise_comparisons(X_triplet, y_index, return_y=False)
     np.testing.assert_equal(X, X_robin_ordered)
 
     with pytest.raises(ValueError):
         # sparse input
-        check_robin_comparisons(X_triplet_sparse)
+        check_pairwise_comparisons(X_triplet_sparse)
 
     with pytest.raises(ValueError):
         # invalid responses
-        check_robin_comparisons(X_triplet, np.full_like(y_index, -1))
+        check_pairwise_comparisons(X_triplet, np.full_like(y_index, -1))

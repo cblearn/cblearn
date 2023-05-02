@@ -138,12 +138,12 @@ def check_pivot_comparisons(X: Comparison, y: Optional[ArrayLike] = None,
         return X, y
 
 
-def check_robin_comparisons(X: Comparison, y: Optional[ArrayLike] = None,
-                            return_y=True, canonical=True) -> Comparison | tuple[Comparison, ArrayLike]:
-    """ Check comparisons in the round-robin format––all pairwise comparisons.
+def check_pairwise_comparisons(X: Comparison, y: Optional[ArrayLike] = None,
+                               return_y=True, canonical=True) -> Comparison | tuple[Comparison, ArrayLike]:
+    """ Check pairwie comparisons where all entries are compared with each other.
         Responses indicate the column of the selected object.
 
-        Round-robin comparisons are, for example, called "the-odd-one-out" or "the-most-central" in the literature.
+        Pairwise comparisons are, for example, called "the-odd-one-out" or "the-most-central" in the literature.
     """
     if issparse(X, y):
         raise ValueError("Round-robin comparisons are not supported for sparse matrices.")
