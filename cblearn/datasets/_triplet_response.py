@@ -89,7 +89,7 @@ def noisy_triplet_response(triplets: cbl.Comparison, embedding: ArrayLike, resul
     if noise is not None and noise_target is NoiseTarget.DIFFERENCES:
         differences += noise_fun(size=differences.shape, **noise_options)
 
-    return utils.check_query_response(quads, (differences > 0).astype(int), result_format=result_format)
+    return utils.check_query_response(quads, np.array([-1, 1])[(differences > 0).astype(int)], result_format=result_format)
 
 
 def triplet_response(triplets: cbl.Comparison, embedding: ArrayLike, result_format: Optional[str] = None,
