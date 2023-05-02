@@ -29,7 +29,6 @@ def test_triplets_from_multiselect():
     assert np.isin(triplets[:, 2], multi_data[:, 3:]).all()
 
     triplets = triplets_from_multiselect(multi_data, selected, is_ranked=True)
-    print(triplets)
     assert triplets.shape == (len(multi_data) * (5 + 4), 3)
     assert np.isin(triplets[:, 1], [1, 2, 11, 12]).all()
     assert np.isin(triplets[:, 2], [1, 3, 4, 5, 6, 12, 13, 14, 15, 16]).all()

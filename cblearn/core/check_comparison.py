@@ -1,4 +1,4 @@
-from typing import Optional
+rom typing import Optional
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -20,7 +20,7 @@ def check_quadruplets(X: Comparison, y: Optional[ArrayLike] = None,
     if y is not None:
         y = y.astype(int)
         if not np.isin(y.ravel(), [-1, 1]).all():
-            raise ValueError(f"y must contain {{-1, 1}}, got {np.unique(y)}")
+            raise ValueError(f"y must contain {{-1, 1}}, got {set(np.unique(y))}")
         y = (y > 0).astype(int)  # convert to {0, 1} for canonical_X_y [-1 -> 0, 1 -> 1]
 
     if return_y and y is None:
@@ -64,7 +64,7 @@ def check_triplets(X: Comparison, y: Optional[ArrayLike] = None,
     if y is not None:
         y = y.astype(int)
         if not np.isin(y.ravel(), [-1, 1]).all():
-            raise ValueError(f"y must contain {{-1, 1}}, got {np.unique(y)}")
+            raise ValueError(f"y must contain {{-1, 1}}, got {set(np.unique(y))}")
         y = (y > 0).astype(int)  # convert to {0, 1} for canonical_X_y
 
     if return_y and y is None:

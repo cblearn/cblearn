@@ -24,7 +24,7 @@ class MLDS(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
     This R package is the reference implementation of MLDS [1]_.
 
     Attributes:
-        embedding_: array-likeThe final embedding, shape (n_objects, 1)
+        embedding_: The final embedding, shape (n_objects, 1)
         log_likelihood_: The final log-likelihood of the embedding.
 
 
