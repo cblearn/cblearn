@@ -1,6 +1,7 @@
 from typing import Union, Optional, Tuple
 
 import numpy as np
+from sklearn.utils import deprecated
 
 from ._data_format import check_format
 from ._data_format import QueryFormat, ResponseFormat, Format
@@ -15,6 +16,7 @@ def _check_triplets_quadruplets(*args, **kwargs):
         return check_quadruplets(*args, **kwargs)
 
 
+@deprecated("Use cblearn.check_triplets and the other more specialized functions instead.")
 def check_query_response(query: Query, response: Optional[np.ndarray] = None,
                          result_format: Optional[Format] = None, standard: bool = True) \
         -> Union[Tuple[np.ndarray, np.ndarray], np.ndarray]:

@@ -1,12 +1,12 @@
 """ Functions in this file generate triplet indices without answers.
 """
-import itertools
 from typing import Union
 
 from sklearn.utils import check_random_state
 import numpy as np
 import scipy
 
+import cblearn as cbl
 from ..utils import check_size
 
 
@@ -20,13 +20,10 @@ def make_all_triplet_indices(n_objects: int, monotonic: bool) -> np.ndarray:
         Numpy array (n_triplets, 3) of triplet indices.
         n_triplets can become quite large by
     """
-    indices = np.arange(n_objects)
-    triplet_iter = itertools.chain.from_iterable(
-        itertools.combinations(indices, 3))
-    triplets = np.fromiter(triplet_iter, int).reshape(-1, 3)
+    triplets = cbl.all_index_tuples(n_objects, n_objects, 3)
 
     if monotonic:
-        return triplets[:, [1, 0, 2]]
+        return np.sort(triplets, axis=1)[:, [1, 0, 2]]
     else:
         return np.r_[triplets[:, [1, 0, 2]], triplets, triplets[:, [2, 0, 1]]]
 
@@ -74,23 +71,18 @@ def make_random_triplet_indices(n_objects: int, size: Union[int, float] = 1.,
     if not repeat and size > n_triplets:
         raise ValueError(f"Cannot sample {n_choose} from {n_triplets} without repetitions.")
     if n_triplets - n_choose < make_all:
-        triplets = make_all_triplet_indices(n_objects, monotonic)
-        ix = random_state.choice(len(triplets), n_choose, replace=repeat)
-        return triplets[ix]
+        pass  # ignore make_all
 
-    pairs = np.transpose(np.triu_indices(n_objects, 1))
     triplets = np.empty((0, 3))
     while triplets.shape[0] < n_choose:
-        i = random_state.randint(0, n_objects, n_choose)
-        jk = pairs[random_state.randint(0, len(pairs), n_choose)]
-
+        ijk = cbl.uniform_index_tuples(n_objects, n_choose, 3, random_state=random_state)
         if monotonic:
-            mask = np.logical_and(jk[:, 0] < i, i < jk[:, 1])
+            mask = np.logical_and(ijk[:, 1] < ijk[:, 0], ijk[:, 0] < ijk[:, 2])
         else:
-            mask = np.logical_and(i != jk[:, 0], jk[:, 1] != i)
-        triplet_candidates = np.c_[i[mask], jk[mask]]
+            mask = np.logical_and(ijk[:, 0] != ijk[:, 1], ijk[:, 2] != ijk[:, 0])
+        triplet_candidates = ijk[mask]
         triplets = np.r_[triplets, triplet_candidates[:(n_choose - triplets.shape[0])]]
         if not repeat:
             triplets = np.unique(triplets, axis=0)
 
-    return triplets.astype(np.uint32)
+    return triplets.astype(int)

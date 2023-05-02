@@ -1,6 +1,7 @@
 import enum
 from typing import Union, Optional, Tuple, Sequence
 
+from sklearn.utils import deprecated
 import scipy
 import sparse
 import numpy as np
@@ -22,6 +23,7 @@ class ResponseFormat(enum.Enum):
 Format = Union[str, Tuple[QueryFormat, ResponseFormat]]
 
 
+@deprecated()
 def check_format(format: Optional[Format], default_query: Union[Query, Response],
                  default_response: Optional[np.ndarray]) -> Tuple[QueryFormat, ResponseFormat]:
     """ Validate comparison format description.
@@ -52,6 +54,7 @@ def check_format(format: Optional[Format], default_query: Union[Query, Response]
             raise ValueError(f"Expects either format as string, enum-tuple or None; got {format}.")
 
 
+@deprecated()
 def data_format(query: Union[Query], response: Optional[np.ndarray] = None
                 ) -> Tuple[QueryFormat, ResponseFormat]:
     """ Extract format of comparison data.
