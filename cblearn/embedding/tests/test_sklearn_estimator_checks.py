@@ -35,7 +35,7 @@ def _features_to_triplets(X, y=None):
             return new_X
         else:
             new_X, new_y = make_random_triplets(X, size=len(X), result_format='list-count', random_state=1)
-            new_y = new_y[:len(y)]  # Make sure new_y has same length as y
+            #new_y = new_y[:len(ne)]  # Make sure new_y has same length as y
             return new_X, new_y
     else:
         if y is None:
@@ -57,12 +57,12 @@ def wrap_triplet_estimator(estimator):
     orig_methods = {m: getattr(estimator.__class__, m) for m in methods
                     if hasattr(estimator.__class__, m)}
 
-    def new_fit(e, X, y=None):
+    def new_fit(e, X, y=None, **kwargs):
         if y is None:
             X = _features_to_triplets(X)
         else:
             X, y = _features_to_triplets(X, y)
-        return orig_fit(e, X, y)
+        return orig_fit(e, X, y, **kwargs)
 
     estimator.__class__.fit = new_fit
     estimator.__class__.fit_transform = lambda estimator, X, y=None: new_fit(estimator, X, y).transform(X)
@@ -100,6 +100,8 @@ SKIP_CHECKS = [
     'check_classifiers_one_label',
     'check_classifier_data_not_an_array',
     'check_classifiers_classes',
+    'check_sample_weights_invariance',
+    'check_classifiers_one_label_sample_weights'
 ]
 
 

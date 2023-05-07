@@ -43,6 +43,13 @@ class TripletEmbeddingMixin(TransformerMixin, ClassifierMixin):
             y = column_or_1d(y, warn=True)
             self.classes_, y = np.unique(y, return_inverse=True)
             y = np.array([-1, 1])[y]
+        if len(self.classes_) < 2:
+            raise ValueError(
+                "This solver needs samples of 2 classes"
+                " in the data, but the data contains only one"
+                " class: %r" % self.classes_[0]
+            )
+
 
         if quadruplets:
             result = cbl.check_quadruplets(X, y, return_y=return_y)
