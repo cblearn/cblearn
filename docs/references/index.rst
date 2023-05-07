@@ -19,7 +19,7 @@ This is the class and function reference of cblearn.
     check_triplets
     check_quadruplets
     check_pivot_comparisons
-    check_robin_comparisons
+    check_pairwise_comparisons
 
 
 :mod:`cblearn.datasets` Datasets
@@ -90,6 +90,7 @@ Low-level Dataset Utility
     embedding.TSTE
     embedding.OENN
     embedding.MLDS
+    embedding.MVTE
 
 
 Wrapper
