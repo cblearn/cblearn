@@ -23,7 +23,7 @@ class TripletEmbeddingMixin(TransformerMixin, ClassifierMixin):
         }
 
     def _prepare_data(self, X: Comparison, y: ArrayLike, quadruplets=False, return_y=True,
-                      ) -> tuple[ArrayLike, ArrayLike, ArrayLike]:
+                      sample_weight=None) -> tuple[ArrayLike, ArrayLike, ArrayLike]:
         """Validate `X` and `y` and binarize `y`.
 
         Args:
@@ -34,6 +34,9 @@ class TripletEmbeddingMixin(TransformerMixin, ClassifierMixin):
             X: (n_samples, n_features), Validated training data.
             y: (n_samples,), Validated target values.
         """
+        if sample_weight is not None:
+            sample_weight = np.asarray(sample_weight)
+
         if y is None:
             self.classes_ = np.array([-1, 1])
         else:
@@ -42,9 +45,14 @@ class TripletEmbeddingMixin(TransformerMixin, ClassifierMixin):
             y = np.array([-1, 1])[y]
 
         if quadruplets:
-            return cbl.check_quadruplets(X, y, return_y=return_y)
+            result = cbl.check_quadruplets(X, y, return_y=return_y)
         else:
-            return cbl.check_triplets(X, y, return_y=return_y)
+            result = cbl.check_triplets(X, y, return_y=return_y)
+
+        if sample_weight is None:
+            return result
+        else:
+            return (result, sample_weight)
 
     def transform(self, X: Comparison = None, y: Optional[ArrayLike] = None) -> np.ndarray:
         check_is_fitted(self, 'embedding_')
