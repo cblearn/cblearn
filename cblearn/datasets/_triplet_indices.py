@@ -20,7 +20,7 @@ def make_all_triplet_indices(n_objects: int, monotonic: bool) -> np.ndarray:
         Numpy array (n_triplets, 3) of triplet indices.
         n_triplets can become quite large by
     """
-    triplets = cbl.all_index_tuples(n_objects, n_objects, 3)
+    triplets = cbl.all_index_tuples(n_objects, 3)
 
     if monotonic:
         return np.sort(triplets, axis=1)[:, [1, 0, 2]]
