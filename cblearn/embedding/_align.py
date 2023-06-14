@@ -1,7 +1,6 @@
 import numpy as np
 from numpy.typing import ArrayLike
 from scipy.linalg import orthogonal_procrustes
-from sklearn.utils import check_array
 
 
 def procrustes_alignment(embeddings: list[ArrayLike], return_disparity=False,
