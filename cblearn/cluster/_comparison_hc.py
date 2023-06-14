@@ -147,12 +147,8 @@ class ComparisonHC(ClusterMixin, BaseEstimator):
 
     Attributes:
         dendrogram_: numpy array, shape (n_clusters-1, 4)
-            An array corresponding to the learned dendrogram. After
-            iteration i, dendrogram[i,0] and dendrogram[i,1] are the
-            indices of the merged clusters, and dendrogram[i,2] is the
-            size of the new cluster. The dendrogram is initialized to None
-            until the fit method is called.
-            The last column is set to 0 (implemented like this by the original algorithm).
+            An array corresponding to the learned dendrogram
+            as specified in the scipy linkage function.
         cluster_: list of list
             Initial cluster information used for fitting.
 
@@ -214,10 +210,12 @@ class ComparisonHC(ClusterMixin, BaseEstimator):
 
             dendrogram[it, 0] = clusters_indices[i]
             dendrogram[it, 1] = clusters_indices[j]
-            dendrogram[it, 2] = len(clusters_copy[i])
+            dendrogram[it, 2] = it + 1
+            dendrogram[it, 3] = len(clusters_copy[i])
 
             clusters_indices[i] = n_clusters + it
             del clusters_indices[j]
+
         return dendrogram
 
     def fit(self, X, y=None, init_clusters=None):
