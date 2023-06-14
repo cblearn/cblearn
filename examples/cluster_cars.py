@@ -1,15 +1,17 @@
-# %% [markdown]
-# Hierarchical clustering
-# =======================
-#
-# Clustering of data points (e.g., stimuli) according to triplet responses can be done in two ways: 1. Estimate and ordinal embedding and apply (metric) clustering methods implemented in scikit-learn. 2. Apply clustering directly to the triplet responses. The second approach is implemented here using hierarchical clustering. Directly clustering from the triplet responses has the advantage that the clustering is done based on the responses without compressing (and potentially losing) some information with an embedding of a fixed dimensionality.
-#
-# In this example, we cluster 60 images of cars based on human responses, judging the "most central" of three.
-# First, we load the responses and convert them to triplets. Then we hierarchically cluster the triplets with the ComparisonHC algorithm and visualize the results.
-# Afterwards, we estimate a 2d embedding and visualize both "ground truth" labels and the cluster labels.
-#
-# This example is inspired by an example in the `ComparisonHC documentation <https://github.com/mperrot/ComparisonHC/blob/master/examples/car.ipynb>`_ and thus shows the API differences in the implementations.
-#
+# -*- coding: utf-8 -*-
+r"""
+Hierarchical clustering
+=======================
+
+Clustering of data points (e.g., stimuli) according to triplet responses can be done in two ways: 1. Estimate and ordinal embedding and apply (metric) clustering methods implemented in scikit-learn. 2. Apply clustering directly to the triplet responses. The second approach is implemented here using hierarchical clustering. Directly clustering from the triplet responses has the advantage that the clustering is done based on the responses without compressing (and potentially losing) some information with an embedding of a fixed dimensionality.
+
+In this example, we cluster 60 images of cars based on human responses, judging the "most central" of three.
+First, we load the responses and convert them to triplets. Then we hierarchically cluster the triplets with the ComparisonHC algorithm and visualize the results.
+Afterwards, we estimate a 2d embedding and visualize both "ground truth" labels and the cluster labels.
+
+This example is inspired by an example in the `ComparisonHC documentation <https://github.com/mperrot/ComparisonHC/blob/master/examples/car.ipynb>`_ and thus shows the API differences in the implementations.
+"""
+
 
 # %%
 from cblearn.cluster import ComparisonHC
