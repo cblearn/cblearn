@@ -17,9 +17,12 @@ def procrustes_alignment(embeddings: list[ArrayLike], return_disparity=False,
         Aligned embeddings.
         Tuple of aligned embeddings and disparities, if return_disparity is True.
 
-    >>> A = np.random.rand(10, 10)
-    >>> B = (A + 0.5) * 0.3
-    >>> C = np.ro(A - 0.3) * 0.2
+    >>> A = np.random.rand(10, 2)
+    >>> B = A * 0.3 + 0.5  # scale, then translate
+    >>> angle_radians = np.radians(30)
+    >>> rotation_matrix = np.array([[np.cos(angle_radians), -np.sin(angle_radians)],
+    ...                             [np.sin(angle_radians), np.cos(angle_radians)]])
+    >>> C = np.dot(A, rotation_matrix) * 50 + 2  # rotate, scale, translate
     >>> (A, B, C), disp = procrustes_alignment([A, B, C], return_disparity=True)
     >>> np.allclose(A, B), np.allclose(A, C), np.allclose(B, C), np.allclose(disp, [0, 0])
     (True, True, True, True)

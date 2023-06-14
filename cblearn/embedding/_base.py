@@ -50,7 +50,6 @@ class TripletEmbeddingMixin(TransformerMixin, ClassifierMixin):
                 " class: %r" % self.classes_[0]
             )
 
-
         if quadruplets:
             result = cbl.check_quadruplets(X, y, return_y=return_y)
         else:
