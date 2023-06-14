@@ -25,19 +25,15 @@ def procrustes_alignment(embeddings: list[ArrayLike], return_disparity=False,
     >>> np.allclose(A, B), np.allclose(A, C), np.allclose(B, C), np.allclose(disp, [0, 0])
     (True, True, True, True)
     """
-    n_entries = max(0, *map(len, embeddings))
-    emb0 = check_array(embeddings[0])
-    reference = np.zeros((n_entries, emb0.shape[1]))
-    reference[:len(emb0), :] = emb0
+    reference = np.array(embeddings[0], dtype=np.double, copy=True)
 
     others = []
     for e in embeddings[1:]:
-        others.append(np.zeros_like(reference))
-        others[-1][:len(e), :] = check_array(e)
+        others.append(np.array(e, dtype=np.double, copy=True))
 
     # standardize the reference embedding: translation, scale, rotation
     if standardize_reference:
-        reference -= reference.mean()
+        reference -= np.mean(reference, 0)
         reference /= np.linalg.norm(reference)
         if standardize_rotation:
             U, S, _ = np.linalg.svd(reference, full_matrices=False)
@@ -48,10 +44,10 @@ def procrustes_alignment(embeddings: list[ArrayLike], return_disparity=False,
 
     # align others translation, scale, rotation
     for other in others:  # inplace operations
-        other -= other.mean()
+        other -= np.mean(other, 0)
         other /= np.linalg.norm(other)
         R, scale = orthogonal_procrustes(reference, other)
-        other[:] = scale * (other @ R.T)
+        other[:] = (other @ R.T) * scale
 
     if return_disparity:
         disparities = np.array([((reference - other)**2).sum() for other in others])
