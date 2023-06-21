@@ -102,7 +102,7 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
         Returns:
             self.
         """
-        triplets = utils.check_query_response(X, y, result_format='list-order')
+        triplets = super()._prepare_data(X, y, return_y=False, quadruplets=False)
         if not n_objects:
             n_objects = triplets.max() + 1
         random_state = check_random_state(self.random_state)
@@ -136,6 +136,10 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
         self.embedding_ = result.x.reshape(-1, self.n_components)
         self.stress_, self.n_iter_ = result.fun, result.nit
         return self
+
+    def _more_tags(self):
+        tags = TripletEmbeddingMixin()._more_tags()
+        return tags
 
 
 def _ckl_x_loss(x, x_shape, triplets, mu, float_min=np.finfo(float).tiny):

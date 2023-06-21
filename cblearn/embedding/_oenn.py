@@ -80,6 +80,10 @@ class OENN(BaseEstimator, TripletEmbeddingMixin):
         self.batch_size = batch_size
         self.device = device
 
+    def _more_tags(self):
+        tags = TripletEmbeddingMixin()._more_tags()
+        return tags
+
     def _make_emb_net(self, input_dim: int, layer_width: int, hidden_layers: int = 3):
         import torch
 
@@ -104,7 +108,7 @@ class OENN(BaseEstimator, TripletEmbeddingMixin):
         Returns:
             self.
         """
-        triplets = utils.check_query_response(X, y, result_format='list-order')
+        triplets = super()._prepare_data(X, y, return_y=False, quadruplets=False)
         random_state = check_random_state(self.random_state)
         if n_objects is None:
             n_objects = triplets.max() + 1

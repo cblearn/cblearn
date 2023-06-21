@@ -72,6 +72,10 @@ class MLDS(BaseEstimator, TripletEmbeddingMixin):
                           + np.log(np.maximum((1 - prob) ** (1 - answer), float_min)))
         return log_likelihood.sum()
 
+    def _more_tags(self):
+        tags = TripletEmbeddingMixin()._more_tags()
+        return tags
+
     def fit(self, X: utils.Query, y: np.ndarray = None) -> 'MLDS':
         """Computes the embedding.
 
@@ -85,19 +89,19 @@ class MLDS(BaseEstimator, TripletEmbeddingMixin):
         random_state = check_random_state(self.random_state)
         n_objects = X.max() + 1
 
-        triplets, answer = utils.check_query_response(X, y, result_format='list-boolean')
-        quads = triplets[:, [1, 0, 0, 2]]
+        quads, answer = super()._prepare_data(X, y, quadruplets=True)
+        answer = (answer > 0).astype(int)
         if self.method.lower() == 'glm':
-            X01, rows = np.zeros((len(quads), n_objects)), np.arange(len(triplets))
+            X01, rows = np.zeros((len(quads), n_objects)), np.arange(len(quads))
             X01[rows, quads[:, 0]] += 1
             X01[rows, quads[:, 3]] += 1
             X01[rows, quads[:, 1]] -= 1
             X01[rows, quads[:, 2]] -= 1
             glm = LogisticRegression(verbose=self.verbose, max_iter=self.max_iter,
                                      fit_intercept=False, random_state=random_state)
-            glm.fit(X01, answer.astype(int))
+            glm.fit(X01, answer)
             self.embedding_ = glm.coef_.reshape(-1, 1)
-            self.log_likelihood_ = glm.predict_log_proba(X01)[rows, answer.astype(int)].mean()
+            self.log_likelihood_ = glm.predict_log_proba(X01)[rows, answer].mean()
             self.n_iter_ = glm.n_iter_
         elif self.method.lower() == 'optim':
             def objective(*args):

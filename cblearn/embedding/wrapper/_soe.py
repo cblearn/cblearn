@@ -4,6 +4,7 @@ from sklearn.base import BaseEstimator
 from sklearn.utils import check_random_state
 import numpy as np
 
+import cblearn as cbl
 from cblearn import utils
 from cblearn.embedding._base import TripletEmbeddingMixin
 from cblearn.embedding.wrapper._r_base import RWrapperMixin
@@ -83,7 +84,7 @@ class SOE(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
             rpy2.rinterface_lib.callbacks.consolewrite_print = lambda prompt: None
             report_every = self.max_iter
 
-        triplets = utils.check_query_response(X, y, result_format='list-order')
+        triplets = cbl.check_triplets(X, y, return_y=False)
         quadruplets = triplets[:, [1, 0, 0, 2]]  # type: ignore
         quadruplets = quadruplets.astype(np.int32) + 1  # R is 1-indexed, int32
 

@@ -38,8 +38,8 @@ def fetch_car_similarity(data_home: Optional[os.PathLike] = None, download_if_mi
     ['OFF-ROAD / SPORT UTILITY VEHICLES', 'ORDINARY CARS', 'OUTLIERS', 'SPORTS CARS']
     >>> dataset.triplet.shape  # doctest: +REMOTE_DATA
     (7097, 3)
-    >>> rounds, round_count = np.unique(dataset.survey_round, return_counts=True)
-    >>> len(rounds), round_count.min(), round_count.max()
+    >>> rounds, round_count = np.unique(dataset.survey_round, return_counts=True)  # doctest: +REMOTE_DATA
+    >>> len(rounds), round_count.min(), round_count.max()  # doctest: +REMOTE_DATA
     (146, 30, 50)
 
     Args:

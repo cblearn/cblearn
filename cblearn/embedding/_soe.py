@@ -40,9 +40,9 @@ class SOE(BaseEstimator, TripletEmbeddingMixin):
         >>> seed = np.random.RandomState(42)
         >>> true_embedding = seed.rand(15, 2)
         >>> triplets = datasets.make_random_triplets(true_embedding, result_format='list-order',
-        ...                                          size=1000, random_state=seed)
+        ...                                          size=500, random_state=seed)
         >>> triplets.shape, np.unique(triplets).shape
-        ((1000, 3), (15,))
+        ((500, 3), (15,))
         >>> estimator = SOE(n_components=2, random_state=seed)
         >>> embedding = estimator.fit_transform(triplets, n_objects=15)
         >>> embedding.shape
@@ -108,7 +108,13 @@ class SOE(BaseEstimator, TripletEmbeddingMixin):
         self.batch_size = batch_size
         self.device = device
 
-    def fit(self, X: utils.Query, y: np.ndarray = None, init: np.ndarray = None,
+    def _more_tags(self):
+        tags = TripletEmbeddingMixin()._more_tags()
+        tags['X_types'].append('quadruplets')
+        return tags
+
+    def fit(self, X: utils.Query, y: np.ndarray = None,
+            init: np.ndarray = None,
             n_objects: Optional[int] = None) -> 'SOE':
         """Computes the embedding.
 
@@ -121,13 +127,14 @@ class SOE(BaseEstimator, TripletEmbeddingMixin):
         Returns:
             self.
         """
-        queries = utils.check_query_response(X, y, result_format='list-order')
+        X = super()._prepare_data(X, y, return_y=False, quadruplets=(self.backend == "scipy"))
+
         if not n_objects:
-            n_objects = queries.max() + 1
+            n_objects = X.max() + 1
         random_state = check_random_state(self.random_state)
         if init is None:
-            inits = (random_state.multivariate_normal(np.zeros(self.n_components),
-                     np.eye(self.n_components), size=n_objects) for _ in range(self.n_init))
+            inits = [random_state.multivariate_normal(np.zeros(self.n_components),
+                     np.eye(self.n_components), size=n_objects) for _ in range(self.n_init)]
         else:
             init = np.array(init)
             if init.ndim == 3:
@@ -139,18 +146,12 @@ class SOE(BaseEstimator, TripletEmbeddingMixin):
         for init in inits:
             if self.backend == "torch":
                 assert_torch_is_available()
-                if queries.shape[1] != 3:
-                    raise ValueError(f"Expect triplets of shape (n_triplets, 3), got {queries.shape}.")
-                result = torch_minimize('adam', _soe_loss_torch, init, data=(queries.astype(int),), args=(self.margin,),
+                result = torch_minimize('adam', _soe_loss_torch, init, data=(X,), args=(self.margin,),
                                         device=self.device, max_iter=self.max_iter, lr=self.learning_rate,
                                         seed=random_state.randint(1))
             elif self.backend == "scipy":
-                if queries.shape[1] == 3:
-                    queries = queries[:, [0, 1, 0, 2]]
-                elif queries.shape[1] != 4:
-                    raise ValueError(f"Expect triplets or quadruplets of shape (n_queries, 3/4), got {queries.shape}.")
-                result = minimize(_soe_loss, init.ravel(), args=(init.shape, queries, self.margin), method='L-BFGS-B',
-                                  jac=True, options=dict(maxiter=self.max_iter, disp=self.verbose))
+                result = minimize(_soe_loss, init.ravel(), args=(init.shape, X, self.margin),
+                                  method='L-BFGS-B', jac=True, options=dict(maxiter=self.max_iter, disp=self.verbose))
 
             else:
                 raise ValueError(f"Unknown backend '{self.backend}'. Try 'scipy' or 'torch' instead.")
@@ -163,14 +164,15 @@ class SOE(BaseEstimator, TripletEmbeddingMixin):
 
         self.embedding_ = best_result.x.reshape(-1, self.n_components)
         self.stress_, self.n_iter_ = best_result.fun, best_result.nit
+        self.optimize_result_ = best_result
         return self
 
 
-def _soe_loss_torch(embedding, triplets, margin):
+def _soe_loss_torch(embedding, X, margin):
     """ Equation (1) of Terada & Luxburg (2014) """
     import torch  # Pytorch is an optional dependency
 
-    X = embedding[triplets.long()]
+    X = embedding[X.long()]
     anchor, positive, negative = X[:, 0, :], X[:, 1, :], X[:, 2, :]
     triplet_loss = torch.nn.functional.triplet_margin_loss(anchor, positive, negative,
                                                            margin=margin, p=2, reduction='none')
@@ -186,8 +188,8 @@ def _soe_loss(x, x_shape, quadruplet, margin):
     X_dist = distance_matrix(X, X)
     ij_dist = X_dist[quadruplet[:, 0], quadruplet[:, 1]]
     kl_dist = X_dist[quadruplet[:, 2], quadruplet[:, 3]]
-    differences = ij_dist + margin - kl_dist
-    stress = (np.maximum(differences, 0) ** 2)
+    differences = (ij_dist - kl_dist + margin)
+    stress = (np.maximum(differences, 0)**2)
 
     # GRADIENT #
     is_diff_positive = differences > 0  # Case 1, 2.1.1

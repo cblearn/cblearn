@@ -4,6 +4,7 @@ from sklearn.base import BaseEstimator
 from sklearn.utils import check_random_state
 import numpy as np
 
+import cblearn as cbl
 from cblearn import utils
 from cblearn.embedding._base import TripletEmbeddingMixin
 from cblearn.embedding.wrapper._r_base import RWrapperMixin
@@ -24,7 +25,7 @@ class MLDS(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
     This R package is the reference implementation of MLDS [1]_.
 
     Attributes:
-        embedding_: array-likeThe final embedding, shape (n_objects, 1)
+        embedding_: The final embedding, shape (n_objects, 1)
         log_likelihood_: The final log-likelihood of the embedding.
 
 
@@ -72,7 +73,8 @@ class MLDS(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
         random_state = check_random_state(self.random_state)
         self.seed_r(random_state)
 
-        triplets, answer = utils.check_query_response(X, y, result_format='list-boolean')
+        triplets, answer = cbl.check_triplets(X, y)
+        answer = answer > 0
         triplets = triplets.astype(np.int32) + 1
         r_df = self.robjects.vectors.DataFrame({
             'resp': answer,
