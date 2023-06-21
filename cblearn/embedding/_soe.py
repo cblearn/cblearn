@@ -164,6 +164,7 @@ class SOE(BaseEstimator, TripletEmbeddingMixin):
 
         self.embedding_ = best_result.x.reshape(-1, self.n_components)
         self.stress_, self.n_iter_ = best_result.fun, best_result.nit
+        self.optimize_result_ = best_result
         return self
 
 
