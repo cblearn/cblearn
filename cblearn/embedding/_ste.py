@@ -44,7 +44,7 @@ class BaseSTE(BaseEstimator, TripletEmbeddingMixin):
                Insights into Ordinal Embedding Algorithms: A Systematic Evaluation. ArXiv:1912.01666 [Cs, Stat].
         """
 
-    def __init__(self, n_components=2, heavy_tailed=False, verbose=False,
+    def __init__(self, n_components=2, heavy_tailed=False, verbose=False, lambd=0,
                  random_state: Union[None, int, np.random.RandomState] = None, max_iter=1000,
                  backend: str = "scipy", learning_rate=1, batch_size=50_000,  device: str = "auto"):
         """ Initialize the estimator.
@@ -57,6 +57,7 @@ class BaseSTE(BaseEstimator, TripletEmbeddingMixin):
                 If true, t-STE is using the heavy-tailed student-t kernel.
             verbose: boolean, default=False
                 Enable verbose output.
+            lambd: float, Amount of L2 regularization.
             random_state:
              The seed of the pseudo random number generator used to initialize the optimization.
             max_iter:
@@ -74,6 +75,7 @@ class BaseSTE(BaseEstimator, TripletEmbeddingMixin):
         self.heavy_tailed = heavy_tailed
         self.max_iter = max_iter
         self.verbose = verbose
+        self.lambd = lambd
         self.random_state = random_state
         self.backend = backend
         self.learning_rate = learning_rate
@@ -115,11 +117,11 @@ class BaseSTE(BaseEstimator, TripletEmbeddingMixin):
             assert_torch_is_available()
             result = torch_minimize('adam', self._torch_objective, init,
                                     data=(triplets.astype(int),),
-                                    args=(sample_weight, self.heavy_tailed,),
+                                    args=(sample_weight, self.heavy_tailed, self.lambd),
                                     device=self.device, max_iter=self.max_iter, lr=self.learning_rate,
                                     seed=random_state.randint(1))
         elif self.backend == "scipy":
-            result = minimize(self._objective, init.ravel(), args=(init.shape, triplets, sample_weight, self.heavy_tailed),
+            result = minimize(self._objective, init.ravel(), args=(init.shape, triplets, sample_weight, self.heavy_tailed, self.lambd),
                               method='L-BFGS-B', jac=True, options=dict(maxiter=self.max_iter, disp=self.verbose))
         else:
             raise ValueError(f"Unknown backend '{self.backend}'. Try 'scipy' or 'torch' instead.")
@@ -128,10 +130,11 @@ class BaseSTE(BaseEstimator, TripletEmbeddingMixin):
             print(f"STE's optimization failed with reason: {result.message}.")
         self.embedding_ = result.x.reshape(-1, self.n_components)
         self.stress_, self.n_iter_ = result.fun, result.nit
+        self.optimize_result_ = result
         return self
 
     @staticmethod
-    def _torch_objective(embedding, triplets, weights, heavy_tailed, p=2.):
+    def _torch_objective(embedding, triplets, weights, heavy_tailed, lambd, p=2.):
         import torch  # Pytorch is an optional dependency
 
         X = embedding[triplets.long()]
@@ -145,23 +148,24 @@ class BaseSTE(BaseEstimator, TripletEmbeddingMixin):
         else:
             p = (-dist_1).exp() / ((-dist_1).exp() + (-dist_2).exp() + 1e-16)
 
-        return -(weights * p).log().sum()
+        return -(weights * p).log().sum() + lambd * embedding.pow(2).sum()
 
     @staticmethod
-    def _objective(x, x_shape, triplets, weights, heavy_tailed):
+    def _objective(x, x_shape, triplets, weights, heavy_tailed, lambd):
+        """ Calculates the log STE loss"""
         X = x.reshape(x_shape)  # scipy minimize expects a flat x.
         n_objects, n_dim = X.shape
         dof = max(n_dim - 1, 1)
         dist = distance.squareform(distance.pdist(X, 'sqeuclidean'))
         if heavy_tailed:
             base_kernel = 1 + dist / dof
-            kernel = base_kernel**(-(dof + 1) / 2)
+            kernel = base_kernel**((dof + 1) / -2)
         else:
             kernel = np.exp(-dist)
 
         I, J, K = tuple(triplets.T)
         P = kernel[I, J] / np.maximum(kernel[I, J] + kernel[I, K], EPS)
-        loss = -np.sum(weights * np.log(np.maximum(P, EPS)))
+        loss = -np.mean(weights * np.log(np.maximum(P, EPS))) + lambd * np.mean(x**2)
 
         if heavy_tailed:
             base_inv = (1 / base_kernel)[..., np.newaxis]
@@ -182,8 +186,8 @@ class BaseSTE(BaseEstimator, TripletEmbeddingMixin):
             loss_grad[:, dim] = np.bincount(triplets[:, 0], grad_triplets[0, :, dim], n_objects)
             loss_grad[:, dim] += np.bincount(triplets[:, 1], grad_triplets[1, :, dim], n_objects)
             loss_grad[:, dim] += np.bincount(triplets[:, 2], grad_triplets[2, :, dim], n_objects)
-        loss_grad = -loss_grad
-        loss_grad = loss_grad / len(triplets) * n_objects
+        loss_grad = loss_grad / len(triplets)  # this normalizes the gradient
+        loss_grad = -loss_grad + 2 * lambd * X
 
         return loss, loss_grad.ravel()
 
@@ -216,11 +220,11 @@ class STE(BaseSTE):
         >>> estimator.score(triplets) > 0.9
         True
     """
-    def __init__(self, n_components=2, verbose=False,
+    def __init__(self, n_components=2, verbose=False, lambd=0,
                  random_state: Union[None, int, np.random.RandomState] = None, max_iter=1000,
                  backend: str = "scipy", learning_rate=1, batch_size=50_000,  device: str = "auto"):
         heavy_tailed = False
-        return super().__init__(n_components, heavy_tailed, verbose, random_state, max_iter, backend,
+        return super().__init__(n_components, heavy_tailed, verbose, lambd, random_state, max_iter, backend,
                                 learning_rate, batch_size, device)
 
 
@@ -253,11 +257,11 @@ class TSTE(BaseSTE):
         >>> estimator.score(triplets) > 0.9
         True
     """
-    def __init__(self, n_components=2, verbose=False,
+    def __init__(self, n_components=2, verbose=False, lambd=0,
                  random_state: Union[None, int, np.random.RandomState] = None, max_iter=1000,
                  backend: str = "scipy", learning_rate=1, batch_size=50_000,  device: str = "auto"):
         heavy_tailed = True
-        return super().__init__(n_components, heavy_tailed, verbose, random_state, max_iter, backend,
+        return super().__init__(n_components, heavy_tailed, verbose, lambd, random_state, max_iter, backend,
                                 learning_rate, batch_size, device)
 
 
@@ -292,11 +296,11 @@ class MVTE(BaseSTE):
     [1] Ehsan Amid, Antti Ukkonen, Multiview Triplet Embedding: Learning Attributes in Multiple Maps,
         Proceedings of the 32nd International Conference on Machine Learning, PMLR
     """
-    def __init__(self, n_components=2, n_maps=1, heavy_tailed=True, verbose=False,
+    def __init__(self, n_components=2, n_maps=1, heavy_tailed=True, verbose=False, lambd=0,
                  random_state: Union[None, int, np.random.RandomState] = None, max_iter=1000,
                  backend: str = "scipy", learning_rate=1, batch_size=50_000,  device: str = "auto"):
         self.n_maps = n_maps
-        return super().__init__(n_components, heavy_tailed, verbose, random_state, max_iter, backend,
+        return super().__init__(n_components, heavy_tailed, verbose, lambd, random_state, max_iter, backend,
                                 learning_rate, batch_size, device)
 
     @staticmethod
