@@ -9,10 +9,22 @@ from . import Comparison, canonical_X_y, asdense, assparse, issparse
 def check_quadruplets(X: Comparison, y: Optional[ArrayLike] = None,
                       return_y=True,
                       sparse=False,
+                      force_quadruplets=False,
                       canonical=True) -> Comparison | tuple[Comparison, ArrayLike]:
-    """ Check comparisons in the quadruplet format (a, b) vs (c, d)."""
+    """ Check comparisons in the quadruplet format (a, b) vs (c, d).
+        Comparison array stores the indices of the quadruplets in the format (a, b, c, d) or, if a=c, (a, b, d).
+
+    Args:
+        X: Comparison array of shape (n, 4) or (n, 3).
+        y: Response array.
+        return_y: Whether to return the response array.
+        sparse: Whether to return a sparse comparison array (implies return_y=False).
+        force_quadruplets: Whether to force comparisons of shape (n, 4).
+        canonical: Whether to sort the comparisons in the canonical format a<b, c<d and a<c.
+                   Expects return_y=True 
+        """
     X, y = asdense(X, y, multi_output=False)
-    if X.shape[1] == 3:
+    if X.shape[1] == 3 and not force_quadruplets:
         X = X[:, [1, 0, 0, 2]]
     elif X.shape[1] != 4:
         raise ValueError("X must have 3 or 4 columns.")
