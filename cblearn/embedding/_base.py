@@ -5,10 +5,10 @@ import numpy as np
 from sklearn.base import TransformerMixin, ClassifierMixin
 from sklearn.utils.validation import check_is_fitted, column_or_1d
 from scipy.special import expit
+from sklearn.metrics import pairwise
 
 import cblearn as cbl
 from cblearn import Comparison
-from cblearn import datasets
 
 
 class TripletEmbeddingMixin(TransformerMixin, ClassifierMixin):
@@ -66,8 +66,11 @@ class TripletEmbeddingMixin(TransformerMixin, ClassifierMixin):
 
     def decision_function(self, X: Comparison) -> np.ndarray:
         check_is_fitted(self, 'embedding_')
-        X, y = datasets.triplet_response(X, self.embedding_, result_format='list-count')
-        return y
+        X = cbl.check_quadruplets(X, return_y=False, canonical=False)
+        X = self.embedding_[X]
+        near_distance = pairwise.paired_euclidean_distances(X[:, 0], X[:, 1])
+        far_distance = pairwise.paired_euclidean_distances(X[:, 2], X[:, 3])
+        return far_distance - near_distance
 
     def predict(self, X: Comparison) -> np.ndarray:
         scores = self.decision_function(X)
@@ -98,9 +101,5 @@ class TripletEmbeddingMixin(TransformerMixin, ClassifierMixin):
         Returns.
             Fraction of correct triplets.
         """
-        # TODO: enable quadruplet support to score, requires quadruplet decision function
-        if 'quadruplets' in self._get_tags()['X_types'] and False:
-            X, y = cbl.check_quadruplets(X, y, return_y=True)
-        else:
-            X, y = cbl.check_triplets(X, y, return_y=True)
-        return ClassifierMixin.score(self, X, y, sample_weight=None)
+        X, y = cbl.check_quadruplets(X, y, return_y=True)
+        return ClassifierMixin.score(self, X, y, sample_weight=sample_weight)
