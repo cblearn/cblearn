@@ -13,31 +13,31 @@ This guide describes how to contribute code or documentation.
 Getting Started
 ---------------
 
-We assume, you downloaded and installed cblearn as described in :ref:`developer_install`.
+We assume you downloaded and installed ``cblearn`` as described in :ref:`developer_install`.
 
 The project directory contains the code directory ``cblearn/`` and the documentation ``docs/``.
-In addition, there are readme, license, and a multiple configuration files as well as an examples folder.
+In addition, the folder contains a readme, license, multiple configuration files, and an examples folder.
 
 -------------
 Changing Code
 -------------
 
 The Python code is structured in :ref:`modules`. Each module contains
-a `tests` folder with unit-tests.
+a `tests` folder with unit tests.
 There should be such a test for every method and function.
-Use ``pytest --cov`` to run these tests and to measure the coverage, no tests should fail.
+Use ``pytest --cov`` to run these tests and to measure the coverage; no tests should fail.
 The coverage indicates the tested fraction of code and should be close to *100%*.
 You can exclude some of the more time expensive tests by ``pytest -m "not (sklearn or download)``.
 
 All Python code follows the `PEP8 Style Guide`_. The style
 of all code can be checked, running ``flake8 .`` and should print no warnings.
 
-Every class, method, and function should also have a docstring, describing the functionality and parameters.
+Every class, method, and function should have a docstring describing the functionality and parameters.
 Please follow the `Google Docstring Style`_.
 The docstring will be added to the :ref:`api_ref` by adding the function name in ``docs/references/index.rst``.
 Check the syntax of the docstring by running ``make html`` in the ``docs/`` folder.
 
-Types should not be added to the docstring, but in the code as `type hints`_.
+Types should not be added to the docstring but in the code as `type hints`_.
 Typechecks can be performed using ``mypy cblearn``.
 
 .. _PEP8 Style Guide: https://www.python.org/dev/peps/pep-0008/
@@ -49,7 +49,7 @@ Changing Documentation
 ----------------------
 
 The documentation is contained in the `docs/` folder.
-It can be build by running ``make html``.
+It can be built by running ``make html``.
 Open ``docs/_build/html/index.html`` in a browser to view the local build of the documentation.
 
 The documentation is structured in multiple folders and written as `reStructuredText`_.
@@ -65,8 +65,8 @@ to run the whole testing workflow, which is used on Github, locally.
 
 Install nektos' `act`_ and then run `act -P ubuntu-latest=nektos/act-environments-ubuntu:18.04-full`
 
-`act` is using docker images with preinstalled software to provide almost the same test environment as Github.
-If it is not yet so, you have to `install docker`_ and, optionally, make it accessible for nonroot user.
+`act` uses docker images with preinstalled software to provide almost the same test environment as Github.
+If it is not yet so, you have to `install docker`_ and, optionally, make it accessible for non-root users.
 
 .. note::
     The docker image requires about 18 GB disk space. The first start of act might take some time,
@@ -80,13 +80,13 @@ If it is not yet so, you have to `install docker`_ and, optionally, make it acce
 Publish Changes
 ------------------
 
-Most contributions will change files either in the code or in the documentation directory, as described in the
+Most contributions will change files in the code or the documentation directory, as described in the
 sections below. Commit your changes to a separate *git* branch (do **not** commit to ``master``).
-After you finished changing push this branch to Github and open a pull request to the ``master`` branch there.
+After changing, push this branch to Github and open a pull request to the ``master`` branch there.
 Once the request is opened, automated tests are run.
 If these tests indicate a problem, you can fix this problem on your branch and push again.
-Once the automated tests are successful, maintainers of cblearn will review the changes and provide feedback.
-Usually after some iterations, your changes will be merged to the ``master`` branch.
+Once the automated tests are successful, maintainers of ``cblearn`` will review the changes and provide feedback.
+Usually, after some iterations, your changes will be merged into the ``main`` branch.
 
 .. Note:
 
@@ -97,6 +97,6 @@ Usually after some iterations, your changes will be merged to the ``master`` bra
 
 Versions should be semantic and follow PIP440_: The version indicates ``major.minor.fix``;
 breaking changes are just allowed with major version steps. 
-A new version is indicated with a Github release tag, which trigger continuous deployment to PyPI via Github Actions.
+A Github release tag indicates a new version, which triggers a continuous deployment to PyPI via Github Actions.
 
 .. _PIP440: https://peps.python.org/pep-0440/

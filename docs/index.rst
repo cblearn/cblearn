@@ -6,9 +6,6 @@
 Welcome to cblearn's documentation!
 ===================================
 
-.. warning::
-    cblearn is work in progress. The API can change and bugs appear. Please help us by posting an issue on Github.
-
 .. toctree::
    :maxdepth: 2
    :caption: Contents:

@@ -2,16 +2,16 @@
 Installation
 ============
 
-cblearn requires Python 3.8 or newer.
+``cblearn`` requires Python 3.9 or newer.
 We recommend using Anaconda_ to install Python and
 dependencies in separated environments.
-We support Linux (tested on Ubuntu 20.4), Windows and Mac OS.
+We mainly test on Linux (tested on Ubuntu 20.4), but Windows and Mac OS should also work.
 Examples in this installation guide Linux shell commands.
 
 .. _Anaconda: https://docs.anaconda.com/anaconda/install/
 
 ```
-conda create -n cblearn python==3.8
+conda create -n cblearn python==3.9
 conda activate cblearn
 ```
 
@@ -19,7 +19,7 @@ conda activate cblearn
 User Installation
 -----------------
 
-cblearn and its dependencies can be installed using `pip`:
+``cblearn`` and its dependencies can be installed using `pip`:
 
 .. code-block:: bash
 
@@ -36,8 +36,8 @@ for most uses.
 However, some features require more packages that can be installed by adding 
 an `option` to the install command..
 
-For example, to use estimators on GPU, based on pytorch, and estimators
-wrapping paper author's original implementation in R-lang:
+For example, to use estimators on GPU, based on ``pytorch``, and estimators
+wrapping paper author's original implementation in ``R``-lang:
 
 .. code-block:: bash
 
@@ -62,7 +62,7 @@ Contributor Installation
 If you want to make changes to the code or documentation, you should
 first download the repository and install the project in developer mode with
 developer dependencies.
-This way, changes in the code are directly considered without the need of re-installation.
+This way, changes in the code are directly considered without the need for re-installation.
 
 .. code-block:: bash
 

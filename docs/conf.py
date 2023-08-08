@@ -18,8 +18,8 @@ sys.path.insert(0, os.path.abspath('..'))
 # -- Project information -----------------------------------------------------
 
 project = 'cblearn'
-author = 'David-Elias Künstle, Leena Suresh, Siyavash Haghiri, Michael Perrot, Debarghya Ghoshdastidari, Ulrike von Luxburg'
-copyright = f'2021, {author}'
+author = 'David-Elias Künstle & Ulrike von Luxburg'
+copyright = f'2023, {author}'
 
 # -- General configuration ---------------------------------------------------
 
@@ -71,9 +71,7 @@ templates_path = ['_templates']
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
-rst_prolog = """.. attention::
-    cblearn is work in progress. The API is still changing and a errors are known. Please help us by posting an issue on Github.
-"""
+rst_prolog = """"""
 
 # -- Options for HTML output -------------------------------------------------
 
