@@ -4,6 +4,7 @@ import joblib
 import os
 from typing import Optional, Union
 import zipfile
+import ssl
 
 import numpy as np
 from sklearn.datasets import _base
@@ -23,6 +24,10 @@ def fetch_food_similarity(data_home: Optional[os.PathLike] = None, download_if_m
                           return_triplets: bool = False) -> Union[Bunch, np.ndarray]:
     """ Load the Food-100 food similarity dataset (triplets).
 
+    .. warning::
+        This function downloads the file without verifying the ssl signature to circumvent an outdated certificate of the dataset hosts.
+        However, after downloading the function verifies the file checksum before loading the file to minimize the risk of man-in-the-middle attacks.
+    
     ===================   =====================
     Triplets                             190376
     Objects                                 100
@@ -72,7 +77,13 @@ def fetch_food_similarity(data_home: Optional[os.PathLike] = None, download_if_m
 
         logger.info('Downloading food similarity from {} to {}'.format(ARCHIVE.url, data_home))
 
-        archive_path = _base._fetch_remote(ARCHIVE, dirname=data_home)
+        try:
+            ssl_default = ssl._create_default_https_context
+            ssl._create_default_https_context = ssl._create_unverified_context
+            archive_path = _base._fetch_remote(ARCHIVE, dirname=data_home)
+        finally:
+            ssl._create_default_https_context = ssl_default
+            
         with zipfile.ZipFile(archive_path) as zf:
             with zf.open('food100-dataset/all-triplets.csv', 'r') as f:
                 triplets = np.loadtxt(f, dtype=str, delimiter=';')
