@@ -3,16 +3,16 @@
 [![PyPI version](https://img.shields.io/pypi/v/cblearn.svg)](https://pypi.python.org/pypi/cblearn)
 [![Documentation](https://readthedocs.org/projects/cblearn/badge/?version=latest)](https://cblearn.readthedocs.io/en/latest/?badge=latest)
 [![Test status](https://github.com/cblearn/cblearn/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/cblearn/cblearn/actions/workflows/test.yml)
-[![Test Coverage](https://codecov.io/gh/cblearn/cblearn/branch/master/graph/badge.svg?token=P9JRT6OK6O)](https://codecov.io/gh/dekuenstle/cblearn)
+[![Test Coverage](https://codecov.io/gh/cblearn/cblearn/branch/master/graph/badge.svg?token=P9JRT6OK6O)](https://codecov.io/gh/cblearn/cblearn)
 
 Comparison-based Learning algorithms are the Machine Learning algorithms to use when training data contains similarity comparisons ("A and B are more similar than C and D") instead of data points. 
 
 Triplet comparisons from human observers help model the perceived similarity of objects.
 These human triplets are collected in studies, asking questions like 
 "Which of the following bands is most similar to Queen?" or 
-"Which colour appears most similar to the reference?".
+"Which color appears most similar to the reference?".
 
-This library provides an easy to use interface to comparison-based learning algorithms.
+This library provides an easy-to-use interface for comparison-based learning algorithms.
 It plays hand-in-hand with scikit-learn:
 
 ```python
