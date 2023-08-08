@@ -112,13 +112,13 @@ def fetch_imagenet_similarity(data_home: Optional[os.PathLike] = None, download_
         with zipfile.ZipFile(archive_path) as zf:
             import h5py
 
-            with zf.open('val/data/psiz0.4.1/obs-118.hdf5', 'r') as f:
+            with zf.open('data/deprecated/psiz0.4.1/obs-118.hdf5', 'r') as f:
                 data_v1 = {k: np.asarray(v[()]) for k, v in h5py.File(f, mode='r').items()}
 
-            with zf.open('val/data/psiz0.4.1/obs-195.hdf5', 'r') as f:
+            with zf.open('data/deprecated/psiz0.4.1/obs-195.hdf5', 'r') as f:
                 data_v2 = {k: np.asarray(v[()]) for k, v in h5py.File(f, mode='r').items()}
 
-            with zf.open('val/data/psiz0.4.1/catalog.hdf5', 'r') as f:
+            with zf.open('data/deprecated/psiz0.4.1/catalog.hdf5', 'r') as f:
                 catalog = {k: np.asarray(v[()]) for k, v in h5py.File(f, mode='r').items()}
 
         joblib.dump((data_v1, data_v2, catalog), filepath, compress=6)
