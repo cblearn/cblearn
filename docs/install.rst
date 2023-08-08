@@ -11,7 +11,7 @@ Examples in this installation guide Linux shell commands.
 .. _Anaconda: https://docs.anaconda.com/anaconda/install/
 
 ```
-conda create -n cblearn python==3.8
+conda create -n cblearn python==3.9
 conda activate cblearn
 ```
 
