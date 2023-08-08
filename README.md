@@ -1,15 +1,11 @@
 # cblearn
 ## Comparison-based Machine Learning in Python
-:warning: **cblearn** is **work in progress**. The API can change and bugs appear. Please help us by posting an [issue]( https://github.com/dekuenstle/cblearn/issues/new) :construction:
-
 [![PyPI version](https://img.shields.io/pypi/v/cblearn.svg)](https://pypi.python.org/pypi/cblearn)
 [![Documentation](https://readthedocs.org/projects/cblearn/badge/?version=latest)](https://cblearn.readthedocs.io/en/latest/?badge=latest)
-[![Unit tests](https://github.com/dekuenstle/cblearn/workflows/Python%20package/badge.svg)](https://github.com/dekuenstle/cblearn/actions)
-[![Test Coverage](https://codecov.io/gh/dekuenstle/cblearn/branch/master/graph/badge.svg?token=P9JRT6OK6O)](https://codecov.io/gh/dekuenstle/cblearn)
+[![Test status](https://github.com/cblearn/cblearn/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/cblearn/cblearn/actions/workflows/test.yml)
+[![Test Coverage](https://codecov.io/gh/cblearn/cblearn/branch/master/graph/badge.svg?token=P9JRT6OK6O)](https://codecov.io/gh/dekuenstle/cblearn)
 
 Comparison-based Learning algorithms are the Machine Learning algorithms to use when training data contains similarity comparisons ("A and B are more similar than C and D") instead of data points. 
-
-**:eyes: VSS 2022: Please find an example of psychophysical scaling with triplets and ordinal embedding [here](https://cblearn.readthedocs.io/en/latest/generated_examples/plot_psychophysical_scales.html) :eyes:**
 
 Triplet comparisons from human observers help model the perceived similarity of objects.
 These human triplets are collected in studies, asking questions like 
@@ -89,10 +85,10 @@ Please see our [Contributor Guide](https://cblearn.readthedocs.io/en/latest/cont
 *cblearn* was initiated by current and former members of the [Theory of Machine Learning group](http://www.tml.cs.uni-tuebingen.de/index.php) of Prof. Dr. Ulrike von Luxburg at the University of Tübingen.
 The leading developer is [David-Elias Künstle](http://www.tml.cs.uni-tuebingen.de/team/kuenstle/index.php).
 
-We would like to thank all the contributors here on Github.
+We want to thank all the contributors here on GitHub.
 This work has been supported by the Machine Learning Cluster of Excellence, funded by EXC number 2064/1 – Project number 390727645. The authors would like to thank the International Max Planck Research School for Intelligent Systems (IMPRS-IS) for supporting David-Elias Künstle. 
 
 ## License
 
-This library is free to use under the [MIT License](https://github.com/dekuenstle/cblearn/blob/master/LICENSE) conditions.
-Please reference this library appropriately if it contributes to your scientific publication. We would also appreciate a short email (optionally) to see how our library is being used. 
+This library is free under the [MIT License](https://github.com/cblearn/cblearn/blob/master/LICENSE) conditions.
+Please cite this library appropriately if it contributes to your scientific publication. We would also appreciate a short email (optionally) to see how our library is being used. 
