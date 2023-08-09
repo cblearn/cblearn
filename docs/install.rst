@@ -5,8 +5,7 @@ Installation
 ``cblearn`` requires Python 3.9 or newer.
 We recommend using Anaconda_ to install Python and
 dependencies in separated environments.
-We mainly test on Linux (tested on Ubuntu 20.4), but Windows and Mac OS should also work.
-Examples in this installation guide Linux shell commands.
+The package is mainly tested on Linux, but Windows and Mac OS should work, too.
 
 .. _Anaconda: https://docs.anaconda.com/anaconda/install/
 
