@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.2
+
+- support python 3.11
+- update core dependencies
+  
 ## 0.1.1
 
 - Minor fixes in the documentation.
