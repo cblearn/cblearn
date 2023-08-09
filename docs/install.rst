@@ -10,10 +10,11 @@ Examples in this installation guide Linux shell commands.
 
 .. _Anaconda: https://docs.anaconda.com/anaconda/install/
 
-```
-conda create -n cblearn python==3.9
-conda activate cblearn
-```
+.. code-block:: bash
+
+    conda create -n cblearn python==3.9
+    conda activate cblearn
+
 
 -----------------
 User Installation
@@ -23,7 +24,7 @@ User Installation
 
 .. code-block:: bash
 
-    $ pip install cblearn
+    pip install cblearn
 
 
 .. _extras_install:
@@ -41,7 +42,7 @@ wrapping paper author's original implementation in ``R``-lang:
 
 .. code-block:: bash
 
-    $ pip install git+https://github.com/dekuenstle/cblearn.git#egg=cblearn[torch,wrapper]
+    $ pip install cblearn[torch,wrapper]
 
 ======= =============================================================
 Extras  Description
@@ -66,6 +67,6 @@ This way, changes in the code are directly considered without the need for re-in
 
 .. code-block:: bash
 
-    $ git clone git@github.com/dekuenstle/cblearn.git
+    $ git clone git@github.com/cblearn/cblearn.git
     $ cd cblearn
     $ pip install -e.[tests,docs]
