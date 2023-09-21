@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="dcterms.date" content="2023-09-22" />
+  <title>Supplementary Material</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Supplementary Material</h1>
+<p class="author">true</p>
+<p class="author">true</p>
+<p class="date">22 September 2023</p>
+</header>
+<h1 id="empirical-evaluation">Empirical evaluation</h1>
+<p>We generated embeddings of comparison-based datasets to measure runtime and triplet accuracy as a small empirical evaluation of our ordinal embedding implementations. We compared various CPU and GPU implementations in <code>cblearn</code> with third-party implementations in R <span class="citation" data-cites="terada_local_2014">[`loe` @terada_local_2014]</span>, and <em>MATLAB</em> <span class="citation" data-cites="van_der_maaten_stochastic_2012">[@van_der_maaten_stochastic_2012]</span>. In contrast to synthetic benchmarks <span class="citation" data-cites="vankadara_insights_2020">[e.g., @vankadara_insights_2020]</span>, we used the real-world datasets that can be accessed through <em>cblearn</em>, converted to triplets. Every algorithm runs once per dataset on a compute node (8-core of IntelXeon Gold 6240; 96GB RAM; NVIDIA 2080ti); just a few runs did not yield results due to resource demanding implementations or bugs: our <em>FORTE</em> implementation exceeded the memory limit on the <em>imagenet-v2</em> dataset, the third-party implementation of <em>tSTE</em> timed out on <em>things</em> and <em>imagenet-v2</em> datasets. The third-party <em>SOE</em> implementation reached a limit on dataset size on <em>imagenet-v2</em>. Probably due to numerical issues, our <em>CKL-GPU</em> implementation did not crash but returned non-numerical values on the <em>musician</em> dataset.</p>
+<p>The benchmarking scripts and results are publicly available in a separate repository[^1].</p>
+<p>[^1] <a href="https://github.com/cblearn/cblearn-benchmark"></a></p>
+<h2 id="is-there-a-best-estimator">Is there a “best” estimator?</h2>
+<p>Comparing all ordinal embedding estimators in <code>cblearn</code>, <em>SOE</em> shows accurate and fast results; <em>CKL</em>, <em>GNMDS</em>, and <em>tSTE</em> were performing about equally well (). The GPU implementations are slower on the tested datasets, presumably because they had some initial computational overhead.</p>
+<h2 id="when-should-gpu-implementations-be-preferred">When should GPU implementations be preferred?</h2>
+<p>In terms of accuracy and runtime, our GPU (or <code>pytorch</code>) implementations could not outperform the GPU (or <code>scipy</code>) pendants on the tested datasets. However,  shows the GPU runtime grows slower with the number of triplets, such that they potentially outperform CPU implementations with large datasets of <span class="math inline">10<sup>7</sup></span> triplets and more. In some cases, the GPU implementations show the overall best accuracy. An additional advantage of GPU implementations is that they require no explicit gradient definition, which allows easier tweaking of algorithms. However, the stochastic optimization process of these GPU implementations might be more sensitive to hyperparameter choices.</p>
+<h2 id="how-does-cblearn-compare-to-other-implementations">How does <code>cblearn</code> compare to other implementations?</h2>
+<p>In a small comparison, our implementations were <span class="math inline">50 − 100%</span> faster with approximately the same accuracy as reference implementations (). We compared our CPU implementations of <em>SOE</em>, <em>STE</em> and <em>tSTE</em> with the corresponding reference implementations in R , <code>loe</code> <span class="citation" data-cites="terada_local_2014">[@terada_local_2014]</span>, and <em>MATLAB</em> <span class="citation" data-cites="van_der_maaten_stochastic_2012">[@van_der_maaten_stochastic_2012]</span>. Additionally, the latter offers an <em>CKL</em> implementation to compare with. Please note that despite our care, runtime comparisons of different interpreters offer room for some confounding effects. The results shown should nevertheless indicate a trend.</p>
+<h1 id="code-example">Code example</h1>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="im">from</span> cblearn <span class="im">import</span> datasets, preprocessing, embedding</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> cross_val_score</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="im">import</span> seaborn <span class="im">as</span> sns<span class="op">;</span> sns.set_theme(<span class="st">&quot;poster&quot;</span>, <span class="st">&quot;whitegrid&quot;</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>cars <span class="op">=</span> datasets.fetch_car_similarity()</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>triplets <span class="op">=</span> preprocessing.triplets_from_mostcentral(cars.triplet, cars.response)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>accuracy <span class="op">=</span> cross_val_score(embedding.SOE(n_components<span class="op">=</span><span class="dv">2</span>), triplets, cv<span class="op">=</span><span class="dv">5</span>).mean()</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>embedding <span class="op">=</span> embedding.SOE(n_components<span class="op">=</span><span class="dv">2</span>).fit_transform(triplets)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>fg <span class="op">=</span> sns.relplot(x<span class="op">=</span>embedding[:, <span class="dv">0</span>], y<span class="op">=</span>embedding[:, <span class="dv">1</span>],</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>        hue<span class="op">=</span>cars.class_name[cars.class_id])</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>fg.<span class="bu">set</span>(title<span class="op">=</span><span class="ss">f&quot;accuracy=</span><span class="sc">{</span>accuracy<span class="sc">:.2f}</span><span class="ss">&quot;</span>, xticklabels<span class="op">=</span>[], yticklabels<span class="op">=</span>[])</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>fg.tight_layout()<span class="op">;</span> fg.savefig(<span class="st">&quot;images/car_example.pdf&quot;</span>)</span></code></pre></div>
+<p> \end{longlisting}</p>
+</body>
+</html>
