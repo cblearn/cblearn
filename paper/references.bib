@@ -1,0 +1,364 @@
+
+
+@article{vankadara_insights_2020,
+	title = {Insights into {Ordinal} {Embedding} {Algorithms}: {A} {Systematic} {Evaluation}},
+	shorttitle = {Insights into {Ordinal} {Embedding} {Algorithms}},
+	abstract = {The objective of ordinal embedding is to find a Euclidean representation of a set of abstract items, using only answers to triplet comparisons of the form "Is item \$i\$ closer to the item \$j\$ or item \$k\$?". In recent years, numerous algorithms have been proposed to solve this problem. However, there does not exist a fair and thorough assessment of these embedding methods and therefore several key questions remain unanswered: Which algorithms scale better with increasing sample size or dimension? Which ones perform better when the embedding dimension is small or few triplet comparisons are available? In our paper, we address these questions and provide the first comprehensive and systematic empirical evaluation of existing algorithms as well as a new neural network approach. In the large triplet regime, we find that simple, relatively unknown, non-convex methods consistently outperform all other algorithms, including elaborate approaches based on neural networks or landmark approaches. This finding can be explained by our insight that many of the non-convex optimization approaches do not suffer from local optima. In the low triplet regime, our neural network approach is either competitive or significantly outperforms all the other methods. Our comprehensive assessment is enabled by our unified library of popular embedding algorithms that leverages GPU resources and allows for fast and accurate embeddings of millions of data points.},
+	journal = {arXiv:1912.01666 [cs, stat]},
+	author = {Vankadara, Leena Chennuru and Haghiri, Siavash and Lohaus, Michael and Wahab, Faiz Ul and von Luxburg, Ulrike},
+	year = {2021},
+	keywords = {Computer Science - Machine Learning, Statistics - Machine Learning},
+}
+
+@article{van_assen_identifying_2022,
+	title = {Identifying the behavioural cues of collective flow perception},
+	volume = {22},
+	abstract = {In this study we investigate the visual perception of collective flow. Collective flow depicts agents that show both individual and group behaviour following a relatively simple set of rules (e.g., swarms of insects, flocks of sheep, cyclists in traffic). These collective patterns occur all around us in animate and inanimate systems and on microscopic and macroscopic scales. Ecologically, it can be argued that the human visual system must have developed certain sensitivities for these collective patterns. Even from very low-level depictions we can identify high-level behaviours (e.g., stress, cooperation, leadership), associate these patterns with specific animal groups, and predict future states of these complex patterns. These are skills that potentially generalize to many cognitively demanding tasks. To investigate this, we developed an online engine that simulates biological collective behaviour using six parameters. Here, we concentrate on zone of alignment, zone of attraction, and turning rate. We collected two types of data: 1. A triplet similarity task i.e., which pair of stimuli is more similar, 2. Rating tasks for ten behavioural attributes selected using online experiments and brainstorm sessions. The triplet task was not easy where 38\% of the trials can be considered hard (high intraobserver variability). Using Soft Ordinal Embeddings (SOE) we found that the similarity space is two-dimensional. One of these dimensions is highly correlated with the turning rate, and with nine of the ten behavioural attributes e.g., grouping, cooperation, focus. However, with the attributes explored here we were not able to clearly identify the second dimension of the similarity space. The dominant correlations with the turning rate seem to overshadow intriguing, more subtle non-linear tendencies of the behavioural ratings. In this study we applied a range of methods that allowed us to increase understanding and identify behavioural cues we employ to perceive the versatile space of collective flow.},
+	number = {14},
+	journal = {Journal of Vision},
+	author = {van Assen, Jan Jaap R. and Pont, Sylvia C.},
+	year = {2022},
+	pages = {3985},
+}
+
+@article{kunstle_estimating_2022,
+	title = {Estimating the perceived dimension of psychophysical stimuli using triplet accuracy and hypothesis testing},
+	volume = {22},
+	copyright = {All rights reserved},
+	abstract = {Vision researchers are interested in mapping complex physical stimuli to perceptual dimensions. Such a mapping can be constructed using multidimensional psychophysical scaling or ordinaljt4 embedding methods. Both methods infer coordinates that agree as much as possible with the observer’s judgments so that perceived similarity corresponds with distance in the inferred space. However, a fundamental problem of all methods that construct scalings in multiple dimensions is that the inferred representation can only reflect perception if the scale has the correct dimension. Here we propose a statistical procedure to overcome this limitation. The critical elements of our procedure are i) measuring the scale’s quality by the number of correctly predicted triplets and ii) performing a statistical test to assess if adding another dimension to the scale improves triplet accuracy significantly. We validate our procedure through extensive simulations. In addition, we study the properties and limitations of our procedure using “real” data from various behavioral datasets from psychophysical experiments. We conclude that our procedure can reliably identify (a lower bound on) the number of perceptual dimensions for a given dataset.},
+	number = {13},
+	journal = {Journal of Vision},
+	author = {Künstle, David-Elias and von Luxburg, Ulrike and Wichmann, Felix A.},
+	year = {2022},
+	pages = {5},
+}
+
+@article{schonmann_using_2022,
+	title = {Using an {Odd}-{One}-{Out} {Design} {Affects} {Consistency}, {Agreement} and {Decision} {Criteria} in {Similarity} {Judgement} {Tasks} {Involving} {Natural} {Images}.},
+	volume = {22},
+	copyright = {All rights reserved},
+	abstract = {Recently, similarity judgement tasks have been employed to estimate the perceived similarity of natural images (Hebart, Zheng, Pereira, \&amp; Baker, 2020). Such tasks typically take the form of triplet questions in which participants are presented with a reference image and two additional images and are asked to indicate which of the two is more similar to the reference. Alternatively, participants can be presented with three images and asked to indicate the odd one out. Though both questions are mathematically similar, they might affect participants’ decision criteria, the agreement among observers, or the consistency of single observers—these possibilities have hitherto not been assessed. To address these issues, we presented four observers with triplets from three image sets designed to juxtapose different perceptual and conceptual features. Using a soft ordinal embedding algorithm—a machine learning version of a multidimensional scaling—we represented the images in a two-dimensional space such that the Euclidean distances between images reflected observers' choices. Agreement between observers was assessed through a leave-one-out procedure in which embeddings based on three observers served to predict the respective fourth observer's choices. Consistency was calculated as the proportion of identical choices in a repeat session. Here we show that design choices in similarity judgement tasks can indeed affect results. The odd-one-out design resulted in greater embedding accuracy, higher agreement among, and higher consistency within observers. Hence, an individual observer's choices could be better predicted in the odd-one-out than in the triplet design. However, predicting individual responses was only possible for image sets for which participants could report a predominant relationship. Otherwise, predictability dropped to close to chance level. Our results suggest that seemingly innocuous experimental variations—standard triplet versus odd-one-out—can have a strong influence on the resulting perceptual spaces. Furthermore, we note severe limitations regarding the predictive power of models relying on pooled observer data.},
+	number = {14},
+	journal = {Journal of Vision},
+	author = {Schönmann, Inés and Künstle, David-Elias and Wichmann, Felix A.},
+	year = {2022},
+	pages = {3232},
+}
+
+@inproceedings{roads_enriching_2021,
+	title = {Enriching {ImageNet} with {Human} {Similarity} {Judgments} and {Psychological} {Embeddings}},
+	abstract = {Advances in supervised learning approaches to object recognition flourished in part because of the availability of high-quality datasets and associated benchmarks. However, these benchmarks—such as ILSVRC—are relatively task-specific, focusing predominately on predicting class labels. We introduce a publicly-available dataset that embodies the task-general capabilities of human perception and reasoning. The Human Similarity Judgments extension to ImageNet (ImageNet-HSJ) is composed of a large set of human similarity judgments that supplements the existing ILSVRC validation set. The new dataset supports a range of task and performance metrics, including evaluation of unsupervised algorithms. We demonstrate two methods of assessment: using the similarity judgments directly and using a psychological embedding trained on the similarity judgments. This embedding space contains an order of magnitude more points (i.e., images) than previous efforts based on human judgments. We were able to scale to the full 50,000 image ILSVRC validation set through a selective sampling process that used variational Bayesian inference and model ensembles to sample aspects of the embedding space that were most uncertain. To demonstrate the utility of ImageNet-HSJ, we used the similarity ratings and the embedding space to evaluate how well several popular models conform to human similarity judgments. One finding is that the more complex models that perform better on task-specific benchmarks do not better conform to human semantic judgments. In addition to the human similarity judgments, pre-trained psychological embeddings and code for inferring variational embeddings are made publicly available. ImageNet-HSJ supports the appraisal of internal representations and the development of more humanlike models.},
+	booktitle = {{Conference} on {Computer} {Vision} and {Pattern} {Recognition} ({CVPR})},
+	author = {Roads, Brett D. and Love, Bradley C.},
+	year = {2021},
+	keywords = {Benchmark testing, Computer vision, Focusing, Measurement, Psychology, Semantics, Supervised learning},
+}
+
+@article{jain_finite_2016,
+	title = {Finite {Sample} {Prediction} and {Recovery} {Bounds} for {Ordinal} {Embedding}},
+	language = {en},
+    journal = {Advances in Neural Information Processing Systems (NeurIPS)},
+	author = {Jain, Lalit and Jamieson, Kevin G. and Nowak, Rob},
+	year = {2016},
+	keywords = {Computer Science - Machine Learning, Statistics - Machine Learning, bounds},
+}
+
+@inproceedings{van_der_maaten_stochastic_2012,
+	title = {Stochastic triplet embedding},
+	abstract = {This paper considers the problem of learning an embedding of data based on similarity triplets of the form “A is more similar to B than to C”. This learning setting is of relevance to scenarios in which we wish to model human judgements on the similarity of objects. We argue that in order to obtain a truthful embedding of the underlying data, it is insufﬁcient for the embedding to satisfy the constraints encoded by the similarity triplets. In particular, we introduce a new technique called t-Distributed Stochastic Triplet Embedding (t-STE) that collapses similar points and repels dissimilar points in the embedding — even when all triplet constraints are satisﬁed. Our experimental evaluation on three data sets shows that as a result, t-STE is much better than existing techniques at revealing the underlying data structure.},
+	language = {en},
+	booktitle = {{International} {Workshop} on {Machine} {Learning} for {Signal} {Processing}},
+	author = {van der Maaten, Laurens and Weinberger, Kilian},
+	year = {2012},
+	pages = {1--6},
+}
+
+@article{maloney_maximum_2003,
+	title = {Maximum likelihood difference scaling},
+	volume = {3},
+	number = {8},
+	journal = {Journal of Vision},
+	author = {Maloney, Laurence T and Yang, Joong Nam},
+	year = {2003},
+	pages = {5--5},
+}
+
+@inproceedings{agarwal_generalized_2007,
+	title = {Generalized non-metric multidimensional scaling},
+	booktitle = {Artificial {Intelligence} and {Statistics} (AISTATS)},
+	author = {Agarwal, Sameer and Wills, Josh and Cayton, Lawrence and Lanckriet, Gert and Kriegman, David and Belongie, Serge},
+	year = {2007},
+}
+
+@inproceedings{terada_local_2014,
+	title = {Local ordinal embedding},
+	booktitle = {International {Conference} on {Machine} {Learning} (ICML)},
+	author = {Terada, Yoshikazu and Luxburg, Ulrike},
+	year = {2014},
+}
+
+@article{wills_toward_2009,
+	title = {Toward a perceptual space for gloss},
+	volume = {28},
+	language = {en},
+	number = {4},
+	journal = {ACM Transactions on Graphics},
+	author = {Wills, Josh and Agarwal, Sameer and Kriegman, David and Belongie, Serge},
+	year = {2009},
+	pages = {1--15},
+}
+
+@article{aguilar_comparing_2017,
+	title = {Comparing sensitivity estimates from {MLDS} and forced-choice methods in a slant-from-texture experiment},
+	volume = {17},
+	language = {en},
+	number = {1},
+	journal = {Journal of Vision},
+	author = {Aguilar, Guillermo and Wichmann, Felix A. and Maertens, Marianne},
+	year = {2017},
+	pages = {37},
+}
+
+@article{aguilar_toward_2020,
+	title = {Toward reliable measurements of perceptual scales in multiple contexts},
+	volume = {20},
+	language = {en},
+	number = {4},
+	urldate = {2020-05-18},
+	journal = {Journal of Vision},
+	author = {Aguilar, Guillermo and Maertens, Marianne},
+	year = {2020},
+	pages = {19},
+}
+
+@article{haghiri_estimation_2020,
+	title = {Estimation of perceptual scales using ordinal embedding},
+	volume = {20},
+	abstract = {In this article, we address the problem of measuring and analyzing sensation, the subjective magnitude of one’s experience. We do this in the context of the method of triads: The sensation of the stimulus is evaluated via relative judgments of the following form: “Is stimulus {\textbackslash}(S\_i{\textbackslash}) more similar to stimulus {\textbackslash}(S\_j{\textbackslash}) or to stimulus {\textbackslash}(S\_k{\textbackslash})?” We propose to use ordinal embedding methods from machine learning to estimate the scaling function from the relative judgments. We review two relevant and well-known methods in psychophysics that are partially applicable in our setting: nonmetric multidimensional scaling (NMDS) and the method of maximum likelihood difference scaling (MLDS). Considering various scaling functions, we perform an extensive set of simulations to demonstrate the performance of the ordinal embedding methods. We show that in contrast to existing approaches, our ordinal embedding approach allows, first, to obtain reasonable scaling functions from comparatively few relative judgments and, second, to estimate multidimensional perceptual scales. In addition to the simulations, we analyze data from two real psychophysics experiments using ordinal embedding methods. Our results show that in the one-dimensional perceptual scale, our ordinal embedding approach works as well as MLDS, while in higher dimensions, only our ordinal embedding methods can produce a desirable scaling function. To make our methods widely accessible, we provide an R-implementation and general rules of thumb on how to use ordinal embedding in the context of psychophysics.},
+	number = {9},
+	journal = {Journal of Vision},
+	author = {Haghiri, Siavash and Wichmann, Felix A. and von Luxburg, Ulrike},
+	year = {2020},
+	pages = {14},
+}
+
+@article{devinck_common_2012,
+	title = {A common signal detection model accounts for both perception and discrimination of the watercolor effect},
+	volume = {12},
+	issn = {1534-7362},
+	abstract = {Establishing the relation between perception and discrimination is a fundamental objective in psychophysics, with the goal of characterizing the neural mechanisms mediating perception. Here, we show that a procedure for estimating a perceptual scale based on a signal detection model also predicts discrimination performance. We use a recently developed procedure, Maximum Likelihood Difference Scaling (MLDS), to measure the perceptual strength of a long-range, color, ﬁlling-in phenomenon, the Watercolor Effect (WCE), as a function of the luminance ratio between the two components of its generating contour. MLDS is based on an equal-variance, Gaussian, signal detection model and yields a perceptual scale with interval properties. The strength of the ﬁll-in percept increased 10–15 times the estimate of the internal noise level for a 3-fold increase in the luminance ratio. Each observer’s estimated scale predicted discrimination performance in a subsequent paired-comparison task. A common signal detection model accounts for both the appearance and discrimination data. Since signal detection theory provides a common metric for relating discrimination performance and neural response, the results have implications for comparing perceptual and neural response functions.},
+	language = {en},
+	journal = {Journal of Vision},
+	author = {Devinck, F. and Knoblauch, K.},
+	year = {2012},
+	pages = {19--19},
+}
+
+@article{hebartRevealingMultidimensionalMental2020,
+	title = {Revealing the multidimensional mental representations of natural objects underlying human similarity judgements},
+	volume = {4},
+	copyright = {2020 This is a U.S. government work and not under copyright protection in the U.S.; foreign copyright protection may apply},
+	abstract = {Objects can be characterized according to a vast number of possible criteria (such as animacy, shape, colour and function), but some dimensions are more useful than others for making sense of the objects around us. To identify these core dimensions of object representations, we developed a data-driven computational model of similarity judgements for real-world images of 1,854 objects. The model captured most explainable variance in similarity judgements and produced 49 highly reproducible and meaningful object dimensions that reflect various conceptual and perceptual properties of those objects. These dimensions predicted external categorization behaviour and reflected typicality judgements of those categories. Furthermore, humans can accurately rate objects along these dimensions, highlighting their interpretability and opening up a way to generate similarity estimates from object dimensions alone. Collectively, these results demonstrate that human similarity judgements can be captured by a fairly low-dimensional, interpretable embedding that generalizes to external behaviour. Hebart et al. developed a computational model of similarity judgements for 1,854 natural objects. The model accurately predicted similarity and revealed 49 interpretable dimensions that reflect both perceptual and conceptual object properties.},
+	language = {en},
+	number = {11},
+	journal = {Nature Human Behaviour},
+	author = {Hebart, Martin N. and Zheng, Charles Y. and Pereira, Francisco and Baker, Chris I.},
+	year = {2020},
+	pages = {1173--1185},
+}
+
+@inproceedings{tamuz_adaptively_2011,
+	title = {Adaptively learning the crowd kernel},
+	abstract = {We introduce an algorithm that, given n objects, learns a similarity matrix over all n2 pairs, from crowdsourced data alone. The algorithm samples responses to adaptively chosen triplet-based relative-similarity queries. Each query has the form "is object a more similar to b or to c?" and is chosen to be maximally informative given the preceding responses. The output is an embedding of the objects into Euclidean space (like MDS); we refer to this as the "crowd kernel." SVMs reveal that the crowd kernel captures prominent and subtle features across a number of domains, such as "is striped" among neckties and "vowel vs. consonant" among letters.},
+	booktitle = {Proceedings of the 28th {International} {Conference} on {International} {Conference} on {Machine} {Learning} (ICML)},
+	author = {Tamuz, Omer and Liu, Ce and Belongie, Serge and Shamir, Ohad and Kalai, Adam Tauman},
+	year = {2011},
+}
+
+@article{roads_obtaining_2019,
+	title = {Obtaining psychological embeddings through joint kernel and metric learning},
+	volume = {51},
+	abstract = {Psychological embeddings provide a powerful formalism for characterizing human-perceived similarity among members of a stimulus set. Obtaining high-quality embeddings can be costly due to algorithm design, software deployment, and participant compensation. This work aims to advance state-of-the-art embedding techniques and provide a comprehensive software package that makes obtaining high-quality psychological embeddings both easy and relatively efficient. Contributions are made on four fronts. First, the embedding procedure allows multiple trial configurations (e.g., triplets) to be used for collecting similarity judgments from participants. For example, trials can be configured to collect triplet comparisons or to sort items into groups. Second, a likelihood model is provided for three classes of similarity kernels allowing users to easily infer the parameters of their preferred model using gradient descent. Third, an active selection algorithm is provided that makes data collection more efficient by proposing comparisons that provide the strongest constraints on the embedding. Fourth, the likelihood model allows the specification of group-specific attention weight parameters. A series of experiments are included to highlight each of these contributions and their impact on converging to a high-quality embedding. Collectively, these incremental improvements provide a powerful and complete set of tools for inferring psychological embeddings. The relevant tools are available as the Python package PsiZ, which can be cloned from GitHub (https://github.com/roads/psiz).},
+	language = {en},
+	number = {5},
+	journal = {Behavior Research Methods},
+	author = {Roads, Brett D. and Mozer, Michael C.},
+	year = {2019},
+	pages = {2180--2193},
+}
+
+@inproceedings{haghiri_comparison-based_2018,
+	title = {Comparison-{Based} {Random} {Forests}},
+	abstract = {Assume we are given a set of items from a general metric space, but we neither have access to the representation of the data nor to the distances between data points. Instead, suppose that we can actively choose a triplet of items (A, B, C) and ask an oracle whether item A is closer to item B or to item C. In this paper, we propose a novel random forest algorithm for regression and classification that relies only on such triplet comparisons. In the theory part of this paper, we establish sufficient conditions for the consistency of such a forest. In a set of comprehensive experiments, we then demonstrate that the proposed random forest is efficient both for classification and regression. In particular, it is even competitive with other methods that have direct access to the metric representation of the data.},
+	language = {en},
+	booktitle = {Proceedings of the 35th {International} {Conference} on {Machine} {Learning} (ICML)},
+	author = {Haghiri, Siavash and Garreau, Damien and Luxburg, Ulrike},
+	year = {2018},
+}
+
+@article{demiralp_learning_2014,
+	title = {Learning {Perceptual} {Kernels} for {Visualization} {Design}},
+	volume = {20},
+	abstract = {Visualization design can benefit from careful consideration of perception, as different assignments of visual encoding variables such as color, shape and size affect how viewers interpret data. In this work, we introduce perceptual kernels: distance matrices derived from aggregate perceptual judgments. Perceptual kernels represent perceptual differences between and within visual variables in a reusable form that is directly applicable to visualization evaluation and automated design. We report results from crowd-sourced experiments to estimate kernels for color, shape, size and combinations thereof. We analyze kernels estimated using five different judgment types--including Likert ratings among pairs, ordinal triplet comparisons, and manual spatial arrangement--and compare them to existing perceptual models. We derive recommendations for collecting perceptual similarities, and then demonstrate how the resulting kernels can be applied to automate visualization design decisions.},
+	language = {eng},
+	number = {12},
+	journal = {IEEE Transactions on Visualization and Computer Graphics},
+	author = {Demiralp, Çağatay and Bernstein, Michael S. and Heer, Jeffrey},
+	year = {2014},
+	pages = {1933--1942},
+}
+
+@article{toscani_three_2020,
+	title = {Three {Perceptual} {Dimensions} for {Specular} and {Diffuse} {Reflection}},
+	volume = {17},
+	abstract = {Previous research investigated the perceptual dimensionality of achromatic reflection of opaque surfaces, by using either simple analytic models of reflection or measured reflection properties of a limited sample of materials. Here, we aim to extend this work to a broader range of simulated materials. In a first experiment, we used sparse multidimensional scaling techniques to represent a set of rendered stimuli in a perceptual space that is consistent with participants’ similarity judgments. Participants were presented with one reference object and four comparisons, rendered with different material properties. They were asked to rank the comparisons according to their similarity to the reference, resulting in an efficient collection of a large number of similarity judgments. To interpret the space individuated by multidimensional scaling, we ran a second experiment in which observers were asked to rate our experimental stimuli according to a list of 30 adjectives referring to their surface reflectance properties. Our results suggest that perception of achromatic reflection is based on at least three dimensions, which we labelled “Lightness,” “Gloss,” and “Metallicity,” in accordance with the rating results. These dimensions are characterized by a relatively simple relationship with the parameters of the physically based rendering model used to generate our stimuli, indicating that they correspond to different physical properties of the rendered materials. Specifically, “Lightness” relates to diffuse reflections, “Gloss” to the presence of high contrast sharp specular highlights, and “Metallicity” to spread out specular reflections.},
+	number = {2},
+	journal = {ACM Transactions on Applied Perception},
+	author = {Toscani, Matteo and Guarnera, Dar’ya and Guarnera, Giuseppe Claudio and Hardeberg, Jon Yngve and Gegenfurtner, Karl R.},
+	year = {2020},
+	keywords = {BRDF, Perception, dimensionality},
+	pages = {6:1--6:26},
+}
+
+@article{pedregosa_scikit-learn_2011,
+	title = {Scikit-learn: {Machine} {Learning} in {Python}},
+	volume = {12},
+	shorttitle = {Scikit-learn},
+	abstract = {Scikit-learn is a Python module integrating a wide range of state-of-the-art machine learning algorithms for medium-scale supervised and unsupervised problems. This package focuses on bringing machine learning to non-specialists using a general-purpose high-level language. Emphasis is put on ease of use, performance, documentation, and API consistency. It has minimal dependencies and is distributed under the simplified BSD license, encouraging its use in both academic and commercial settings. Source code, binaries, and documentation can be downloaded from http://scikit-learn.sourceforge.net.},
+	number = {85},
+	urldate = {2022-07-01},
+	journal = {Journal of Machine Learning Research (JMLR)},
+	author = {Pedregosa, Fabian and Varoquaux, Gaël and Gramfort, Alexandre and Michel, Vincent and Thirion, Bertrand and Grisel, Olivier and Blondel, Mathieu and Prettenhofer, Peter and Weiss, Ron and Dubourg, Vincent and Vanderplas, Jake and Passos, Alexandre and Cournapeau, David and Brucher, Matthieu and Perrot, Matthieu and Duchesnay, Édouard},
+	year = {2011},
+	pages = {2825--2830},
+}
+
+@article{buitinck_api_2013,
+      title={{API} design for machine learning software: experiences from the scikit-learn project}, 
+      author={Lars Buitinck and Gilles Louppe and Mathieu Blondel and Fabian Pedregosa and Andreas Mueller and Olivier Grisel and Vlad Niculae and Peter Prettenhofer and Alexandre Gramfort and Jaques Grobler and Robert Layton and Jake Vanderplas and Arnaud Joly and Brian Holt and Gaël Varoquaux},
+      year={2013},
+      journal={arXiv:1309.0238 [cs.LG]},
+}
+@inproceedings{ghoshdastidar_foundations_2019,
+	title = {Foundations of {Comparison}-{Based} {Hierarchical} {Clustering}},
+	abstract = {We address the classical problem of hierarchical clustering, but in a framework where one does not have access to a representation of the objects or their pairwise similarities. Instead, we assume that only a set of comparisons between objects is available, that is, statements of the form objects i and j are more similar than objects k and l.'' Such a scenario is commonly encountered in crowdsourcing applications. The focus of this work is to develop comparison-based hierarchical clustering algorithms that do not rely on the principles of ordinal embedding. We show that single and complete linkage are inherently comparison-based and we develop variants of average linkage. We provide statistical guarantees for the different methods under a planted hierarchical partition model. We also empirically demonstrate the performance of the proposed approaches on several datasets.},
+	booktitle = {Advances in {Neural} {Information} {Processing} {Systems} (NeurIPS)},
+	author = {Ghoshdastidar, Debarghya and Perrot, Michaël and von Luxburg, Ulrike},
+	year = {2019},
+}
+
+@article{harris_array_2020,
+	title = {Array programming with {NumPy}},
+	volume = {585},
+	copyright = {2020 The Author(s)},
+	abstract = {Array programming provides a powerful, compact and expressive syntax for accessing, manipulating and operating on data in vectors, matrices and higher-dimensional arrays. NumPy is the primary array programming library for the Python language. It has an essential role in research analysis pipelines in fields as diverse as physics, chemistry, astronomy, geoscience, biology, psychology, materials science, engineering, finance and economics. For example, in astronomy, NumPy was an important part of the software stack used in the discovery of gravitational waves1 and in the first imaging of a black hole2. Here we review how a few fundamental array concepts lead to a simple and powerful programming paradigm for organizing, exploring and analysing scientific data. NumPy is the foundation upon which the scientific Python ecosystem is constructed. It is so pervasive that several projects, targeting audiences with specialized needs, have developed their own NumPy-like interfaces and array objects. Owing to its central position in the ecosystem, NumPy increasingly acts as an interoperability layer between such array computation libraries and, together with its application programming interface (API), provides a flexible framework to support the next decade of scientific and industrial analysis.},
+	language = {en},
+	number = {7825},
+	journal = {Nature},
+	author = {Harris, Charles R. and Millman, K. Jarrod and van der Walt, Stéfan J. and Gommers, Ralf and Virtanen, Pauli and Cournapeau, David and Wieser, Eric and Taylor, Julian and Berg, Sebastian and Smith, Nathaniel J. and Kern, Robert and Picus, Matti and Hoyer, Stephan and van Kerkwijk, Marten H. and Brett, Matthew and Haldane, Allan and del Río, Jaime Fernández and Wiebe, Mark and Peterson, Pearu and Gérard-Marchant, Pierre and Sheppard, Kevin and Reddy, Tyler and Weckesser, Warren and Abbasi, Hameer and Gohlke, Christoph and Oliphant, Travis E.},
+	year = {2020},
+	keywords = {Computational neuroscience, Computational science, Computer science, Software, Solar physics},
+	pages = {357--362},
+}
+
+@inproceedings{perrot_near-optimal_2020,
+	title = {Near-optimal comparison based clustering},
+	booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+	author = {Perrot, Michaël and Esser, Pascal and Ghoshdastidar, Debarghya},
+	editor = {Larochelle, H. and Ranzato, M. and Hadsell, R. and Balcan, M.F. and Lin, H.},
+	year = {2020},
+}
+@inproceedings{heikinheimo2013crowd,
+  title={The crowd-median algorithm},
+  author={Heikinheimo, Hannes and Ukkonen, Antti},
+  booktitle={Proceedings of the AAAI Conference on Human Computation and Crowdsourcing},
+  volume={1},
+  pages={69--77},
+  year={2013}
+}
+
+@InProceedings{amid2015,
+  title = 	 {Multiview Triplet Embedding: Learning Attributes in Multiple Maps},
+  author = 	 {Amid, Ehsan and Ukkonen, Antti},
+  booktitle = 	 {Proceedings of the 32nd International Conference on Machine Learning},
+  pages = 	 {1472--1480},
+  year = 	 {2015},
+  editor = 	 {Bach, Francis and Blei, David},
+  volume = 	 {37},
+  series = 	 {Proceedings of Machine Learning Research},
+  address = 	 {Lille, France},
+  month = 	 {07--09 Jul},
+  publisher =    {PMLR},
+  abstract = 	 {For humans, it is usually easier to make statements about the similarity of objects in relative, rather than absolute terms. Moreover, subjective comparisons of objects can be based on a number of different and independent attributes. For example, objects can be compared based on their shape, color, etc. In this paper, we consider the problem of uncovering these hidden attributes given a set of relative distance judgments in the form of triplets. The attribute that was used to generate a particular triplet in this set is unknown. Such data occurs, e.g., in crowdsourcing applications where the triplets are collected from a large group of workers. We propose the Multiview Triplet Embedding (MVTE) algorithm that produces a number of low-dimensional maps, each corresponding to one of the hidden attributes. The method can be used to assess how many different attributes were used to create the triplets, as well as to assess the difficulty of a distance comparison task, and find objects that have multiple interpretations in relation to the other objects.}
+}
+@inproceedings{balcan2016learning,
+  title={Learning combinatorial functions from pairwise comparisons},
+  author={Balcan, Maria-Florina and Vitercik, Ellen and White, Colin},
+  booktitle={Conference on Learning Theory},
+  pages={310--335},
+  year={2016},
+  organization={PMLR}
+}
+@inproceedings{anderton2019scaling,
+  title={Scaling up ordinal embedding: A landmark approach},
+  author={Anderton, Jesse and Aslam, Javed},
+  booktitle={International Conference on Machine Learning},
+  pages={282--290},
+  year={2019},
+  organization={PMLR}
+}
+@inproceedings{bower2018landscape,
+  title={The landscape of non-convex quadratic feasibility},
+  author={Bower, Amanda and Jain, Lalit and Balzano, Laura},
+  booktitle={2018 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)},
+  pages={3974--3978},
+  year={2018},
+  organization={IEEE}
+}
+@article{ghosh2019landmark,
+  title={Landmark ordinal embedding},
+  author={Ghosh, Nikhil and Chen, Yuxin and Yue, Yisong},
+  journal={Advances in Neural Information Processing Systems},
+  volume={32},
+  year={2019}
+}
+
+% active OE:
+@article{sievert2023efficiently,
+  title={Efficiently Learning Relative Similarity Embeddings with Crowdsourcing},
+  author={Sievert, Scott and Nowak, Robert and Rogers, Timothy},
+  journal={Journal of Open Source Software},
+  volume={8},
+  number={84},
+  pages={4517},
+  year={2023}
+}
+@article{jamieson2015next,
+  title={Next: A system for real-world development, evaluation, and application of active learning},
+  author={Jamieson, Kevin G and Jain, Lalit and Fernandez, Chris and Glattard, Nicholas J and Nowak, Rob},
+  journal={Advances in neural information processing systems},
+  volume={28},
+  year={2015}
+}
+@article{heim2015active,
+  title={Active perceptual similarity modeling with auxiliary information},
+  author={Heim, Eric and Berger, Matthew and Seversky, Lee and Hauskrecht, Milos},
+  journal={arXiv preprint arXiv:1511.02254},
+  year={2015}
+}
+
+% used software:
+@article{zhao2023perceiving,
+	title = {Perceiving style at different levels of information},
+	journal = {Journal of Vision},
+	author = {Zhao, Yuguang and de Ridder, Huib and Stumpel, Jeroen and Wijntjes, Maarten},
+	year = {in press},
+}
+@misc{mandal2023revenue,
+      title={A Revenue Function for Comparison-Based Hierarchical Clustering}, 
+      author={Aishik Mandal and Michaël Perrot and Debarghya Ghoshdastidar},
+      year={2023},
+      eprint={2211.16459},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG}
+}
