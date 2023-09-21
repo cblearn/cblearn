@@ -7,10 +7,6 @@ author:
     | David-Elias Künstle and Ulrike von Luxburg
     | University of Tübingen and Tübingen AI Center, Germany
 date: 22 September 2023
-header-includes: |
-    \usepackage{placeins}
-    \usepackage{subcaption}
-    \usepackage{caption}
 ---
 
 # Empirical evaluation
@@ -55,22 +51,14 @@ and *tSTE* with the corresponding reference implementations in R , `loe` [@terad
 Please note that despite our care, runtime comparisons of different interpreters offer room for some confounding effects.
 The results shown should nevertheless indicate a trend.
 
+![\label{fig:deltaerror-per-algorithm_library}](./images/deltaerror-per-algorithm_library.pdf){width=45%}
+![\label{fig:deltatime-per-algorithm_library}](images/deltatime-per-algorithm_library.pdf){width=45%}
 \begin{figure}[!ht]
-    \centering
-    \begin{subfigure}{0.45\textwidth}
-        \includegraphics[width=\textwidth]{paper/images/deltaerror-per-algorithm_library.pdf}
-        \label{fig:deltaerror-per-algorithm_library}
-    \end{subfigure}
-    \begin{subfigure}{0.45\textwidth}
-        \includegraphics[width=\textwidth]{paper/images/deltatime-per-algorithm_library.pdf}
-     \label{fig:deltatime-per-algorithm_library}
-    \end{subfigure}
     \caption{The triplet error and runtime improvement per estimator. Improvement
     is calculated against the average performance per dataset of all estimators in the plot.}
     \label{fig:performance-per-algorithm_library}
 \end{figure}
 
-\FloatBarrier
 
 # Code example\label{sec:code-example}
 
