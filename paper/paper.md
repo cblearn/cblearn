@@ -82,7 +82,7 @@ There is no Iris, CIFAR, or ImageNet in comparison-based learning---the communit
 These datasets---typically comparisons between images or words---consist of human responses. 
 Additionally, our package provides preprocessing functions to convert different comparisons to triplets or quadruplets, which many algorithms expect. 
 
-![Real-world datasets that can be accessed with \texttt{cblearn} cover many object and triplet numbers. Please find a detailed description and references to the dataset authors in our package documentation. \label{fig:datasets}](images/datasets.pdf){ width=35% }
+![Real-world datasets that can be accessed with `cblearn cover many object and triplet numbers. Please find a detailed description and references to the dataset authors in our package documentation. \label{fig:datasets}](images/datasets.pdf){ width=35% }
 
  ##Standard algorithm implemented for CPU and GPU
 
