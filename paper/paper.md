@@ -55,14 +55,14 @@ s.t. $\left\lVert x_i - x_j \right\rVert_2 < \left\lVert x_k - x_l \right\rVert_
 
 # Python package `cblearn` (Statement of need)
 
-This work presents `cblearn, an open-source Python package for comparison-based learning. In contrast to related packages, 
+This work presents `cblearn`, an open-source Python package for comparison-based learning. In contrast to related packages, 
 `cblearn` provides not just a specific algorithm but an ecosystem for comparison-based data with access to multiple real-world datasets and a collection of algorithm implementations.   
 `cblearn` is fast and user-friendly for applications but flexible for research on new algorithms and methods. 
-The package integrates well into the scientific Python ecosystem; for example, third-party functions for cross-validation or hyperparameter tuning of `scikit-learn` estimators can typically be used with `cblearn` estimators, too.
+The package integrates well into the scientific Python ecosystem; for example, third-party functions for cross-validation or hyperparameter tuning of `scikit-learn` estimators can typically be used with `cblearn` estimators.
 Although our package is relatively new, it has already been used for algorithm development [@mandal2023revenue] and data analysis in several studies [@schonmann_using_2022; @kunstle_estimating_2022; @van_assen_identifying_2022,zhao2023perceiving]. 
 
 We designed `cblearn` as a modular package with functions 
-for processing and converting the comparison data in all its varieties (`cblearn\-.preprocessing`, `cblearn\-.utils`, `cblearn\-.metrics`), routines to generate artificial or load real-world datasets (`cblearn\-.datasets`), and algorithms for ordinal embedding and clustering (`cblearn\-.embedding`, `cblearn\-.cluster`). 
+for processing and converting the comparison data in all its varieties (`cblearn.preprocessing`, `cblearn.utils`, `cblearn.metrics`), routines to generate artificial or load real-world datasets (`cblearn.datasets`), and algorithms for ordinal embedding and clustering (`cblearn.embedding`, `cblearn.cluster`). 
 
 ## Various data formats supported
 
@@ -72,7 +72,7 @@ Some tasks ask for the "odd-one-out", the "most-central" object, or the two most
 Different data types can store triplets, and  `cblearn` converts them internally.
 A 2D array with three columns for the object indices $(i, j, k)$ stores a triplet per row. In some applications, it is comfortable to separate the comparison ``question'' and ``response'', which leads to an additional list of labels $1$, if $\delta(i, j) \le \delta(i, k)$, and $-1$, if $\delta(i, j) > \delta(i, k)$. 
 An alternative format stores queries and responses as a 3-dimensional sparse array. 
-These sparse arrays convert fast back and forth to dense 2D arrays while providing an intuitive comparison representation via multidimensional indexing. For example, \mintinline{python}{[[i, j, k]]}, \mintinline{python}{([[i, k, j]], [-1])} and \mintinline{python}{sparse_arr[i, j, k] == 1} are different representations of the same triplet. 
+These sparse arrays convert fast back and forth to dense 2D arrays while providing an intuitive comparison representation via multidimensional indexing. For example, `[[i, j, k]]`,`([[i, k, j]], [-1])` and `sparse_arr[i, j, k] == 1` are different representations of the same triplet. 
 
 
 ## Interfaces to diverse datasets
@@ -81,12 +81,8 @@ There is no Iris, CIFAR, or ImageNet in comparison-based learning---the communit
 `cblearn` provides access to various real-world datasets, summarized in \autoref{fig:datasets}, with functions to download and load the comparisons.  
 These datasets---typically comparisons between images or words---consist of human responses. 
 Additionally, our package provides preprocessing functions to convert different comparisons to triplets or quadruplets, which many algorithms expect. 
-\begin{SCfigure}[][!ht]
-\includegraphics[width=0.35\textwidth]{images/datasets.pdf}
-\caption{Real-world datasets that can be accessed with \texttt{cblearn} cover many object and triplet numbers. Please find a detailed description and references to the dataset authors in our package documentation.}
-\label{fig:datasets}
-\end{SCfigure}
 
+![Real-world datasets that can be accessed with \texttt{cblearn} cover many object and triplet numbers. Please find a detailed description and references to the dataset authors in our package documentation. \label{fig:datasets}](images/datasets.pdf){ width=35% }
 
  ##Standard algorithm implemented for CPU and GPU
 
@@ -94,27 +90,18 @@ In the current version `0.1.12`, `cblearn` implements an extensive palette of or
 Most algorithm implementations use `scipy` to be fast and lightweight. Inspired by \cite{vankadara_insights_2020}, we added GPU implementations using \texttt{pytorch}, which use the stochastic optimization routines known from deep-learning algorithms. 
 These GPU implementations can be used with large datasets and rapidly adapted thanks to automated differentiation.
 
-\begin{table}[H]
-    \centering
-        \caption{Algorithm implementations in \texttt{cblearn}.
-        Most of these come in multiple variants: Different backends for small datasets on CPU or large datasets on GPU, or varied objective functions.}
-        \label{tab:algorithms}
-\begin{tabular}{ll}
-\toprule
-Algorithm & Reference  \\
-\midrule
-Crowd Kernel Learning & \cite{tamuz_adaptively_2011}\\
-Fast Ordinal Triplet Embedding & \cite{jain_finite_2016} \\
-Generalized Non-metric MDS & \cite{agarwal_generalized_2007}\\
-Maximum-likelihood Difference Scaling & \cite{maloney_maximum_2003} \\
-Soft Ordinal Embedding  & \cite{terada_local_2014} \\
-Ordinal Embedding Neural Network & \cite{vankadara_insights_2020} \\
-Stochastic Triplet Embedding & \cite{van_der_maaten_stochastic_2012} \\
-ComparisonHC (clustering) & \cite{perrot_near-optimal_2020}\\
-\bottomrule
-\end{tabular}
-\end{table}
-
+![Algorithm implementations in `cblearn`. Most of these come in multiple variants: Different backends for small datasets on CPU or large datasets on GPU, or varied objective functions.\label{tab:algorithms}](
+|Algorithm | Reference |
+|:---------|:---------------|
+|Crowd Kernel Learning | @tamuz_adaptively_2011 |
+|Fast Ordinal Triplet Embedding | @jain_finite_2016 |
+|Generalized Non-metric MDS | @agarwal_generalized_2007 |
+|Maximum-likelihood Difference Scaling | @maloney_maximum_2003 |
+|Soft Ordinal Embedding  | @terada_local_2014 |
+|Ordinal Embedding Neural Network | @vankadara_insights_2020 |
+|Stochastic Triplet Embedding | @van_der_maaten_stochastic_2012 |
+|ComparisonHC (clustering) | @perrot_near-optimal_2020 |
+)
 
 ## User-friendly and compatible API
 One of Python's greatest strengths is its scientific ecosystem, into which `cblearn` integrates. Our package does not only make use of this ecosystem internally but adapts their API conventions–––every user of `scikit-learn` [@pedregosa_scikit-learn_2011;@buitinck_api_2013] is already familiar with the API  of `cblearn`:
@@ -128,9 +115,9 @@ extensible, and documented package [e.g., @van_der_maaten_stochastic_2012; @ghos
 Positive exceptions implement a small set of algorithms, for example, in the packages `loe` [@terada_local_2014] or `psiz` [@roads_obtaining_2019]. 
 However, we are unaware of other packages that provide an ecosystem for comparison-based learning with various algorithms or datasets, like `cblearn`. 
 
-A small empirical comparison to third-party packages reveals that \texttt{cblearn}'s algorithm implementations 
+A small empirical comparison to third-party packages reveals that `cblearn`'s algorithm implementations 
 typically are more accurate, faster, or both (see Appendix \ref{sec:empirical-evaluation}). 
-A more comprehensive evaluation of ordinal embedding algorithms per se, focusing on large data sets, can be found in \cite{vankadara_insights_2020}.
+A more comprehensive evaluation of ordinal embedding algorithms per se, focusing on large data sets, can be found in @vankadara_insights_2020.
 
 # Outlook
 `cblearn` includes key features for comparison-based learning and has already demonstrated its
