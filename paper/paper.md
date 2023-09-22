@@ -41,8 +41,8 @@ There exist comparison-based algorithms for most machine learning tasks,
 like clustering, regression, or classification [e.g., @balcan2016learning; @heikinheimo2013crowd; @perrot_near-optimal_2020];
 The most frequently applied algorithms, however, are the so-called ordinal embedding algorithms
 [e.g., @agarwal_generalized_2007; @tamuz_adaptively_2011; @van_der_maaten_stochastic_2012; @terada_local_2014;
-@amid2015,anderton2019scaling; @ghosh2019landmark].
-Ordinal embedding algorithms estimate a metric representation, such that the distances between embedded objects reflect the similarity comparisons and, for example, more similar objects are embedded closer together.
+@amid2015; @anderton2019scaling; @ghosh2019landmark].
+Ordinal embedding algorithms estimate a metric representation, such that the distances between embedded objects reflect the similarity comparisons.
 These embedding algorithms have recently come into fashion in psychology and cognitive science to objectively quantify the perceived similarity of various stimuli
 [e.g., @haghiri_estimation_2020; @wills_toward_2009; @roads_obtaining_2019].
 
@@ -93,8 +93,7 @@ In the current version `0.1.2`, `cblearn` implements an extensive palette of ord
 Most algorithm implementations use `scipy` to be fast and lightweight. Inspired by the work of @vankadara_insights_2020, we added GPU implementations using *pytorch*, which use the stochastic optimization routines known from deep-learning algorithms.
 These GPU implementations can be used with large datasets and rapidly adapted thanks to automated differentiation.
 
-: Algorithm implementations in `cblearn`. Most of these come in multiple variants: Different backends for small datasets on CPU or large datasets on GPU, or varied objective functions.
-  []{label=tablealgorithms}
+: Algorithm implementations in `cblearn`. Most of these come in multiple variants: Different backends for small datasets on CPU or large datasets on GPU, or varied objective functions. \label{tablealgorithms}
 
 |Algorithm | Reference |
 |:---------|:---------------|
@@ -115,8 +114,8 @@ Interested readers can find a code example in the Supplementary Material, which 
 
 # Related work and empirical comparison
 
-Most comparison-based learning algorithms were implemented independently as part of a research paper [e.g., @hebartRevealingMultidimensionalMental2020; @van_der_maaten_stochastic_2012; @ghoshdastidar_foundations_2019; @roads_obtaining_2019];
-Just a few of these implementations, for example `loe` [@terada_local_2014] or `psiz` [@roads_obtaining_2019], take the form of a comprehensive package. However, we are unaware of packages that provide an ecosystem for comparison-based learning with various algorithms, datasets and integration in the scientific ecosystem, like `cblearn`.
+Most comparison-based learning algorithms were implemented independently as part of a research paper [e.g., @ghoshdastidar_foundations_2019; @hebartRevealingMultidimensionalMental2020; @van_der_maaten_stochastic_2012; @roads_obtaining_2019];
+Just a few of these implementations, for example `loe` [@terada_local_2014] or `psiz` [@roads_obtaining_2019], come in the form of software packages. However, we are unaware of packages that provide an ecosystem for comparison-based learning with various algorithms, datasets, automated-tests, and *scikit-learn*-integration, like `cblearn`.
 
 A small empirical comparison to third-party packages reveals that `cblearn`'s algorithm implementations
 typically are accurate and fast. Details are described in Supplementary Material.
