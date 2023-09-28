@@ -1,6 +1,7 @@
 {
     "python.testing.pytestArgs": [
-        "cblearn"
+        "cblearn",
+        "--remote-data"
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true
