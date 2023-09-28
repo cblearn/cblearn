@@ -2,7 +2,8 @@
 
 ## Upcoming
 
-- Add embedding dimension estimation routine to `embeddings` module (Künstle et al., 2022)
+- Feature: add routine for embedding dimension estimation to `embeddings` module (Künstle et al., 2022)
+- Fix: Avoid numpy deprecation warning for scalar variables in `fetch_similarity_matrix`
 
 ## 0.1.2
 
