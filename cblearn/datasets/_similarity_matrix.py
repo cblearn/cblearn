@@ -106,9 +106,9 @@ def fetch_similarity_matrix(name: str, data_home: Optional[os.PathLike] = None, 
                     _this_dict = {
                         'similarity': np.array(_raw.get('s', None)),
                         'proximity': np.array(_raw.get('d', None)),
-                        'n_objects': int(_raw['n'][0]),
+                        'n_objects': int(_raw['n'][0, 0]),
                         'labels': np.array(_raw['labs'], dtype=str),
-                        'sigma': float(_raw.get('sigma_emp', np.nan)[0]),
+                        'sigma': float(_raw.get('sigma_emp', np.array([[np.nan]]))[0, 0]),
                     }
                     _this_filepath = basepath.joinpath(f'{_this_name}.pkz')
                     joblib.dump(_this_dict, _this_filepath, compress=6)
