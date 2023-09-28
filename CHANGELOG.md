@@ -1,5 +1,9 @@
 # Changelog
 
+## Upcoming
+
+- Add embedding dimension estimation routine to `embeddings` module (Künstle et al., 2022)
+
 ## 0.1.2
 
 - support python 3.11
