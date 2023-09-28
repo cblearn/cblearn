@@ -84,8 +84,8 @@ Utility
 .. autosummary::
     :toctree: generated/
 
-    embedding.estimate_dimensionality_cv
-    embedding.DimensionEstimationResult
+    estimate_dimensionality_cv
+    DimensionEstimationResult
 
 
 Wrapper
