@@ -76,6 +76,17 @@ Low-level Dataset Utility
     embedding.OENN
     embedding.MLDS
 
+Utility
+-------
+
+.. automodule:: cblearn.embedding
+
+.. autosummary::
+    :toctree: generated/
+
+    estimate_dimensionality_cv
+    DimensionEstimationResult
+
 
 Wrapper
 -------

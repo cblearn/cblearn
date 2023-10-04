@@ -151,8 +151,8 @@ def fetch_imagenet_similarity(data_home: Optional[os.PathLike] = None, download_
 
     return Bunch(data=data['stimulus_set'],
                  rt_ms=data['rt_ms'],
-                 n_select=int(np.unique(data['n_select'])),
-                 is_ranked=bool(np.unique(data['is_ranked'])),
+                 n_select=int(np.unique(data['n_select'])[0]),
+                 is_ranked=bool(np.unique(data['is_ranked'])[0]),
                  session_id=data['session_id'],
                  stimulus_id=catalog['stimulus_id'],
                  stimulus_filepath=catalog['stimulus_filepath'],
