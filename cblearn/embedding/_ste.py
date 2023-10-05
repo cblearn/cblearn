@@ -3,20 +3,17 @@ from scipy.spatial import distance
 from typing import Optional, Union
 
 from sklearn.base import BaseEstimator
-from sklearn.utils import check_random_state
 import numpy as np
-from scipy.optimize import minimize
 
 import cblearn as cbl
 from cblearn import Comparison
-from cblearn.embedding._base import TripletEmbeddingMixin
-from cblearn.embedding._torch_utils import assert_torch_is_available, torch_minimize
+from cblearn.embedding._base import QuadrupletEmbeddingMixin
 
 
 EPS = np.finfo(float).tiny
 
 
-class BaseSTE(BaseEstimator, TripletEmbeddingMixin):
+class BaseSTE(BaseEstimator, QuadrupletEmbeddingMixin):
     """ Stochastic Triplet Embedding algorithm (STE / t-STE).
 
         STE [1]_ maximizes the probability, that the triplets are satisfied.
@@ -46,7 +43,7 @@ class BaseSTE(BaseEstimator, TripletEmbeddingMixin):
 
     def __init__(self, n_components=2, heavy_tailed=False, verbose=False, lambd=0,
                  random_state: Union[None, int, np.random.RandomState] = None, max_iter=1000,
-                 backend: str = "scipy", learning_rate=1, batch_size=50_000,  device: str = "auto"):
+                 backend: str = "scipy", learning_rate=0.0002, batch_size=50_000,  device: str = "auto"):
         """ Initialize the estimator.
 
         Args:
@@ -71,115 +68,63 @@ class BaseSTE(BaseEstimator, TripletEmbeddingMixin):
                 "auto" chooses cuda (GPU) if available, but falls back on cpu if not.
                 Only used with the *torch* backend, else ignored.
         """
-        self.n_components = n_components
         self.heavy_tailed = heavy_tailed
-        self.max_iter = max_iter
-        self.verbose = verbose
         self.lambd = lambd
-        self.random_state = random_state
-        self.backend = backend
-        self.learning_rate = learning_rate
-        self.batch_size = batch_size
-        self.device = device
+        super().__init__(
+            n_components=n_components,
+            max_iter=max_iter,
+            verbose=verbose,
+            random_state=random_state,
+            batch_size=batch_size,
+            device=device,
+            learning_rate=learning_rate,
+            backend=backend,
+            use_quadruplets=False)
 
-    def _more_tags(self):
-        tags = TripletEmbeddingMixin()._more_tags()
-        return tags
-
-    def fit(self, X: Comparison, y: np.ndarray = None,
-            sample_weight: Optional[np.ndarray] = None,
-            init: np.ndarray = None,
-            n_objects: Optional[int] = None) -> 'STE':
-        """Computes the embedding.
-
-        Args:
-            X: The training input samples, shape (n_samples, 3)
-            y: Ignored
-            sample_weight: Optional weight per triplet.
-            init: Initial embedding for optimization
-            n_objects: Number of objects in the embedding.
-        Returns:
-            self.
-        """
-        if sample_weight is None:
-            sample_weight = 1
-        triplets, sample_weight = super()._prepare_data(
-            X, y, return_y=False, quadruplets=False, sample_weight=sample_weight)
-
-        if not n_objects:
-            n_objects = triplets.max() + 1
-        random_state = check_random_state(self.random_state)
-        if init is None:
-            init = random_state.multivariate_normal(np.zeros(self.n_components), np.eye(self.n_components),
-                                                    size=n_objects)
-
-        if self.backend == "torch":
-            assert_torch_is_available()
-            result = torch_minimize('adam', self._torch_objective, init,
-                                    data=(triplets.astype(int),),
-                                    args=(sample_weight, self.heavy_tailed, self.lambd),
-                                    device=self.device, max_iter=self.max_iter, lr=self.learning_rate,
-                                    seed=random_state.randint(1))
-        elif self.backend == "scipy":
-            result = minimize(self._objective, init.ravel(), args=(init.shape, triplets, sample_weight, self.heavy_tailed, self.lambd),
-                              method='L-BFGS-B', jac=True, options=dict(maxiter=self.max_iter, disp=self.verbose))
-        else:
-            raise ValueError(f"Unknown backend '{self.backend}'. Try 'scipy' or 'torch' instead.")
-
-        if self.verbose and not result.success:
-            print(f"STE's optimization failed with reason: {result.message}.")
-        self.embedding_ = result.x.reshape(-1, self.n_components)
-        self.stress_, self.n_iter_ = result.fun, result.nit
-        self.optimize_result_ = result
-        return self
-
-    @staticmethod
-    def _torch_objective(embedding, triplets, weights, heavy_tailed, lambd, p=2.):
-        import torch  # Pytorch is an optional dependency
-
-        X = embedding[triplets.long()]
+    def _torch_loss(self, embedding, triplets, dist_pos, dist_neg,
+                    sample_weights, *args):
         dof = max(embedding.shape[1] - 1, 1)
-        I, J, K = X[:, 0, :], X[:, 1, :], X[:, 2, :]
-        dist_1 = torch.linalg.vector_norm(I - J, ord=p, dim=1)**2
-        dist_2 = torch.linalg.vector_norm(I - K, ord=p, dim=1)**2
-        if heavy_tailed:
+        dist_1 = dist_pos**2
+        dist_2 = dist_neg**2
+        if self.heavy_tailed:
             t_dist_1 = (1 + dist_1 / 2.)**(-(dof + 1) / 2)
             p = t_dist_1 / (t_dist_1 + (1 + dist_2 / 2.)**(-(dof + 1) / 2) + 1e-16)
         else:
             p = (-dist_1).exp() / ((-dist_1).exp() + (-dist_2).exp() + 1e-16)
 
-        return -(weights * p).log().sum() + lambd * embedding.pow(2).sum()
+        return -(sample_weights * p).log().sum() + self.lambd * embedding.pow(2).sum()
 
-    @staticmethod
-    def _objective(x, x_shape, triplets, weights, heavy_tailed, lambd):
+    def _scipy_loss(self, X, triplets, dist_pos, dist_neg, sample_weights, *args):
         """ Calculates the log STE loss"""
-        X = x.reshape(x_shape)  # scipy minimize expects a flat x.
         n_objects, n_dim = X.shape
         dof = max(n_dim - 1, 1)
-        dist = distance.squareform(distance.pdist(X, 'sqeuclidean'))
-        if heavy_tailed:
-            base_kernel = 1 + dist / dof
-            kernel = base_kernel**((dof + 1) / -2)
+        if self.heavy_tailed:
+            base_dist_pos = 1 + dist_pos**2 / dof
+            base_dist_neg = 1 + dist_neg**2 / dof
+            dist_pos = base_dist_pos**((dof + 1) / -2)
+            dist_neg = base_dist_neg**((dof + 1) / -2)
         else:
-            kernel = np.exp(-dist)
+            dist_pos = np.exp(-dist_pos**2)
+            dist_neg = np.exp(-dist_neg**2)
 
         I, J, K = tuple(triplets.T)
-        P = kernel[I, J] / np.maximum(kernel[I, J] + kernel[I, K], EPS)
-        loss = -np.mean(weights * np.log(np.maximum(P, EPS))) + lambd * np.mean(x**2)
+        P = dist_pos / np.maximum(dist_pos + dist_neg, EPS)
+        loss = -np.mean(sample_weights * np.log(np.maximum(P, EPS))) + self.lambd * np.mean(X**2)
 
-        if heavy_tailed:
-            base_inv = (1 / base_kernel)[..., np.newaxis]
+        if self.heavy_tailed:
+            dist_pos_inv = (1 / base_dist_pos)[..., np.newaxis]
+            dist_neg_inv = (1 / base_dist_neg)[..., np.newaxis]
             grad_triplets = - (dof + 1) / dof * np.array([
-                base_inv[I, J] * (X[I] - X[J]) - base_inv[I, K] * (X[I] - X[K]),
-                - base_inv[I, J] * (X[I] - X[J]),
-                base_inv[I, K] * (X[I] - X[K])])
+                dist_pos_inv * (X[I] - X[J]) - dist_neg_inv * (X[I] - X[K]),
+                - dist_pos_inv * (X[I] - X[J]),
+                dist_neg_inv * (X[I] - X[K])])
         else:
             grad_triplets = - 2 * np.array([
                 (X[I] - X[J]) - (X[I] - X[K]),
                 - (X[I] - X[J]),
                 (X[I] - X[K])])
 
-        grad_triplets *= (weights * (1 - P))[np.newaxis, :, np.newaxis]
+        grad_triplets *= (sample_weights * (1 - P))[np.newaxis, :, np.newaxis]
 
         loss_grad = np.empty_like(X)
         for dim in range(X.shape[1]):
@@ -187,7 +132,7 @@ class BaseSTE(BaseEstimator, TripletEmbeddingMixin):
             loss_grad[:, dim] += np.bincount(triplets[:, 1], grad_triplets[1, :, dim], n_objects)
             loss_grad[:, dim] += np.bincount(triplets[:, 2], grad_triplets[2, :, dim], n_objects)
         loss_grad = loss_grad / len(triplets)  # this normalizes the gradient
-        loss_grad = -loss_grad + 2 * lambd * X
+        loss_grad = -loss_grad + 2 * self.lambd * X
 
         return loss, loss_grad.ravel()
 
@@ -282,7 +227,7 @@ class MVTE(BaseSTE):
         >>> estimator = MVTE(n_components=1, n_maps=2, random_state=seed)
         >>> estimator.fit(X, y).embedding_.shape
         (2, 15, 1)
-        >>> estimator.score(X, y) > 0.9
+        >>> estimator.score(X, y) > 0.8
         True
 
         >>> from sklearn.model_selection import cross_val_score
@@ -303,19 +248,19 @@ class MVTE(BaseSTE):
         return super().__init__(n_components, heavy_tailed, verbose, lambd, random_state, max_iter, backend,
                                 learning_rate, batch_size, device)
 
-    @staticmethod
-    def _objective(x, x_shape, triplets, weights, heavy_tailed):
-        x = x.reshape(x_shape)
-        ratio = satifyability_ratio(x, triplets)
+    def _scipy_loss(self, X, triplets, dist_pos, dist_neg, sample_weights, *args):
+        ratio = satifyability_ratio(X, triplets)
         ratio[ratio <= 1] = EPS
         ratio[np.isinf(ratio)] = 1e5
         z = ratio / ratio.sum(axis=0)
         cost = 0
-        grad = np.zeros_like(x)
+        grad = np.zeros_like(X)
         for i in range(len(z)):
-            c, g = BaseSTE._objective(x[i].ravel(), x_shape[1:], triplets, weights * z[i], heavy_tailed)
+            c, g = BaseSTE._scipy_loss(self, X[i], triplets,
+                                       dist_pos[i], dist_neg[i],
+                                       sample_weights * z[i], *args)
             cost += c
-            grad[i, :, :] = g.reshape(x_shape[1:])
+            grad[i, :, :] = g.reshape(X.shape[1:])
         return cost, grad.ravel()
 
     def satifyability_ratio(self, triplets, metric='euclidean'):

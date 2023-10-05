@@ -1,23 +1,17 @@
-from typing import Optional, Union
+from typing import Union
 
 from sklearn.base import BaseEstimator
-from sklearn.utils import check_random_state
 import numpy as np
-from scipy.optimize import minimize
-from scipy.spatial import distance
 
-from cblearn import utils
-from cblearn.embedding._base import TripletEmbeddingMixin
-from cblearn.embedding import _torch_utils
+from cblearn.embedding._base import QuadrupletEmbeddingMixin
 
 
-class CKL(BaseEstimator, TripletEmbeddingMixin):
+class CKL(BaseEstimator, QuadrupletEmbeddingMixin):
     """ Crowd Kernel Learning (CKL) embedding kernel for triplet data.
 
         CKL [1]_ searches for an Euclidean representation of objects.
         The model is regularized through the rank of the embedding's kernel matrix.
 
-        This estimator supports multiple implementations which can be selected by the `backend` parameter.
 
         The *torch* backend uses the ADAM optimizer and backpropagation [2]_.
         It can executed on CPU, but also CUDA GPUs.
@@ -60,7 +54,7 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
 
     def __init__(self, n_components=2, mu=0.0, verbose=False,
                  random_state: Union[None, int, np.random.RandomState] = None, max_iter=2000,
-                 backend: str = 'scipy', kernel: bool = False, learning_rate=None, batch_size=50000,
+                 backend: str = 'scipy', kernel: bool = False, learning_rate=0.002, batch_size=50000,
                  device: str = "auto"):
         """ Initialize the estimator.
 
@@ -80,105 +74,51 @@ class CKL(BaseEstimator, TripletEmbeddingMixin):
                 "auto" chooses cuda (GPU) if available, but falls back on cpu if not.
                 Only used with the *torch* backend, else ignored.
         """
-        self.n_components = n_components
-        self.max_iter = max_iter
         self.mu = mu
-        self.learning_rate = learning_rate
-        self.batch_size = batch_size
-        self.kernel = kernel
-        self.verbose = verbose
-        self.random_state = random_state
-        self.backend = backend
-        self.device = device
+        super().__init__(
+            n_components=n_components,
+            max_iter=max_iter,
+            verbose=verbose,
+            random_state=random_state,
+            batch_size=batch_size,
+            device=device,
+            learning_rate=learning_rate,
+            backend=backend,
+            kernel=kernel,
+            use_quadruplets=False)
 
-    def fit(self, X: utils.Query, y: np.ndarray = None, init: np.ndarray = None,
-            n_objects: Optional[int] = None) -> 'CKL':
-        """Computes the embedding.
+    def _scipy_loss(self, X, triplets, D_pos, D_neg, *args):
+        float_min = np.finfo(float).tiny
+        n_objects, n_dim = X.shape
 
-        Args:
-            X: The training input samples, shape (n_samples, 3)
-            y: Ignored
-            init: Initial embedding for optimization
-        Returns:
-            self.
-        """
-        triplets = super()._prepare_data(X, y, return_y=False, quadruplets=False)
-        if not n_objects:
-            n_objects = triplets.max() + 1
-        random_state = check_random_state(self.random_state)
-        if init is None:
-            init = random_state.multivariate_normal(
-                np.zeros(self.n_components), np.eye(self.n_components), size=n_objects)
+        I, J, K = tuple(triplets.T)
+        nom = self.mu + D_neg**2
+        den = 2 * self.mu + D_pos**2 + D_neg*2
+        loss = -(np.log(np.maximum(nom, float_min)) - np.log(np.maximum(den, float_min)))
 
-        if self.backend == 'torch':
-            _torch_utils.assert_torch_is_available()
-            if self.kernel:
-                result = _torch_utils.torch_minimize_kernel(
-                    'adam', _ckl_kernel_loss_torch, init, data=[triplets.astype(int)], args=(self.mu,),
-                    device=self.device, max_iter=self.max_iter, batch_size=self.batch_size, lr=self.learning_rate or 100,
-                    seed=random_state.randint(1))
-            else:
-                result = _torch_utils.torch_minimize(
-                    'adam', _ckl_x_loss_torch, init, data=(triplets.astype(int),), args=(self.mu,),
-                    device=self.device, max_iter=self.max_iter, lr=self.learning_rate or 1,
-                    seed=random_state.randint(1))
-        elif self.backend == "scipy":
-            if self.kernel:
-                raise ValueError(f"Kernel objective is not available for backend {self.backend}.")
+        loss_grad = np.empty_like(X)
+        for dim in range(n_dim):
+            triplet_grads = [
+                2 / nom * (X[I, dim] - X[K, dim]) - 2 / den * ((X[I, dim] - X[J, dim]) + (X[I, dim] - X[K, dim])),
+                2 / den * (X[I, dim] - X[J, dim]),
+                -2 / nom * (X[I, dim] - X[K, dim]) + 2 / den * (X[I, dim] - X[K, dim]),
+                ]
+            loss_grad[:, dim] = -np.bincount(triplets[:, 0], triplet_grads[0], n_objects)
+            loss_grad[:, dim] -= np.bincount(triplets[:, 1], triplet_grads[1], n_objects)
+            loss_grad[:, dim] -= np.bincount(triplets[:, 2], triplet_grads[2], n_objects)
 
-            result = minimize(_ckl_x_loss, init.ravel(), args=(init.shape, triplets, self.mu), method='L-BFGS-B',
-                              jac=True, options=dict(maxiter=self.max_iter, disp=self.verbose))
-        else:
-            raise ValueError(f"Unknown backend '{self.backend}'. Try 'scipy' or 'torch' instead.")
+        return loss.mean(), loss_grad / len(triplets)
 
-        if self.verbose and not result.success:
-            print(f"CKL's optimization failed with reason: {result.message}.")
-        self.embedding_ = result.x.reshape(-1, self.n_components)
-        self.stress_, self.n_iter_ = result.fun, result.nit
-        return self
+    def _torch_loss(self, embedding, triplets, dist_pos, dist_neg, *args):
+        nom = dist_neg**2 + self.mu
+        denom = nom + dist_pos**2 + self.mu
+        return -1 * (nom.log() - denom.log()).mean()
 
-    def _more_tags(self):
-        tags = TripletEmbeddingMixin()._more_tags()
-        return tags
-
-
-def _ckl_x_loss(x, x_shape, triplets, mu, float_min=np.finfo(float).tiny):
-    X = x.reshape(x_shape)
-    n_objects, n_dim = X.shape
-    D = distance.squareform(distance.pdist(X, 'sqeuclidean'))
-
-    I, J, K = tuple(triplets.T)
-    nom = mu + D[I, K]
-    den = 2 * mu + D[I, K] + D[I, J]
-    loss = -(np.log(np.maximum(nom, float_min)) - np.log(np.maximum(den, float_min))).sum()
-
-    loss_grad = np.empty_like(X)
-    for dim in range(n_dim):
-        triplet_grads = [
-            2 / nom * (X[I, dim] - X[K, dim]) - 2 / den * ((X[I, dim] - X[J, dim]) + (X[I, dim] - X[K, dim])),
-            2 / den * (X[I, dim] - X[J, dim]),
-            -2 / nom * (X[I, dim] - X[K, dim]) + 2 / den * (X[I, dim] - X[K, dim]),
-            ]
-        loss_grad[:, dim] = -np.bincount(triplets[:, 0], triplet_grads[0], n_objects)
-        loss_grad[:, dim] -= np.bincount(triplets[:, 1], triplet_grads[1], n_objects)
-        loss_grad[:, dim] -= np.bincount(triplets[:, 2], triplet_grads[2], n_objects)
-
-    return loss, loss_grad.ravel()
-
-
-def _ckl_x_loss_torch(embedding, triplets, mu):
-    X = embedding[triplets.long()]
-    x_i, x_j, x_k = X[:, 0, :], X[:, 1, :], X[:, 2, :]
-    nominator = (x_i - x_k).norm(p=2, dim=1) ** 2 + mu
-    denominator = (x_i - x_j).norm(p=2, dim=1) ** 2 + (x_i - x_k).norm(p=2, dim=1) ** 2 + 2 * mu
-    return -1 * (nominator.log() - denominator.log()).sum()
-
-
-def _ckl_kernel_loss_torch(kernel_matrix, triplets, mu):
-    triplets = triplets.long()
-    diag = kernel_matrix.diag()[:, None]
-    dist = -2 * kernel_matrix + diag + diag.transpose(0, 1)
-    d_ij = dist[triplets[:, 0], triplets[:, 1]].squeeze()
-    d_ik = dist[triplets[:, 0], triplets[:, 2]].squeeze()
-    probability = (d_ik + mu).log() - (d_ij + d_ik + 2 * mu).log()
-    return -probability.sum()
+    def _torch_kernel_loss(self, kernel_matrix, quads, *args):
+        quads = quads.long()
+        diag = kernel_matrix.diag()[:, None]
+        sqdist = -2 * kernel_matrix + diag + diag.transpose(0, 1)
+        d_ij = sqdist[quads[:, 0], quads[:, 1]].squeeze()
+        d_ik = sqdist[quads[:, 0], quads[:, 2]].squeeze()
+        probs = (d_ik + self.mu).log() - (d_ij + d_ik + 2 * self.mu).log()
+        return -probs.mean()

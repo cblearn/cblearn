@@ -2,8 +2,11 @@
 
 ## In development
 
-- Core functions for validating various comparison data types #35
-- Treat embedding estimators as binary classifiers (sklearn-compatible)
+- Refactor core functions for validating comparison data types #35. 
+  These functions are now available from the base module `cblearn`.
+- SOE, GNMDS, and MLDS estimators support quadruplet comparison data.
+- API of embedding estimators is compatible to sklearn's binary classifiers.
+- Refactoring of embedding estimators to share more functionality.
 
 - TODO: Core functions for generating comparison data w/ flexible sampling and noise models #27 #24
 - TODO: Add kNN sampling # 25

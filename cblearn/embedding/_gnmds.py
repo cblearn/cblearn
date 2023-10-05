@@ -1,20 +1,15 @@
-from typing import Optional, Union
+from typing import Union
 
 from sklearn.base import BaseEstimator
-from sklearn.utils import check_random_state
 import numpy as np
-from scipy.spatial import distance
-from scipy.optimize import minimize
 
-from cblearn import utils
-from cblearn.embedding._base import TripletEmbeddingMixin
-from cblearn.embedding import _torch_utils
+from cblearn.embedding._base import QuadrupletEmbeddingMixin
 
 
-class GNMDS(BaseEstimator, TripletEmbeddingMixin):
+class GNMDS(BaseEstimator, QuadrupletEmbeddingMixin):
     """ Generalized Non-metric Multidimensional Scaling (GNMDS).
 
-        Embedding estimator for triplet and quadruplet data (currently only triplet data is implemented).
+        Embedding estimator for triplet and quadruplet data.
 
         GNMDS [1]_ minimizes a kernel version of the triplet hinge soft objective
         as a smooth relaxation of the triplet error.
@@ -57,15 +52,16 @@ class GNMDS(BaseEstimator, TripletEmbeddingMixin):
                Insights into Ordinal Embedding Algorithms: A Systematic Evaluation. ArXiv:1912.01666 [Cs, Stat].
         """
 
-    def __init__(self, n_components=2, lambd=0.0, verbose=False,
+    def __init__(self, n_components=2, lambd=0.0, margin=1, verbose=False, kernel=False,
                  random_state: Union[None, int, np.random.RandomState] = None, max_iter=2000, backend: str = 'scipy',
-                 learning_rate=10, batch_size=50_000, device: str = "auto"):
+                 learning_rate=0.0002, batch_size=50_000, device: str = "auto"):
         """ Initialize the estimator.
 
         Args:
             n_components :
                 The dimension of the embedding.
             lambd: Regularization parameter. The strength of the rank regularization is proportional to lambda.
+            margin: Margin parameter, scaling the embedding.
             verbose: Enable verbose output.
             random_state: The seed of the pseudo random number generator used to initialize the optimization.
             max_iter: Maximum number of optimization iterations.
@@ -78,95 +74,67 @@ class GNMDS(BaseEstimator, TripletEmbeddingMixin):
                 "auto" chooses cuda (GPU) if available, but falls back on cpu if not.
                 Only used with the *torch* backend, else ignored.
         """
-        self.n_components = n_components
-        self.max_iter = max_iter
-        self.verbose = verbose
-        self.random_state = random_state
-        self.device = device
+        self.margin = margin
         self.lambd = lambd
-        self.learning_rate = learning_rate
-        self.batch_size = batch_size
-        self.backend = backend
+        super().__init__(
+            n_components=n_components,
+            max_iter=max_iter,
+            verbose=verbose,
+            random_state=random_state,
+            batch_size=batch_size,
+            device=device,
+            learning_rate=learning_rate,
+            backend=backend,
+            kernel=kernel,
+            use_quadruplets=True)
 
-    def _more_tags(self):
-        tags = TripletEmbeddingMixin()._more_tags()
-        return tags
+    def _scipy_loss(self, embedding, quads, dist_pos, dist_neg, *args):
+        """ Calculate the loss and gradient for scipy.optimize.minimize.
 
-    def fit(self, X: utils.Query, y: np.ndarray = None, init: np.ndarray = None,
-            n_objects: Optional[int] = None) -> 'GNMDS':
-        """Computes the embedding.
-
-        Args:
-            X: The training input samples, shape (n_samples, 3)
-            y: Ignored
-            init: Initial embedding for optimization
-        Returns:
-            self.
+        The GNMDS loss is similar to the SOE loss.
+        Main differrences are (a) using squared distances
+                              (b) no squared distance difference
+                              (c) add regularization lambda
         """
-        triplets = super()._prepare_data(X, y, return_y=False, quadruplets=False)
-        if not n_objects:
-            n_objects = triplets.max() + 1
-        random_state = check_random_state(self.random_state)
-        if init is None:
-            init = random_state.multivariate_normal(np.zeros(self.n_components), np.eye(self.n_components),
-                                                    size=n_objects)
+        # OBJECTIVE #
+        differences = (dist_pos**2 - dist_neg**2 + self.margin)
+        loss = np.maximum(differences, 0)
+        loss = loss.mean() + self.lambd * (embedding**2).mean()
 
-        if self.backend == 'torch':
-            _torch_utils.assert_torch_is_available()
-            result = _torch_utils.torch_minimize('adam', _gnmds_x_loss_torch, init, data=(triplets.astype(int),),
-                                                 args=(self.lambd,), device=self.device, max_iter=self.max_iter,
-                                                 seed=random_state.randint(1), lr=self.learning_rate)
-        elif self.backend == "scipy":
-            result = minimize(_gnmds_x_grad, init.ravel(), args=(init.shape, triplets, self.lambd), method='L-BFGS-B',
-                              jac=True, options=dict(maxiter=self.max_iter, disp=self.verbose))
-        else:
-            raise ValueError(f"Unknown backend '{self.backend}'. Try 'scipy' or 'torch' instead.")
+        # GRADIENT #
+        is_diff_positive = differences > 0  # Case 1, 2.1.1
+        i, j, k, l = quads[is_diff_positive].T
 
-        if self.verbose and not result.success:
-            print(f"GNMDS's optimization failed with reason: {result.message}.")
-        self.embedding_ = result.x.reshape(-1, self.n_components)
-        self.stress_, self.n_iter_ = result.fun, result.nit
-        return self
+        i_is_k = (i == k)[:, np.newaxis]
+        i_is_l = (i == l)[:, np.newaxis]
+        j_is_k = (j == k)[:, np.newaxis]
+        j_is_l = (j == l)[:, np.newaxis]
+        # gradients of distances
+        Xij = 2 * (embedding[i] - embedding[j])
+        Xik = 2 * (embedding[i] - embedding[k])  # if i == l
+        Xil = 2 * (embedding[i] - embedding[l])  # if k == l
+        Xjk = 2 * (embedding[j] - embedding[k])  # if j == l
+        Xjl = 2 * (embedding[j] - embedding[l])
+        Xkl = 2 * (embedding[k] - embedding[l])
 
+        grad = np.zeros_like(embedding)
+        np.add.at(grad, i, (Xij - np.where(i_is_k, Xil, np.where(i_is_l, Xik, 0))))
+        np.add.at(grad, j, (-Xij - np.where(j_is_k, Xjl, np.where(j_is_l, Xjk, 0))))
+        np.add.at(grad, k, np.where(i_is_k | j_is_k, 0, -Xkl))
+        np.add.at(grad, l, np.where(i_is_l | j_is_l, 0, Xkl))
 
-def _gnmds_x_grad(x, x_shape, triplets, lambd):
-    X = x.reshape(x_shape)  # scipy minimize expects a flat x.
-    n_objects, n_dim = X.shape
-    D = distance.squareform(distance.pdist(X, 'sqeuclidean'))
+        grad = grad / len(quads) + self.lambd * 2 * embedding
+        return loss.mean(), grad.ravel()
 
-    I, J, K = tuple(triplets.T)
-    slack = np.maximum(D[I, J] + 1 - D[I, K], 0)
-    loss = slack.sum() + lambd * (X**2).sum()
+    def _torch_kernel_loss(self, kernel_matrix, quads, *args):
+        quads = quads.long()
+        diag = kernel_matrix.diag()[:, None]
+        dist = -2 * kernel_matrix + diag + diag.transpose(0, 1)
+        d_ij = dist[quads[:, 0], quads[:, 1]].squeeze()
+        d_kl = dist[quads[:, 2], quads[:, 3]].squeeze()
+        return (d_ij - d_kl).clamp(min=0).mean()\
+            + self.lambd * kernel_matrix.trace().mean()
 
-    loss_grad = np.empty_like(X)
-    triplets = triplets[slack > 0]
-    I, J, K = tuple(triplets.T)
-    for dim in range(X.shape[1]):
-        loss_grad[:, dim] = np.bincount(triplets[:, 0], 2 * (X[I, dim] - X[J, dim])
-                                        - 2 * (X[I, dim] - X[K, dim]), n_objects)
-        loss_grad[:, dim] += np.bincount(triplets[:, 1], -2 * (X[I, dim] - X[J, dim]), n_objects)
-        loss_grad[:, dim] += np.bincount(triplets[:, 2], 2 * (X[I, dim] - X[K, dim]), n_objects)
-    loss_grad = loss_grad + lambd * 2 * X
-
-    return loss, loss_grad.ravel()
-
-
-def _gnmds_kernel_loss_torch(kernel_matrix, triplets, lambd):
-    triplets = triplets.long()
-    diag = kernel_matrix.diag()[:, None]
-    dist = -2 * kernel_matrix + diag + diag.transpose(0, 1)
-    d_ij = dist[triplets[:, 0], triplets[:, 1]].squeeze()
-    d_ik = dist[triplets[:, 0], triplets[:, 2]].squeeze()
-    return (d_ij - d_ik).clamp(min=0).sum() + lambd * kernel_matrix.trace()
-
-
-def _gnmds_x_loss_torch(embedding, triplets, lambd, p=2.):
-    import torch  # Pytorch is an optional dependency
-
-    X = embedding[triplets.long()]
-    I, J, K = X[:, 0, :], X[:, 1, :], X[:, 2, :]
-    sqnorm_near = torch.linalg.vector_norm(I - J, ord=p, dim=1)**2
-    sqnorm_far = torch.linalg.vector_norm(I - K, ord=p, dim=1)**2
-    loss = (sqnorm_near + 1 - sqnorm_far).clamp(min=0).sum()
-
-    return loss + lambd * (X**2).sum()
+    def _torch_loss(self, embedding, triplets, dist_pos, dist_neg, *args):
+        loss = (dist_pos**2 + 1 - dist_neg**2).clamp(min=0)
+        return loss.mean() + self.lambd * (embedding**2).mean()

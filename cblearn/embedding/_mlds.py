@@ -8,10 +8,10 @@ from scipy.stats import norm
 from scipy.optimize import minimize
 
 from cblearn import utils
-from cblearn.embedding._base import TripletEmbeddingMixin
+from cblearn.embedding._base import QuadrupletEmbeddingMixin
 
 
-class MLDS(BaseEstimator, TripletEmbeddingMixin):
+class MLDS(BaseEstimator, QuadrupletEmbeddingMixin):
     """ A maximum-likelihood difference scaling (MLDS) estimator .
 
     MLDS [1]_ is limited to monotonic, one-dimensional embeddings.
@@ -60,21 +60,12 @@ class MLDS(BaseEstimator, TripletEmbeddingMixin):
         if n_components != 1:
             raise ValueError(f"MLDS expects n_components=1, got {n_components}")
         self.n_components = n_components
-        self.random_state = random_state
         self.method = method
-        self.verbose = verbose
-        self.max_iter = max_iter
-
-    def _log_likelihood(self, x, quadruplet, answer, float_min=np.finfo(float).tiny):
-        prob = norm.cdf((x[quadruplet[:, 0]] - x[quadruplet[:, 1]])
-                        - (x[quadruplet[:, 2]] - x[quadruplet[:, 3]]))
-        log_likelihood = (np.log(np.maximum(prob ** answer, float_min))
-                          + np.log(np.maximum((1 - prob) ** (1 - answer), float_min)))
-        return log_likelihood.sum()
-
-    def _more_tags(self):
-        tags = TripletEmbeddingMixin()._more_tags()
-        return tags
+        super().__init__(n_components=1,
+                         random_state=random_state,
+                         max_iter=max_iter,
+                         verbose=verbose,
+                         use_quadruplets=True)
 
     def fit(self, X: utils.Query, y: np.ndarray = None) -> 'MLDS':
         """Computes the embedding.
@@ -104,11 +95,8 @@ class MLDS(BaseEstimator, TripletEmbeddingMixin):
             self.log_likelihood_ = glm.predict_log_proba(X01)[rows, answer].mean()
             self.n_iter_ = glm.n_iter_
         elif self.method.lower() == 'optim':
-            def objective(*args):
-                return -self._log_likelihood(*args)
-
             init = np.linspace(0, 1, n_objects)
-            result = minimize(objective, init, args=(quads, answer),
+            result = minimize(self._scipy_loss, init, args=(quads, answer),
                               method='L-BFGS-B', options=dict(maxiter=self.max_iter, disp=self.verbose))
             if self.verbose and not result.success:
                 print(f"MLDS's optimization failed with reason: {result.message}.")
@@ -120,3 +108,10 @@ class MLDS(BaseEstimator, TripletEmbeddingMixin):
 
         self.embedding_ -= self.embedding_.min()
         return self
+
+    def _scipy_loss(self, x, quadruplet, answer, float_min=np.finfo(float).tiny):
+        prob = norm.cdf((x[quadruplet[:, 0]] - x[quadruplet[:, 1]])
+                        - (x[quadruplet[:, 2]] - x[quadruplet[:, 3]]))
+        log_likelihood = (np.log(np.maximum(prob ** answer, float_min))
+                          + np.log(np.maximum((1 - prob) ** (1 - answer), float_min)))
+        return -log_likelihood.mean()

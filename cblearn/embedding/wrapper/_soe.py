@@ -6,14 +6,14 @@ import numpy as np
 
 import cblearn as cbl
 from cblearn import utils
-from cblearn.embedding._base import TripletEmbeddingMixin
+from cblearn.embedding._base import QuadrupletEmbeddingMixin
 from cblearn.embedding.wrapper._r_base import RWrapperMixin
 
 
 __doctest_requires__ = {'SOE': ['rpy2']}
 
 
-class SOE(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
+class SOE(BaseEstimator, QuadrupletEmbeddingMixin, RWrapperMixin):
     """ A soft ordinal embedding estimator, wrapping an R implementation.
 
         The wrapped R package is the reference implementation of SOE [1]_.
@@ -106,7 +106,7 @@ class SOE(BaseEstimator, TripletEmbeddingMixin, RWrapperMixin):
 
     def _more_tags(self):
         return {
-            **TripletEmbeddingMixin._more_tags(self),
+            **QuadrupletEmbeddingMixin._more_tags(self),
             'Xfail': [
                 'check_transformer_n_iter',  # the R package does not return n_iter
             ]

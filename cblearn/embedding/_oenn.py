@@ -5,11 +5,11 @@ from sklearn.base import BaseEstimator
 from sklearn.utils import check_random_state
 
 from cblearn import utils
-from cblearn.embedding._base import TripletEmbeddingMixin
+from cblearn.embedding._base import QuadrupletEmbeddingMixin
 from cblearn.embedding._torch_utils import assert_torch_is_available, torch_device
 
 
-class OENN(BaseEstimator, TripletEmbeddingMixin):
+class OENN(BaseEstimator, QuadrupletEmbeddingMixin):
     """ Ordinal Embedding Neural Network (OENN).
 
         OENN [1]_ learns a dense neural network, that maps from the
@@ -81,7 +81,7 @@ class OENN(BaseEstimator, TripletEmbeddingMixin):
         self.device = device
 
     def _more_tags(self):
-        tags = TripletEmbeddingMixin()._more_tags()
+        tags = QuadrupletEmbeddingMixin()._more_tags()
         return tags
 
     def _make_emb_net(self, input_dim: int, layer_width: int, hidden_layers: int = 3):
