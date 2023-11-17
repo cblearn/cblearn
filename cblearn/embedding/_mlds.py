@@ -80,7 +80,7 @@ class MLDS(BaseEstimator, QuadrupletEmbeddingMixin):
         random_state = check_random_state(self.random_state)
         n_objects = X.max() + 1
 
-        quads, answer = super()._prepare_data(X, y, quadruplets=True)
+        quads, answer = super()._prepare_data(X, y, quadruplets=True, return_y=True)
         answer = (answer > 0).astype(int)
         if self.method.lower() == 'glm':
             X01, rows = np.zeros((len(quads), n_objects)), np.arange(len(quads))
