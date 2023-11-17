@@ -7,3 +7,4 @@ from cblearn.embedding._oenn import OENN
 from cblearn.embedding._mlds import MLDS
 
 from cblearn.embedding._align import procrustes_alignment
+from cblearn.embedding._align import procrustes_standardize
