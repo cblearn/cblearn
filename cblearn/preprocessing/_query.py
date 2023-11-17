@@ -48,7 +48,7 @@ def triplets_from_multiselect(X: np.ndarray, select: Union[np.ndarray, int], is_
     return np.concatenate(X[:, ix_array])
 
 
-def triplets_from_oddoneout(X: np.ndarray, y: Optional[np.ndarray] = None) -> np.ndarray:
+def triplets_from_oddoneout(X: np.ndarray, y: Optional[np.ndarray] = None, return_index: bool = False) -> np.ndarray:
     """ Calculates triplets from odd-one-out queries.
 
     The odd-one-out query consists of k objects, of which one
@@ -62,6 +62,7 @@ def triplets_from_oddoneout(X: np.ndarray, y: Optional[np.ndarray] = None) -> np
         X: Array of odd-one-out queries (n_query, n_choices)
         y: Optional list of indices, that indicate the odd choice per query.
            If omitted, the first entry is assumed to be the odd object.
+        return_index: If true, return an array of indices that indicates the original query of each triplet.
     Returns:
         triplets: Array of triplet queries (n_query * (n_choices - 2) * (n_choices - 1), 3)
     """
@@ -74,12 +75,19 @@ def triplets_from_oddoneout(X: np.ndarray, y: Optional[np.ndarray] = None) -> np
     far = X[mask]
     others = X[~mask].reshape(X.shape[0], X.shape[1] - 1)
     triplets = []
+    index = []
     for other_ix in permutations(np.arange(others.shape[1]), 2):
         triplets.append(np.c_[others[:, other_ix], far])
-    return np.row_stack(triplets)
+        if return_index:
+            index.append(np.arange(len(X)))
+
+    if return_index:
+        return np.row_stack(triplets), np.concatenate(index)
+    else:
+        return np.row_stack(triplets)
 
 
-def triplets_from_mostcentral(X: np.ndarray, y: Optional[np.ndarray] = None) -> np.ndarray:
+def triplets_from_mostcentral(X: np.ndarray, y: Optional[np.ndarray] = None, return_index: bool = False) -> np.ndarray:
     """ Calculates triplets from most-central queries.
 
     The most-central query consists of k objects, of which one
@@ -93,8 +101,13 @@ def triplets_from_mostcentral(X: np.ndarray, y: Optional[np.ndarray] = None) -> 
         X: Array of most-central queries (n_query, n_choices)
         y: Optional list of indices, that indicate the central choice per query.
            If omitted, the first entry is assumed to be the odd object.
+        return_index: If true, return an array of indices that indicates the original query of each triplet.
     Returns:
         triplets: Array of triplet queries (n_query * (n_choices - 2) * (n_choices - 1), 3)
     """
-    triplets = triplets_from_oddoneout(X, y)
-    return triplets[:, [0, 2, 1]]
+    if return_index:
+        triplets, index = triplets_from_oddoneout(X, y, return_index=True)
+        return triplets[:, [0, 2, 1]], index
+    else:
+        triplets = triplets_from_oddoneout(X, y, return_index=False)
+        return triplets[:, [0, 2, 1]]

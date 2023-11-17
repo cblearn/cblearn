@@ -72,20 +72,16 @@ class QuadrupletEmbeddingMixin(TransformerMixin, ClassifierMixin):
             X: (n_samples, n_features), Validated training data.
             y: (n_samples,), Validated target values.
         """
-        sample_weight = _check_sample_weight(sample_weight, X)
+        checked_sample_weight = _check_sample_weight(sample_weight, X)
 
         if y is None:
             self.classes_ = np.array([-1, 1])
         else:
             y = column_or_1d(y, warn=True)
             self.classes_, y = np.unique(y, return_inverse=True)
+            if len(self.classes_) != 2:
+                raise ValueError(f"Expected 2 classes in responses y, got {len(self.classes_)}")
             y = np.array([-1, 1])[y]
-        if len(self.classes_) < 2:
-            raise ValueError(
-                "This solver needs samples of 2 classes"
-                " in the data, but the data contains only one"
-                " class: %r" % self.classes_[0]
-            )
 
         if quadruplets:
             result = cbl.check_quadruplets(X, y, return_y=return_y)
@@ -95,7 +91,7 @@ class QuadrupletEmbeddingMixin(TransformerMixin, ClassifierMixin):
         if sample_weight is None:
             return result
         else:
-            return (result, sample_weight)
+            return (result, checked_sample_weight)
 
     def transform(self, X: Comparison = None, y: Optional[ArrayLike] = None) -> np.ndarray:
         check_is_fitted(self, 'embedding_')
