@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 def fetch_car_similarity(data_home: Optional[os.PathLike] = None, download_if_missing: bool = True,
+                         load_images: bool = False,
                          shuffle: bool = True, random_state: Optional[np.random.RandomState] = None,
                          return_triplets: bool = False) -> Union[Bunch, np.ndarray]:
     """ Load the 60-car dataset (most-central triplets).
@@ -33,11 +34,13 @@ def fetch_car_similarity(data_home: Optional[os.PathLike] = None, download_if_mi
 
     See :ref:`central_car_dataset` for a detailed description.
 
-    >>> dataset = fetch_car_similarity(shuffle=False)  # doctest: +REMOTE_DATA
+    >>> dataset = fetch_car_similarity(shuffle=False, load_images=True)  # doctest: +REMOTE_DATA
     >>> dataset.class_name.tolist()  # doctest: +REMOTE_DATA
     ['OFF-ROAD / SPORT UTILITY VEHICLES', 'ORDINARY CARS', 'OUTLIERS', 'SPORTS CARS']
     >>> dataset.triplet.shape  # doctest: +REMOTE_DATA
     (7097, 3)
+    >>> dataset.images.shape
+    (60, 180, 280, 3)
     >>> rounds, round_count = np.unique(dataset.survey_round, return_counts=True)  # doctest: +REMOTE_DATA
     >>> len(rounds), round_count.min(), round_count.max()  # doctest: +REMOTE_DATA
     (146, 30, 50)
@@ -46,6 +49,10 @@ def fetch_car_similarity(data_home: Optional[os.PathLike] = None, download_if_mi
         data_home : optional, default: None
             Specify another download and cache folder for the datasets. By default
             all scikit-learn data is stored in '~/scikit_learn_data' subfolders.
+        load_images :
+            Load images and add them to the file.
+
+            Required additional dependency matplotlib
         download_if_missing : optional, default=True
         shuffle: default = True
             Shuffle the order of triplet constraints.
@@ -63,6 +70,8 @@ def fetch_car_similarity(data_home: Optional[os.PathLike] = None, download_if_mi
                 The columns represent the three indices shown per most-central question.
             response : ndarray, shape (n_triplets, )
                 The car per question (0, 1, or 2) that was selected as "most-central".
+            images: ndarray, shape (60, 180, 280, 3)
+                Images of the car stimuli.
             survey_round : ndarray of int, shape (n_triplets, )
                 Survey rounds, grouping responses from a participant during a session.
                 Some participants responded in multiple rounds at different times.
@@ -97,10 +106,29 @@ def fetch_car_similarity(data_home: Optional[os.PathLike] = None, download_if_mi
             with zf.open('60_cars_data/survey_data.csv', 'r') as f:
                 survey_data = np.loadtxt(f, dtype=str, delimiter=',', skiprows=1)
 
-        joblib.dump(survey_data, filepath, compress=6)
+            if load_images:
+                try:
+                    import matplotlib.image as mpimg
+                except ImportError:
+                    raise ImportError("Requires matplotlib to load the image files.")
+                images = np.empty((60, 180, 280, 3), dtype='uint8')
+                for i in range(60):
+                    with zf.open(f'60_cars_data/car_data_set_images/{i + 1}.jpg', 'r') as f:
+                        images[i] = mpimg.imread(f)
+            else:
+                images = None
+
+        joblib.dump((survey_data, images), filepath, compress=6)
         os.remove(archive_path)
     else:
-        survey_data = joblib.load(filepath)
+        cache = joblib.load(filepath)
+        if isinstance(cache, tuple):
+            survey_data, images = cache
+        else:  # backwards compatibility
+            survey_data, images = cache, None
+
+    if images is None and load_images:
+        raise ValueError(f"Cannot load images from cached file.\nConsider cleaning cache {filepath}.")
 
     class_map = {
         'ORDINARY CARS': [2, 6, 7, 8, 9, 10, 11, 12, 16, 17, 25, 32, 35, 36, 37, 38,
@@ -135,6 +163,7 @@ def fetch_car_similarity(data_home: Optional[os.PathLike] = None, download_if_mi
     return Bunch(triplet=triplets,
                  response=response,
                  survey_round=survey_round,
+                 images=images,
                  rt=rt,
                  class_id=classes,
                  class_name=class_names,
