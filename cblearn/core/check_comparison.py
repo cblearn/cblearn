@@ -21,13 +21,16 @@ def check_quadruplets(X: Comparison, y: Optional[ArrayLike] = None,
         sparse: Whether to return a sparse comparison array (implies return_y=False).
         force_quadruplets: Whether to force comparisons of shape (n, 4).
         canonical: Whether to sort the comparisons in the canonical format a<b, c<d and a<c.
-                   Expects return_y=True 
+                   Expects return_y=True
         """
     X, y = asdense(X, y, multi_output=False)
-    if X.shape[1] == 3 and not force_quadruplets:
+    if X.shape[1] == 3:
+        if force_quadruplets:
+            raise ValueError(f"""Expects X with 4 columns, got shape={X.shape}."""
+                             """ To automatically cast triplets, set force_quadruplet=False""")
         X = X[:, [1, 0, 0, 2]]
     elif X.shape[1] != 4:
-        raise ValueError("X must have 3 or 4 columns.")
+        raise ValueError(f"""Expects X with 3 or 4 columns, got shape={X.shape}.""")
 
     if y is not None:
         y = y.astype(int)
