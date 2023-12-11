@@ -19,26 +19,26 @@ def procrustes_standardize(reference, standardize_rotation):
     return reference, reference_center, reference_scale
 
 
-def procrustes_alignment(embeddings: list[ArrayLike], return_disparity=False,
-                         keep_reference=False, standardize_rotation=True):
-    """Align multiple embeddings using procrustes alignment.
+def generalized_procrustes(embeddings: list[ArrayLike], initial_reference=None,
+                           threshold: float = 1e-6, max_iter=100):
+    """Align multiple embeddings using the generalized procrustes analysis.
 
     The procrustes alignment is the translation, rotation (including flipping), and scaling
     that minimizes the sum of squared errors between two standardized embeddings (Froebenius norm).
-    The alignment is pairwise calculated between the first embedding (the reference) and the others.
 
     The embeddings are standardizes by centering on their mean, scaling by the Froebenius norm,
     and rotating to the support vectors of the reference embedding.
+    The returned reference is the center of all embeddings in the previous iteration.
+    The disparity is the sum of squared residuals between the
+    center of aligned embeddings and the reference.
 
     Args:
         embeddings: List of embeddings to align (first entry is the reference).
-        keep_reference: Do not standardize the reference before alignment.
-        standardize_rotation: Standardize rotation of the reference embedding,
-                              used only if keep_reference is False.
-        return_disparity: Return list of disparity between reference and aligned embeddings.
+        initial_reference: Initial reference embedding (default: first embedding).
+        threshold: Stop alignment when the mean disparity is below this threshold.
+        max_iter: Maximum number of iterations.
     Returns:
-        Aligned embeddings.
-        Tuple of aligned embeddings and disparities, if return_disparity is True.
+        (reference, aligned_embeddings, disparities)
 
     >>> A = np.random.rand(10, 2)
     >>> B = A * 0.3 + 0.5  # scale, then translate
@@ -46,37 +46,41 @@ def procrustes_alignment(embeddings: list[ArrayLike], return_disparity=False,
     >>> rotation_matrix = np.array([[np.cos(angle_radians), -np.sin(angle_radians)],
     ...                             [np.sin(angle_radians), np.cos(angle_radians)]])
     >>> C = np.dot(A, rotation_matrix) * 50 + 2  # rotate, scale, translate
-    >>> (a, b, c), disp = procrustes_alignment([A, B, C], return_disparity=True)
+    >>> ref, (a, b, c), disp = generalized_procrustes([A, B, C])
     >>> np.allclose(a, b), np.allclose(a, c), np.allclose(b, c), np.allclose(disp, [0, 0])
     (True, True, True, True)
-    >>> (a, b, c), disp = procrustes_alignment([A, B, C], return_disparity=True, keep_reference=True)
-    >>> np.allclose(A, a), np.allclose(a, b), np.allclose(a, c), np.allclose(b, c), np.allclose(disp, [0, 0])
-    (True, True, True, True, True)
     """
-    reference = np.array(embeddings[0], dtype=np.double, copy=True)
-
-    others = []
-    for e in embeddings[1:]:
-        others.append(np.array(e, dtype=np.double, copy=True))
-    reference, reference_center, reference_scale = procrustes_standardize(
-        reference, not keep_reference and standardize_rotation)
-
-    # align others translation, scale, rotation
-    for other in others:  # inplace operations
-        other -= np.mean(other, 0)
-        other /= np.linalg.norm(other)
-        R, scale = orthogonal_procrustes(reference, other)
-        other[:] = (other @ R.T) * scale
-        if keep_reference:
-            other *= reference_scale
-            other += reference_center
-
-    if keep_reference:
-        reference *= reference_scale
-        reference += reference_center
-
-    if return_disparity:
-        disparities = np.array([((reference - other)**2).sum() for other in others])
-        return np.array([reference] + others), disparities
+    if initial_reference is None:
+        reference = embeddings[0]  # arbitrary choice
     else:
-        return np.array([reference] + others)
+        reference = initial_reference
+    reference, __, __ = procrustes_standardize(reference, True)
+
+    embeddings_ = np.empty((len(embeddings), *reference.shape), dtype=np.double)
+    for i in range(len(embeddings)):
+        embeddings_[i, :, :] = np.asarray(embeddings[i])
+        embeddings_[i] -= np.mean(embeddings_[i], 0)
+        embeddings_[i] /= np.linalg.norm(embeddings_[i])
+
+    # initial alignment to arbitrary embedding
+    for e in embeddings_:
+        R, scale = orthogonal_procrustes(reference, e)
+        e[:] = (e @ R.T) * scale
+    center = np.mean(embeddings_, 0)
+    prev_disparity = ((reference - center)**2).sum()
+    reference = center
+
+    # iterative alignment to center of embeddings
+    for _ in range(max_iter):
+        for e in embeddings_:
+            R, scale = orthogonal_procrustes(reference, e)
+            e[:] = (e @ R.T) * scale
+        center = np.mean(embeddings_, 0)
+        disparity = ((reference - center)**2).sum()
+        if (prev_disparity - disparity) > threshold:
+            prev_disparity = disparity
+            reference = center
+        else:
+            break
+
+    return reference, embeddings_, disparity
