@@ -101,12 +101,12 @@ class SOE(BaseEstimator, QuadrupletEmbeddingMixin):
             n_init=n_init,
             use_quadruplets=True)
 
-    def _scipy_loss(self, embedding, quads, dist_pos, dist_neg, *args):
+    def _scipy_loss(self, embedding, quads, dist_pos, dist_neg, sample_weight, *args):
         """ Loss equation (1) of Terada & Luxburg (2014)
          and Gradient of the loss function.
          """
         # OBJECTIVE #
-        differences = (dist_pos - dist_neg + self.margin)
+        differences = sample_weight * (dist_pos - dist_neg + self.margin)
         stress = (np.maximum(differences, 0)**2)
 
         # GRADIENT #
@@ -133,6 +133,7 @@ class SOE(BaseEstimator, QuadrupletEmbeddingMixin):
         np.add.at(grad, j, double_dist * (-Xij - np.where(j_is_k, Xjl, np.where(j_is_l, Xjk, 0))))
         np.add.at(grad, k, double_dist * np.where(i_is_k | j_is_k, 0, -Xkl))
         np.add.at(grad, l, double_dist * np.where(i_is_l | j_is_l, 0, Xkl))
+
         return stress.mean(), grad.ravel() / len(quads)
 
     def _torch_loss(self, embedding, quads, dist_pos, dist_neg, *args):
