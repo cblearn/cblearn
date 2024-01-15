@@ -33,7 +33,7 @@ Extras Requirements
 
 The installation routine above installs a minimal set of required packages, sufficient
 for most uses.
-However, some features require more packages that can be installed by adding 
+However, some features require more packages that can be installed by adding
 an `option` to the install command..
 
 For example, to use estimators on GPU, based on ``pytorch``, and estimators
@@ -66,6 +66,16 @@ This way, changes in the code are directly considered without the need for re-in
 
 .. code-block:: bash
 
-    $ git clone git@github.com/cblearn/cblearn.git
+    $ git clone git@github.com:cblearn/cblearn.git
     $ cd cblearn
-    $ pip install -e.[tests,docs]
+    $ pip install -e.[tests,docs,torch,wrapper]
+
+The ``-e`` option installs the package in developer mode such that changes in the code are considered directly without re-installation.
+Now you can run the tests and build the documentation:
+
+.. code-block:: bash
+
+    $ python -m pytest --remote-data  # should run all tests; this can take a while.
+
+    $ cd docs
+    $ make html  # should generate docs/_build/html/index.html
