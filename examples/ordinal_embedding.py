@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 r"""
+.. _example_ordinal_embedding:
 Ordinal Embedding
 =================
 
