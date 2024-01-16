@@ -114,10 +114,9 @@ def fetch_imagenet_similarity(data_home: Optional[os.PathLike] = None, download_
                 import h5py
             except ImportError:
                 raise ImportError(
-                    "This function needs the extra package 'h5py' but could not find it. "
-                    "The package can be installed with pip install h5py."
-                    "On some platforms you might have to install hdf5 libraries separately.
-                    "")
+                    "This function needs the extra package 'h5py' but could not find it.\n"
+                    "The package can be installed with pip install h5py.\n"
+                    "On some platforms you might have to install hdf5 libraries separately.")
 
             with zf.open('data/deprecated/psiz0.4.1/obs-118.hdf5', 'r') as f:
                 data_v1 = {k: np.asarray(v[()]) for k, v in h5py.File(f, mode='r').items()}

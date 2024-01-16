@@ -55,9 +55,10 @@ wrapper
     The ``R`` packages are installed automatically upon the first use of the estimators.
 
 h5py
-    The function :func:`cblearn.datasets.fetch_imagenet_similarity` requires the ``h5py`` package to be installed.
-    This can be done by adding the ``h5py`` option to the install command.
-    Note that some platforms require additionally the ``hdf5`` package to be installed `manually <https://www.hdfgroup.org/downloads/hdf5/>`_.
+    The function :func:`cblearn.datasets.fetch_imagenet_similarity` requires the ``h5py`` package to load the dataset.
+    This can package can be installed with pip.
+    Note that some platforms require additionally the ``hdf5`` libraries to be installed
+     `manually <https://www.hdfgroup.org/downloads/hdf5/>`_.
 
 
 .. _developer_install:
