@@ -144,6 +144,7 @@ def estimate_dimensionality_cv(estimator, queries, responses=None,
           result: A result object with the estimated dimension and other information.
 
         Examples:
+
         >>> from cblearn.embedding import estimate_dimensionality_cv
         >>> from cblearn.embedding import SOE
         >>> from cblearn.datasets import make_random_triplets
