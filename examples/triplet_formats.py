@@ -51,7 +51,11 @@ print(f"triplet_spmatrix[i, j, k]="
 
 def time_convert_triplet(triplets, to_format):
     time_start = time.process_time()
-    check_query_response(triplets, result_format=to_format)
+    if len(triplets) == 2:
+        triplets, answers = triplets
+        check_query_response(triplets, answers, result_format=to_format)
+    else:
+        check_query_response(triplets, result_format=to_format)
     return (time.process_time() - time_start)
 
 
