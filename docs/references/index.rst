@@ -88,6 +88,7 @@ Utility
     DimensionEstimationResult
 
 
+.. _references_embedding_wrapper:
 Wrapper
 -------
 
