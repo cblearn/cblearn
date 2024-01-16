@@ -5,9 +5,11 @@ Ordinal Embedding
 
 Ordinal embedding algorithms are used to estimate d-dimensional Euclidean coordinates from comparison data.
 
-So in this example, we first generate some triplet comparisons from Euclidean points.
-In the usual applications of ordinal embedding algorithms, these true points cannot be determined and are unknown.
-We try to reconstruct the original points from the comparisons and quantify how good this works.
+In this example, we first generate some triplet comparisons from Euclidean points.
+If you want to use triplets from a human experiment, these ground-truth points are actually unknown.
+
+We try to reconstruct the points from the comparisons and quantify. As we know the ground-truth points here,
+we can evaluate how good this works.
 """
 from sklearn.datasets import make_blobs
 from cblearn.datasets import make_random_triplets
@@ -23,7 +25,7 @@ print(f"Triplet comparisons: {triplets.shape}")
 # %%
 # The ordinal embedding estimators in cblearn follow the interface of scikit-learn's transformers.
 # Let's estimate coordinates in a 2-dimensional and in a 3-dimensional Euclidean space.
-from cblearn.embedding.wrapper import SOE  # noqa: E402 linter ignore import not at top of file
+from cblearn.embedding import SOE  # noqa: E402 linter ignore import not at top of file
 
 
 transformer_2d = SOE(n_components=2)
