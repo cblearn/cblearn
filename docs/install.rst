@@ -38,7 +38,7 @@ Some of those extra dependencies need non-Python packages to be installed first.
 
 .. code-block:: bash
 
-    $ pip install cblearn[torch,wrapper]
+    $ pip install cblearn[torch,wrapper] h5py
 
 
 torch
@@ -54,6 +54,10 @@ wrapper
     Additionally, this requires an installed ``R`` interpreter whit must available be in the ``PATH`` environment variable.
     The ``R`` packages are installed automatically upon the first use of the estimators.
 
+h5py
+    The function :func:`cblearn.datasets.fetch_imagenet_similarity` requires the ``h5py`` package to be installed.
+    This can be done by adding the ``h5py`` option to the install command.
+    Note that some platforms require additionally the ``hdf5`` package to be installed `manually <https://www.hdfgroup.org/downloads/hdf5/>`_.
 
 
 .. _developer_install:
