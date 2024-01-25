@@ -144,6 +144,7 @@ def estimate_dimensionality_cv(estimator, queries, responses=None,
           result: A result object with the estimated dimension and other information.
 
         Examples:
+
         >>> from cblearn.embedding import estimate_dimensionality_cv
         >>> from cblearn.embedding import SOE
         >>> from cblearn.datasets import make_random_triplets
@@ -154,8 +155,8 @@ def estimate_dimensionality_cv(estimator, queries, responses=None,
         >>> dim_result = estimate_dimensionality_cv(estimator, triplets, test_dimensions=[1, 2, 3], n_splits=5, refit=True)
         >>> dim_result.estimated_dimension
         2
-        >>> estimator.embedding_.shape
-        (15, 2)
+        >>> true_embedding.shape == estimator.embedding_.shape
+        True
         >>> dim_result.plot_scores()
 
 

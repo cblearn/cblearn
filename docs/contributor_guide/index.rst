@@ -27,7 +27,6 @@ a `tests` folder with unit tests.
 There should be such a test for every method and function.
 Use ``pytest --cov`` to run these tests and to measure the coverage; no tests should fail.
 The coverage indicates the tested fraction of code and should be close to *100%*.
-You can exclude some of the more time expensive tests by ``pytest -m "not (sklearn or download)``.
 
 All Python code follows the `PEP8 Style Guide`_. The style
 of all code can be checked, running ``flake8 .`` and should print no warnings.
@@ -43,6 +42,25 @@ Typechecks can be performed using ``mypy cblearn``.
 .. _PEP8 Style Guide: https://www.python.org/dev/peps/pep-0008/
 .. _Google Docstring Style: https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html
 .. _type hints: https://docs.python.org/3/library/typing.html
+
+Remote data tests
+-----------------
+Tests that require remote data, for example fetching a dataset from the internet, are marked with ``@pytest.mark.remote_data``
+or ``+REMOTE_DATA`` (docstring).
+These tests are skipped by default but can be run by adding the ``--remote-data`` flag to ``pytest``.
+
+Scikit-learn estimator tests
+----------------------------
+``scikit-learn`` provides a test suite that should ensure the compatibility of estimators.
+We use this test suite to test our estimators, too, but have to skip some tests because they use artificial data incompatible
+to comparison data. Typically, ``cblearn`` estimators are compatible with ``scikit-learn`` estimators
+if comparisons are represented as ``numpy`` arrays. From an API perspective,
+comparison arrays look like discrete features and class labels; however, not all discrete features and class labels are valid comparisons.
+
+In the future scikit-learn might simplify the usage of custom data generation routines during the compatibility tests.
+Otherwise, we might replace those incompatible tests with our own.
+
+All sklearn estimator tests can be skipped with ``pytest -m "not sklearn``.
 
 ----------------------
 Changing Documentation
@@ -96,7 +114,7 @@ Usually, after some iterations, your changes will be merged into the ``main`` br
 
 
 Versions should be semantic and follow PIP440_: The version indicates ``major.minor.fix``;
-breaking changes are just allowed with major version steps. 
+breaking changes are just allowed with major version steps.
 A Github release tag indicates a new version, which triggers a continuous deployment to PyPI via Github Actions.
 
 .. _PIP440: https://peps.python.org/pep-0440/

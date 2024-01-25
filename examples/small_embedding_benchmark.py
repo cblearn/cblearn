@@ -37,8 +37,8 @@ def benchmark_embedding(embedding, n_dims):
     print(f"{estimator}: test  acc {np.mean(test_accs):.2f} (sd: {np.std(test_accs):.2f})")
 
 
-n_samples = 100
-n_triplets = 1_000
+n_samples, n_triplets = 10, 100
+#  n_samples, n_triplets = 100, 1_000   # uncomment to use 10x more data
 n_repeat = 10
 estimator = embedding.SOE(1, n_init=1)
 
@@ -52,4 +52,3 @@ estimator = embedding.SOE(1, n_init=10)
 benchmark_embedding(estimator, n_dims=1)
 benchmark_embedding(estimator, n_dims=3)
 benchmark_embedding(estimator, n_dims=10)
-

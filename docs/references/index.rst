@@ -79,7 +79,7 @@ Low-level Dataset Utility
 Utility
 -------
 
-.. automodule:: cblearn.embedding
+.. currentmodule:: cblearn.embedding
 
 .. autosummary::
     :toctree: generated/
@@ -88,6 +88,7 @@ Utility
     DimensionEstimationResult
 
 
+.. _references_embedding_wrapper:
 Wrapper
 -------
 
@@ -143,7 +144,7 @@ Wrapper
     preprocessing.triplets_from_multiselect
     preprocessing.triplets_from_oddoneout
     preprocessing.triplets_from_mostcentral
-    preprocessing.SharedLabelEncoder
+    preprocessing.SharedColumnEncoder
     preprocessing.MultiColumnLabelEncoder
 
 :mod:`cblearn.utils` Utility
