@@ -1,7 +1,7 @@
 # cblearn
 ## Comparison-based Machine Learning in Python
 [![PyPI version](https://img.shields.io/pypi/v/cblearn.svg)](https://pypi.python.org/pypi/cblearn)
-[![Documentation](https://readthedocs.org/projects/cblearn/badge/?version=latest)](https://cblearn.readthedocs.io/en/latest/?badge=latest)
+[![Documentation](https://readthedocs.org/projects/cblearn/badge/?version=stable)](https://cblearn.readthedocs.io/en/stable/?badge=stable)
 [![Test status](https://github.com/cblearn/cblearn/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/cblearn/cblearn/actions/workflows/test.yml)
 [![Test Coverage](https://codecov.io/gh/cblearn/cblearn/branch/master/graph/badge.svg?token=P9JRT6OK6O)](https://codecov.io/gh/cblearn/cblearn)
 
@@ -36,14 +36,14 @@ embedding = estimator.fit_transform(triplets)
 print(f"The embedding has shape {embedding.shape}.")
 ```
 
-Please try the [Examples](https://cblearn.readthedocs.io/en/latest/generated_examples/index.html).
+Please try the [Examples](https://cblearn.readthedocs.io/en/stable/generated_examples/index.html).
 
 ## Getting Started
 
-Install cblearn as described [here](https://cblearn.readthedocs.io/en/latest/install.html) and try the [examples](https://cblearn.readthedocs.io/en/latest/generated_examples/index.html).
+Install cblearn as described [here](https://cblearn.readthedocs.io/en/stable/install.html) and try the [examples](https://cblearn.readthedocs.io/en/stable/generated_examples/index.html).
 
 Find a theoretical introduction to comparison-based learning, the datatypes, 
-algorithms, and datasets in the [User Guide](https://cblearn.readthedocs.io/en/latest/user_guide/index.html).
+algorithms, and datasets in the [User Guide](https://cblearn.readthedocs.io/en/stable/user_guide/index.html).
 
 ## Features
 
@@ -79,7 +79,7 @@ of your comparison datasets. In addition, some functions download and load multi
 ## Contribute
 
 We are happy about your bug reports, questions or suggestions as Github Issues and code or documentation contributions as Github Pull Requests. 
-Please see our [Contributor Guide](https://cblearn.readthedocs.io/en/latest/contributor_guide/index.html). 
+Please see our [Contributor Guide](https://cblearn.readthedocs.io/en/stable/contributor_guide/index.html). 
 
 ## Authors and Acknowledgement
 *cblearn* was initiated by current and former members of the [Theory of Machine Learning group](http://www.tml.cs.uni-tuebingen.de/index.php) of Prof. Dr. Ulrike von Luxburg at the University of Tübingen.
