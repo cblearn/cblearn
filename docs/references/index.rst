@@ -29,6 +29,8 @@ Loaders
     datasets.fetch_vogue_cover_similarity
     datasets.fetch_things_similarity
     datasets.fetch_similarity_matrix
+    datasets.BaseManifold
+    datasets.LinearSubspace
 
 
 Simulations
