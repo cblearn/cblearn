@@ -19,6 +19,20 @@ class Distance(enum.Enum):
     PRECOMPUTED = 'precomputed'
 
 
+def _count_unique_items(query):
+    """ Count unique items per row in a 2D array.
+
+    Efficient approach even for large number of rows
+    and integer items:
+    https://stackoverflow.com/a/48473125
+    """
+    n = query.max()+1
+    a_off = query + n * (np.arange(query.shape[0])[:, None])
+    min_length = query.shape[0] * n
+    bincounts = np.bincount(a_off.ravel(), minlength=min_length).reshape(-1, n)
+    return (bincounts != 0).sum(1)
+
+
 def noisy_triplet_response(triplets: utils.Query, embedding: np.ndarray, result_format: Optional[str] = None,
                            noise: Union[None, str, Callable] = None, noise_options: Dict = {},
                            noise_target: Union[str, NoiseTarget] = 'differences',
@@ -73,6 +87,13 @@ def noisy_triplet_response(triplets: utils.Query, embedding: np.ndarray, result_
     result_format = utils.check_format(result_format, triplets, None)
     triplets: np.ndarray = utils.check_query(triplets, result_format=utils.QueryFormat.LIST)
     embedding = check_array(embedding)
+    if triplets.shape[1] != 3:
+        raise ValueError("Triplets require 3 columns.")
+    if (triplets < 0).any() or (triplets >= embedding.shape[0]).any():
+        raise ValueError("Triplet indices must be within the range of the embedding.")
+    if (_count_unique_items(triplets) != 3).any():
+        raise ValueError("Triplets must contain unique indices.")
+
     if isinstance(noise, str):
         random_state = check_random_state(random_state)
         noise_fun: Callable = getattr(random_state, noise)
