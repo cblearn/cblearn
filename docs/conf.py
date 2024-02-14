@@ -49,7 +49,7 @@ autodoc_typehints_description_target = 'documented'
 
 sphinx_gallery_conf = {
      'examples_dirs': '../examples',   # path to your example scripts
-     #'filename_pattern': r'.\.py',
+     'filename_pattern': r'.*\.py',  # run all .py files in the directory
      'gallery_dirs': 'generated_examples',  # path to where to save gallery generated output
 }
 

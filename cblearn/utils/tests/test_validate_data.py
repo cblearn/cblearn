@@ -35,7 +35,7 @@ def test_check_query():
 
     triplets = utils.check_query(triplets_ordered, result_format='tensor')
     assert (triplets == utils.check_query(triplets_spmatrix)).all()
-    np.testing.assert_equal(np.triu(triplets), triplets)
+    np.testing.assert_equal(np.triu(triplets).todense(), triplets.todense())
 
     triplets = utils.check_query(triplets_spmatrix, result_format='list')
     np.testing.assert_equal(triplets, triplets_explicit)

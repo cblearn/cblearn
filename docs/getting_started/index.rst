@@ -28,39 +28,47 @@ The easiest way to install Python and its dependencies is using a
 Install cblearn
 ===================
 
-``cblearn`` and its dependencies can be installed using `pip`:
+``cblearn`` and can be installed using `pip`:
 
 .. code-block:: bash
 
     pip install cblearn
 
 
+This will install the minimal set of required packages, sufficient for most uses and saving disk space.
+However, some features require more packages that can be installed by adding an ``option`` to the install command.
 
 .. _extras_install:
 
 Install Extra Requirements
 ==========================
 
-The installation routine above installs a minimal set of required packages, sufficient
-for most uses.
-However, some features require more packages that can be installed by adding
-an `option` to the install command..
-
-For example, to use estimators on GPU, based on ``pytorch``, and estimators
-wrapping paper author's original implementation in ``R``-lang:
+Extra requirements can be installed by adding an ``option`` to the install command and enable more advanced features.
+Some of those extra dependencies need non-Python packages to be installed first.
 
 .. code-block:: bash
 
-    $ pip install cblearn[torch,wrapper]
+    $ pip install cblearn[torch,wrapper] h5py
 
-======= =============================================================
-Extras  Description
-======= =============================================================
-torch   Estimators which can run on a GPU, implemented using pytorch.
-wrapper Estimators which wrap implementations in R or Matlab/Octave.
-tests   Test runner for unit tests (required to contribute).
-docs    Build the documentation (required to contribute).
-======= =============================================================
+
+torch
+    Most estimators provide an (optional) implementation using ``pytorch`` to run large datasets on CPU and GPU.
+    This requires the ``pytorch`` package to be installed `manually <https://pytorch.org/get-started/locally/>`_
+    or by adding the ``torch``` option to the install command.
+    Note that ``pytorch`` might need about 1GB of disk space.
+
+wrapper
+    The estimators in :ref:`references_embedding_wrapper` provide an Python interface to the original implementation
+    in ``R``-lang.
+    This requires the ``rpy2`` package to be installed by adding the ``wrapper`` option to the install command.
+    Additionally, this requires an installed ``R`` interpreter whit must available be in the ``PATH`` environment variable.
+    The ``R`` packages are installed automatically upon the first use of the estimators.
+
+h5py
+    The function :func:`cblearn.datasets.fetch_imagenet_similarity` requires the ``h5py`` package to load the dataset.
+    This can package can be installed with pip.
+    Note that some platforms require additionally the ``hdf5`` libraries to be installed `manually <https://www.hdfgroup.org/downloads/hdf5/>`_.
+
 
 -----------
 Quick Start

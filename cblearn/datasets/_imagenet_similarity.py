@@ -110,7 +110,13 @@ def fetch_imagenet_similarity(data_home: Optional[os.PathLike] = None, download_
         urlretrieve(ARCHIVE.url, archive_path)
 
         with zipfile.ZipFile(archive_path) as zf:
-            import h5py
+            try:
+                import h5py
+            except ImportError:
+                raise ImportError(
+                    "This function needs the extra package 'h5py' but could not find it.\n"
+                    "The package can be installed with pip install h5py.\n"
+                    "On some platforms you might have to install hdf5 libraries separately.")
 
             with zf.open('data/deprecated/psiz0.4.1/obs-118.hdf5', 'r') as f:
                 data_v1 = {k: np.asarray(v[()]) for k, v in h5py.File(f, mode='r').items()}
@@ -151,8 +157,8 @@ def fetch_imagenet_similarity(data_home: Optional[os.PathLike] = None, download_
 
     return Bunch(data=data['stimulus_set'],
                  rt_ms=data['rt_ms'],
-                 n_select=int(np.unique(data['n_select'])),
-                 is_ranked=bool(np.unique(data['is_ranked'])),
+                 n_select=int(np.unique(data['n_select'])[0]),
+                 is_ranked=bool(np.unique(data['is_ranked'])[0]),
                  session_id=data['session_id'],
                  stimulus_id=catalog['stimulus_id'],
                  stimulus_filepath=catalog['stimulus_filepath'],

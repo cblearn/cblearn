@@ -20,14 +20,32 @@ Contributors should not install the package from PyPI but from the Github reposi
 to get the latest version and to be able to manipulate the code.
 First download the repository and install the project in developer mode with
 developer dependencies.
-In the developer mode, changes in the local code files are directly considered in run scripts without re-installation.
-The developer dependencies are needed to run the tests and to build the documentation.
 
 .. code-block:: bash
 
     $ git clone git@github.com/cblearn/cblearn.git
     $ cd cblearn
     $ pip install -e.[tests,docs]
+
+The ``-e`` option installs the package in developer mode such that changes in the code are considered directly without re-installation.
+
+tests
+    To run the unit tests, the ``pytest`` package is required, which
+    can be installed by adding the ``tests`` option to the install command.
+
+docs
+    Building these docs requires the ``sphinx`` package, which can be installed by adding the `docs` option to the install command.
+
+
+Now you can run the tests and build the documentation:
+
+.. code-block:: bash
+
+    $ python -m pytest --remote-data  # should run all tests; this can take a while.
+
+    $ cd docs
+    $ make html  # should generate docs/_build/html/index.html
+
 
 The project directory contains the code directory ``cblearn/`` and the documentation ``docs/``.
 In addition, the folder contains a readme, license, multiple configuration files, and an examples folder.
@@ -41,7 +59,6 @@ a `tests` folder with unit tests.
 There should be such a test for every method and function.
 Use ``pytest --cov`` to run these tests and to measure the coverage; no tests should fail.
 The coverage indicates the tested fraction of code and should be close to *100%*.
-You can exclude some of the more time expensive tests by ``pytest -m "not (sklearn or download)``.
 
 All Python code follows the `PEP8 Style Guide`_. The style
 of all code can be checked, running ``flake8 .`` and should print no warnings.
@@ -57,6 +74,25 @@ Typechecks can be performed using ``mypy cblearn``.
 .. _PEP8 Style Guide: https://www.python.org/dev/peps/pep-0008/
 .. _Google Docstring Style: https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html
 .. _type hints: https://docs.python.org/3/library/typing.html
+
+Remote data tests
+-----------------
+Tests that require remote data, for example fetching a dataset from the internet, are marked with ``@pytest.mark.remote_data``
+or ``+REMOTE_DATA`` (docstring).
+These tests are skipped by default but can be run by adding the ``--remote-data`` flag to ``pytest``.
+
+Scikit-learn estimator tests
+----------------------------
+``scikit-learn`` provides a test suite that should ensure the compatibility of estimators.
+We use this test suite to test our estimators, too, but have to skip some tests because they use artificial data incompatible
+to comparison data. Typically, ``cblearn`` estimators are compatible with ``scikit-learn`` estimators
+if comparisons are represented as ``numpy`` arrays. From an API perspective,
+comparison arrays look like discrete features and class labels; however, not all discrete features and class labels are valid comparisons.
+
+In the future scikit-learn might simplify the usage of custom data generation routines during the compatibility tests.
+Otherwise, we might replace those incompatible tests with our own.
+
+All sklearn estimator tests can be skipped with ``pytest -m "not sklearn``.
 
 ----------------------
 Changing Documentation
