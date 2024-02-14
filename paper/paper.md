@@ -108,17 +108,19 @@ These GPU implementations can be used with large datasets and rapidly adapted th
 
 
 ## User-friendly and compatible API
-One of Python's greatest strengths is the scientific ecosystem, into which `cblearn` integrates. Our package does not only make use of this ecosystem internally but adapts their API conventions–––every user of `scikit-learn` [@pedregosa_scikit-learn_2011;@buitinck_api_2013] is already familiar with the API  of `cblearn`:
-`numpy` arrays [@harris_array_2020] are used to store comparison datasets and estimated embeddings; estimator objects use the well-known `scikit-learn` methods `.fit(X, y)`,`.transform(X)`, and `.predict(X)`. This API allows using `scikit-learn`  or third-party routines with `cblearn`'s estimators.
-Interested readers can find a code example in the Supplementary Material, which shows in just four lines how to fetch a real-world dataset, preprocess the data, estimate an embedding, and cross-validate the fit. More examples are available in the package's documentation.
+One of Python's greatest strengths is the scientific ecosystem, into which `cblearn` integrates. Our package does not only make use of this ecosystem internally but adopts their API conventions–––every user of `scikit-learn` [@pedregosa_scikit-learn_2011;@buitinck_api_2013] is already familiar with the API  of `cblearn`:
+Estimator objects use the well-known `scikit-learn` methods `.fit(X, y)`,`.transform(X)`, and `.predict(X)`. This convention allows the use of many routines from the `scikit-learn` ecosystem with `cblearn`'s estimators while representing comparisons as `numpy` arrays [@harris_array_2020].
+Interested readers can find a code example in the [Supplementary Material](https://github.com/cblearn/cblearn/blob/main/paper/supplementary.pdf), which shows in just four lines how to fetch a real-world dataset, preprocess the data, estimate an embedding, and cross-validate the fit. More examples are available in the package's documentation.
 
 # Related work and empirical comparison
 
 Most comparison-based learning algorithms were implemented independently as part of a research paper [e.g., @ghoshdastidar_foundations_2019; @hebartRevealingMultidimensionalMental2020; @van_der_maaten_stochastic_2012; @roads_obtaining_2019];
-Just a few of these implementations, for example `loe` [@terada_local_2014] or `psiz` [@roads_obtaining_2019], come in the form of software packages. However, we are unaware of packages that provide an ecosystem for comparison-based learning with various algorithms, datasets, automated-tests, and *scikit-learn*-integration, like `cblearn`.
+Just a few of these implementations, for example `loe` [@terada_local_2014] or `psiz` [@roads_obtaining_2019], come in the form of software packages.
+
+Related packages with collections of comparison-based learning algorithms  have a focus on metric learning [`metric-learn` with a high compatibility to scikit-learn, @metric-learn] and crowd-sourced data collection, using active ordinal embedding algorithms [e.g., `NEXT`, @NIPS2015_89ae0fe2 and `salmon`, @Sievert2023]. Our package `cblearn`, on the other hand, focuses on providing comparison data and interoperable estimator implementations of the remaining areas of comparison-based learning. 
 
 A small empirical comparison to third-party packages reveals that `cblearn`'s algorithm implementations
-typically are accurate and fast. Details are described in Supplementary Material.
+typically are accurate and fast. Details are described in [Supplementary Material](https://github.com/cblearn/cblearn/blob/main/paper/supplementary.pdf).
 A more comprehensive evaluation of various ordinal embedding algorithms per se, focusing on large data sets, can be found in @vankadara_insights_2020.
 
 # Acknowledgements
