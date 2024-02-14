@@ -81,6 +81,13 @@ of your comparison datasets. In addition, some functions download and load multi
 We are happy about your bug reports, questions or suggestions as Github Issues and code or documentation contributions as Github Pull Requests. 
 Please see our [Contributor Guide](https://cblearn.readthedocs.io/en/latest/contributor_guide/index.html). 
 
+## Related packages
+
+There are more Python packages for comparison-based learning:
+
+- [metric-learn](http://contrib.scikit-learn.org/metric-learn) is a collection of algorithms for metric learning. The *weakly supervised* algorithms learn from triplets and quadruplets.
+- [salmon](https://docs.stsievert.com/salmon/) is a package to collect triplets efficiently in crowd-sourced experiments. Therefore it implements ordinal embedding algorithms and sampling strategies to actively query the most informative comparisons.
+
 ## Authors and Acknowledgement
 *cblearn* was initiated by current and former members of the [Theory of Machine Learning group](http://www.tml.cs.uni-tuebingen.de/index.php) of Prof. Dr. Ulrike von Luxburg at the University of Tübingen.
 The leading developer is [David-Elias Künstle](http://www.tml.cs.uni-tuebingen.de/team/kuenstle/index.php).
