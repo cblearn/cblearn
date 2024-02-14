@@ -119,12 +119,21 @@ def query_from_columns(data: Union[np.ndarray, "pandas.DataFrame"],  # noqa: F82
                        return_transformer: bool = False) \
         -> Union[Tuple[np.ndarray, np.ndarray],
                  Tuple[Tuple[np.ndarray, np.ndarray], Tuple[TransformerMixin, TransformerMixin]]]:
-    """ Extract queries from objects in columns or dataframes.
+    """ Extract queries with indices from feature columns in a DataFrame.
 
-        The objects in the column data might be defined by a single or multiple numerical attributes.
-        Then this function assigns to each object an index and returns query and response based on object indices,
-        as required by most library functions.
-        If attributes are non-numeric, consider first encoding them with :class:`sklearn.preprocessing.LabelEncoder`.
+        Comparison-based data in this libarary is typically represented by a collection
+        of unique object indices. For example, [[1, 0, 2], [0, 2, 3]] could encode two triplet
+        comparisons between objects 0, 1, 2, and 3.
+        Experimental data, however, often stores the objects as featurized columns in a dataframe, describing the
+        presented stimuli.
+        There the same comparisons could be represented by two rows with columns
+        `alpha1`, `tau1` `alpha2`, `tau2`, `alpha3`, `tau3` and `Response`.
+        The `query_from_columns` function allows to extract the comparsion queries
+        from such a dataframe by identifying the unique objects (e.g. unique combination of `alpha` and `tau` here).
+
+        .. note::
+            If the dataframe already contains unique indices for the objects per query,
+            consider accessing the indices directly, e.g. `df[['anchor_ix', 'pos_ix', 'neg_ix']].values.astype(int), df['response'].values.astype(bool)`.
 
         >>> import pandas as pd
         >>> frame = pd.DataFrame({'alpha1': [0.1, 0.7, 0.1], 'tau1': [0, 0, 1],
@@ -141,7 +150,10 @@ def query_from_columns(data: Union[np.ndarray, "pandas.DataFrame"],  # noqa: F82
         >>> q.tolist(), r.tolist()
         ([[0, 3, 4], [4, 2, 3], [1, 4, 4]], [True, False, False])
 
-        The transformers can be used to get object attributes from the object index.
+        The indices can be used to get the object attributes from the dataframe.
+        This might be helpful in visulizations and for debugging.
+        In the following example, the object-feature to object-index transformer object
+        is accessed to get the object attributes from the object index.
 
         >>> (q,r), (q_transform, r_transform) = query_from_columns(
         ...     np.array(frame), [0, 2, 4], -1, {1: True, 0: False}, return_transformer=True)
@@ -154,7 +166,7 @@ def query_from_columns(data: Union[np.ndarray, "pandas.DataFrame"],  # noqa: F82
              query_columns: Indices or column-labels in data per query entry.
                             Columns can be grouped as tuples, if multiple columns define an object.
              response_columns: Indices or column-labels in data per response entry.
-             response_map: Dictionary mapping the response entries in data to {-1, 1} or {False, True}.
+             response_map: Dictionary mapping the response entries in data to {-1, 1} or {False, True}. If none, use the original response.
              return_transformer: If true, transformer objects for the query and response are returned.
         Returns:
             Tuple with arrays for the queries and responses.
@@ -172,9 +184,17 @@ def query_from_columns(data: Union[np.ndarray, "pandas.DataFrame"],  # noqa: F82
     query = query_enc.fit_transform(query_data)
 
     if response_columns:
-        inverse_map = {v: k for k, v in response_map.items()}
-        response_enc = FunctionTransformer(func=np.vectorize(response_map.get),
-                                           inverse_func=np.vectorize(inverse_map.get), check_inverse=False)
+        if response_map is None:
+            response_enc = FunctionTransformer(
+                func=lambda x: x,
+                inverse_func=lambda x: x,
+                check_inverse=False)
+        else:
+            inverse_map = {v: k for k, v in response_map.items()}
+            response_enc = FunctionTransformer(
+                func=np.vectorize(response_map.get),
+                inverse_func=np.vectorize(inverse_map.get),
+                check_inverse=False)
         response = response_enc.fit_transform(data[response_columns])
         if return_transformer:
             return (query, response), (query_enc, response_enc)

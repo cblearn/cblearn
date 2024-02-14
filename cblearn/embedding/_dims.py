@@ -10,13 +10,28 @@ from cblearn import utils
 
 @dataclass
 class DimensionEstimationResult:
-    estimated_dimension: int
+    """ Result object for dimensionality estimation of embeddings.
+
+    Attributes:
+        estimated_dimension: The estimated dimensionality
+        dimensions: The tested dimensions
+        train_scores: The training scores for each dimension
+        test_scores: The test scores for each dimension
+        stats_result: The result of the hypothesis test
+    """
+    estimated_dimension: int  # The estimated dimensionality
     dimensions: np.ndarray
     train_scores: np.ndarray
     test_scores: np.ndarray
     stats_result: dict
 
     def plot_scores(self, train_kwargs={}, test_kwargs={}):
+        """ Plot the train and test scores per dimesionality of the embedding.
+
+        Args:
+            train_kwargs: Keyword arguments for the training scores plot.
+            test_kwargs: Keyword arguments for the test scores plot.
+        """
         import matplotlib.pyplot as plt
 
         plot_validation_curve(self.dimensions, self.train_scores, self.test_scores,
@@ -123,8 +138,14 @@ def _sequential_crossval_ttest(test_scores_cv, n_splits, alpha):
 def estimate_dimensionality_cv(estimator, queries, responses=None,
                                test_dimensions: list = [1, 2, 3], n_splits=10, n_repeats=1,
                                refit=True, alpha=0.05, param_name="n_components", n_jobs=-1, random_state=None):
-    """ Estimates the dimensionality of the embedding space through cross-validation
-        that has the best fit for the provided data [1]_.
+    """ Estimates the dimensionality of the embedding space.
+
+        The procedure estimates embeddings for the provided *test_dimensions*
+        and evaluates the fit (triplet accuracy) through cross-validation [1]_.
+        The estimated dimension is the lowest,
+        that has the best fit for the provided data. The test compares the increase in accuracy;
+        if the increase is not significant, the dimension is considered to be sufficient.
+        Testing a larger range of dimensions can reduce the test sensitivity due to multiple testing correction.
 
         Attributes:
           estimator: The embedding estimator to use.

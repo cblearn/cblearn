@@ -1,6 +1,12 @@
 import numpy as np
 from sklearn.utils import check_array
 from sklearn import metrics
+try:
+    from sklearn.metrics._scorer import _Scorer
+    _legacy_scorer = False
+except ImportError:
+    from sklearn.metrics._scorer import _PredictScorer as _Scorer
+    _legacy_scorer = True
 import sparse
 import scipy
 
@@ -58,12 +64,23 @@ def query_accuracy(true_response: utils.Response, pred_response: utils.Response)
 
 
 def query_error(true_response: utils.Response, pred_response: utils.Response) -> float:
+    """ Error measured by 1 - query accuracy.`
+
+    See :py:func:`cblearn.metrics.query_accuracy` for more information."""
     return 1 - query_accuracy(true_response, pred_response)
 
 
-def _scorer(true_response, query):
-    query, pred_response = utils.check_query_response(query, result_format='list-boolean')
-    return query_accuracy(true_response, pred_response)
+class QueryScorer(_Scorer):
+    """Scorer class for query accuracy.
 
+    See :py:func:`cblearn.metrics.query_accuracy` for more information.
+    """
+    def __init__(self):
+        if _legacy_scorer:
+            super().__init__(QueryScorer._score_func, 1, {})
+        else:
+            super().__init__(QueryScorer._score_func, 1, {}, 'predict')
 
-QueryScorer = metrics.make_scorer(_scorer)
+    def _score_func(true_response, query):
+        query, pred_response = utils.check_query_response(query, result_format='list-boolean')
+        return query_accuracy(true_response, pred_response)

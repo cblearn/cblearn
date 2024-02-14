@@ -79,16 +79,17 @@ Low-level Dataset Utility
 Utility
 -------
 
-.. currentmodule:: cblearn.embedding
+.. currentmodule:: cblearn
 
 .. autosummary::
     :toctree: generated/
 
-    estimate_dimensionality_cv
-    DimensionEstimationResult
+    embedding.estimate_dimensionality_cv
+    embedding.DimensionEstimationResult
 
 
 .. _references_embedding_wrapper:
+
 Wrapper
 -------
 
