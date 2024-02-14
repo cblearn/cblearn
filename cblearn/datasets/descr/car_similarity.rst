@@ -10,7 +10,8 @@ The people chose one car of three, such that the following statement is true:
 All images were found on Wikimedia Commons and are assigned to one of four classes:
 ORDINARY CARS, SPORTS CARS, OFF-ROAD/SPORT UTILITY VEHICLES, and OUTLIERS.
 
-The corresponding car images are available with the _`full dataset`.
+The corresponding car images are available here in the `full dataset`_.
+
 .. _full dataset: http://www.tml.cs.uni-tuebingen.de/team/luxburg/code_and_data/index.php
 
 **Data Set Characteristics:**

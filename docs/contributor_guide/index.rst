@@ -1,3 +1,5 @@
+.. _contributor_guide:
+
 =================
 Contributor Guide
 =================
@@ -9,11 +11,23 @@ This guide describes how to contribute code or documentation.
 .. _Github issues: https://github.com/dekuenstle/cblearn/issues
 
 
----------------
-Getting Started
----------------
+.. _developer_install:
+------------
+Installation
+------------
 
-We assume you downloaded and installed ``cblearn`` as described in :ref:`developer_install`.
+Contributors should not install the package from PyPI but from the Github repository
+to get the latest version and to be able to manipulate the code.
+First download the repository and install the project in developer mode with
+developer dependencies.
+In the developer mode, changes in the local code files are directly considered in run scripts without re-installation.
+The developer dependencies are needed to run the tests and to build the documentation.
+
+.. code-block:: bash
+
+    $ git clone git@github.com/cblearn/cblearn.git
+    $ cd cblearn
+    $ pip install -e.[tests,docs]
 
 The project directory contains the code directory ``cblearn/`` and the documentation ``docs/``.
 In addition, the folder contains a readme, license, multiple configuration files, and an examples folder.
@@ -96,7 +110,7 @@ Usually, after some iterations, your changes will be merged into the ``main`` br
 
 
 Versions should be semantic and follow PIP440_: The version indicates ``major.minor.fix``;
-breaking changes are just allowed with major version steps. 
+breaking changes are just allowed with major version steps.
 A Github release tag indicates a new version, which triggers a continuous deployment to PyPI via Github Actions.
 
 .. _PIP440: https://peps.python.org/pep-0440/

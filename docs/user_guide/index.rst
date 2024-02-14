@@ -1,3 +1,5 @@
+.. _user_guide:
+
 ==========
 User Guide
 ==========
@@ -21,7 +23,7 @@ inequality:
     \delta(x_i, x_j) \le \delta(x_i, x_k).
 
 This library supports two representation formats of triplets in an array or a sparse matrix form.
-The array form uses 2d ``numpy`` arrays representing a triplet per row and columns for ``i,j,k``. 
+The array form uses 2d ``numpy`` arrays representing a triplet per row and columns for ``i,j,k``.
 Alternatively to the ordering, an additional response array containing 1 or -1 can specify if  ``(i,j,k)`` is correct or wrong.
 The sparse matrix is an alternative representation, where triplets are naturally specified as the matrix indices, containing entries 1 or -1.
 
