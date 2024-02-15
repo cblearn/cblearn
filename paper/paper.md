@@ -54,7 +54,7 @@ This work presents `cblearn`, an open-source Python package for comparison-based
 `cblearn` provides not just a specific algorithm but an ecosystem for comparison-based data with access to multiple real-world datasets and a collection of algorithm implementations.
 `cblearn` is fast and user-friendly for applications but flexible for research on new algorithms and methods.
 The package integrates well into the scientific Python ecosystem; for example, third-party functions for cross-validation or hyperparameter tuning of `scikit-learn` estimators can typically be used with `cblearn` estimators.
-Although our package is relatively new, it has already been used for algorithm development [@mandal2023revenue] and data analysis in several studies [@schonmann_using_2022; @kunstle_estimating_2022; @van_assen_identifying_2022; @zhao2023perceiving].
+Although our package is relatively new, it has already been used for algorithm development [@mandal2023revenue] and data analysis in several studies [@schonmann_using_2022; @kunstle_estimating_2022; @van_assen_identifying_2022; @zhao2023perceiving; @sauer2023seeing; @huber2024tracing].
 
 We designed `cblearn` as a modular package with functions
 for processing and converting the comparison data in all its varieties (`cblearn.preprocessing`, `cblearn.utils`, `cblearn.metrics`), routines to generate artificial or load real-world datasets (`cblearn.datasets`), and algorithms for ordinal embedding and clustering (`cblearn.embedding`, `cblearn.cluster`).
@@ -126,6 +126,7 @@ A more comprehensive evaluation of various ordinal embedding algorithms per se, 
 # Acknowledgements
 We want to thank Debarghya Ghoshdastidar, Leena Vankadara, Siavash Haghiri, Michael Lohaus, and especially Michaël Perrot for the inspiring discussions about comparison-based learning in general and the `cblearn` package in particular.
 Additionally, we thank Thomas Klein for the helpful feedback on this manuscript and Alexander Conzelmann for the contributions to the `cblearn.cluster` module.
+The paper, code and documentation profited considerably from the feedback of the JOSS reviewers and the editor.
 
 This work was funded by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) under Germany’s Excellence Strategy – EXC number 2064/1 – Project number 390727645 and supported by the German Federal Ministry of Education and Research (BMBF): Tübingen AI Center, FKZ: 01IS18039A.
 The authors thank the International Max Planck Research School for Intelligent Systems (IMPRS-IS) for supporting David-Elias Künstle.
