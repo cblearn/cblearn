@@ -75,8 +75,10 @@ Quick Start
 -----------
 
 `cblearn` is designed to be easy to use.
-The following example generates triplets from a point cloud and fits an ordinal embedding
+The following example generates triplets from a point cloud,
+each specifying if point A is closer to point B or C, and fits an ordinal embedding
 model to the triplets.
+This ordinal embedding model is then used to predict the relative distances between the points.
 
 .. literalinclude:: ./quickstart.py
    :language: python
@@ -91,14 +93,12 @@ The output should show a trend similar to the following::
          400 |       0.053
         1600 |       0.001
 
-The procrustes distance measures the sum of squared errors between points and embedding,
+The Procrustes distance measures the sum of squared errors between points and embedding
 after aligning the embedding to the points (i.e., by optimizing rotating, translation, and scaling).
-The error approaches zero, demonstrating, that the relative distances of the point cloud can be reconstructed from triplets only.
+The error approaches zero, demonstrating that the relative distances in the point cloud can be reconstructed from triplets only
+once enough are available.
 
-The `result_format` option of the triplet generator can be used to explore the different
-data formats that can be used to represent triplets.
-Besides the `list-order` format, using a numpy array with shape `(n, 3)` (containing entries of indices of the points in the order *anchor*, *near*, *far*),
-triplets can be represented along responses as a pair of numpy arrays `((n, 3), (n,))` (e.g., `estimator.fit((triplets, responses))`) or as positions in a 3-dimensional sparse matrix.
-
-From here, you might look for more theoretical insight in the :ref:`user_guide`,
-look at practical :ref:`examples`, or get an overview of the :ref:`API`.
+The triplet generator's `result_format` option specifies the expected data format of the triplets, as triplets can be represented in different ways.
+This example uses the `list-order` format, a list of triplets, containing the indices of an anchor, near, and far point.
+Learn more about data formats and other aspects of the library in the :ref:`user_guide`.
+Alternatively, you can find more code in the :ref:`examples`` or get an overview of the :ref:`api`.

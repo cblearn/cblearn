@@ -129,7 +129,7 @@ Wrapper
     metrics.query_accuracy
     metrics.query_error
     metrics.procrustes_distance
-    metrics.QueryScorer
+    metrics.query_accuracy_scorer
 
 :mod:`cblearn.preprocessing` Preprocessing
 ==========================================
