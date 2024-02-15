@@ -202,7 +202,7 @@ def check_response(response: np.ndarray, result_format: Optional[Format] = None)
     if result_format[0] is not QueryFormat.LIST or result_format[1] is ResponseFormat.ORDER:
         raise ValueError(f"Expects result format list-boolean or list-count, got {result_format}.")
 
-    dummy_query = np.empty_like(response).reshape(-1, 1)
+    dummy_query = np.zeros_like(response).reshape(-1, 1)
     return check_list_query_response(dummy_query, response, standard=False, result_format=(result_format))[1]
 
 
