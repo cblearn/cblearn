@@ -56,6 +56,7 @@ An additional disadvantage of stochastic optimizers like Adam is, that they are 
     images/adam_lr.pdf
 ){width=50%}
 
+
 ## How does `cblearn` compare to other implementations?
 
 In a small comparison, our implementations were $50-100\%$ faster with approximately the same accuracy as reference implementations (\autoref{fig:performance-per-algorithm_library}).
