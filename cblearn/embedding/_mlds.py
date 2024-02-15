@@ -88,6 +88,11 @@ class MLDS(BaseEstimator, TripletEmbeddingMixin):
         self.n_features_in_ = 3
         n_objects = triplets.max() + 1
         quads = triplets[:, [1, 0, 0, 2]]
+        flip = quads[:, [0, 1]].max(axis=1) > quads[:, [2, 3]].min(axis=1)
+        # make sure that we "standardize" the order of quadruplets to ensure
+        # that both True/False answers occur, which is required by the Logistic Regression
+        quads = np.where(np.c_[flip, flip, flip, flip], quads[:, [2, 3, 0, 1]], quads)
+        answer[flip] = ~answer[flip]
         if self.method.lower() == 'glm':
             X01, rows = np.zeros((len(quads), n_objects)), np.arange(len(triplets))
             X01[rows, quads[:, 0]] += 1
