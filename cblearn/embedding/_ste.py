@@ -111,6 +111,7 @@ class STE(BaseEstimator, TripletEmbeddingMixin):
             self.
         """
         triplets = utils.check_query_response(X, y, result_format='list-order')
+        self.n_features_in_ = 3
         if not n_objects:
             n_objects = triplets.max() + 1
         random_state = check_random_state(self.random_state)
@@ -165,7 +166,7 @@ def _ste_x_grad(x, x_shape, triplets, heavy_tailed):
         kernel = np.exp(-dist)
 
     I, J, K = tuple(triplets.T)
-    P = kernel[I, J] / (kernel[I, J] + kernel[I, K])
+    P = kernel[I, J] / (kernel[I, J] + kernel[I, K] + 1e-12)
     loss = -np.log(np.maximum(P, np.finfo(float).tiny)).sum()
 
     if heavy_tailed:

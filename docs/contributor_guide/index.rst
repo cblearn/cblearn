@@ -84,13 +84,10 @@ These tests are skipped by default but can be run by adding the ``--remote-data`
 Scikit-learn estimator tests
 ----------------------------
 ``scikit-learn`` provides a test suite that should ensure the compatibility of estimators.
-We use this test suite to test our estimators, too, but have to skip some tests because they use artificial data incompatible
-to comparison data. Typically, ``cblearn`` estimators are compatible with ``scikit-learn`` estimators
-if comparisons are represented as ``numpy`` arrays. From an API perspective,
-comparison arrays look like discrete features and class labels; however, not all discrete features and class labels are valid comparisons.
-
-In the future scikit-learn might simplify the usage of custom data generation routines during the compatibility tests.
-Otherwise, we might replace those incompatible tests with our own.
+We use this test suite to test our estimators, too, by monkey-patching the ``check_estimator`` function
+to create triplets instead of featurized data.
+The estimator classes that should be tested with triplet data should return
+`'triplets'=True` in the ``_get_tags`` method.
 
 All sklearn estimator tests can be skipped with ``pytest -m "not sklearn``.
 

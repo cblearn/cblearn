@@ -90,4 +90,4 @@ def data_format(query: Union[Query], response: Optional[np.ndarray] = None
     elif np.issubdtype(response_dtype, np.number):
         return query_format, ResponseFormat.COUNT
     else:
-        raise ValueError(f"Expects response dtype bool or numeric, got {response_dtype}")
+        raise ValueError(f"Unknown label type: Expects response as bool or numeric, got {response_dtype}")

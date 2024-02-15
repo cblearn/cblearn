@@ -123,11 +123,18 @@ def test_check_query_response_FORMAT(input, response_format, test_output):
     """ Test all possible conversations of answer types. """
     if isinstance(input, tuple):
         triplets, answers = input
+        orig_triplets = np.array(triplets, copy=True)
+        orig_answers = np.array(answers, copy=True)
     else:
         triplets, answers = input, None
+        orig_triplets = np.array(triplets, copy=True)
     triplet_answers = utils._validate_data.check_list_query_response(triplets, answers, standard=True,
                                                                      result_format=response_format)
     np.testing.assert_equal(triplet_answers, test_output)
+
+    np.testing.assert_equal(triplets, orig_triplets, err_msg="Input data was modified.")
+    if answers is not None:
+        np.testing.assert_equal(answers, orig_answers, err_msg="Input data was modified.")
 
 
 def test_check_query_response_UNDECIDED():

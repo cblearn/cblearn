@@ -17,6 +17,12 @@ from contextlib import contextmanager
 import pytest
 import numpy as np
 from sklearn.utils.estimator_checks import parametrize_with_checks
+import sklearn.utils.estimator_checks
+from sklearn.metrics.pairwise import linear_kernel, pairwise_distances
+from sklearn.utils._tags import (
+    _DEFAULT_TAGS,
+    _safe_tags,
+)
 
 from cblearn.embedding import SOE, MLDS, STE, TSTE, CKL, GNMDS
 from cblearn.embedding import wrapper
@@ -27,53 +33,34 @@ from cblearn.datasets import make_random_triplets
 ALL_TRIPLET_EMBEDDING_ESTIMATORS = [SOE(), MLDS(), STE(), TSTE(), CKL(), GNMDS()]
 
 
-def _features_to_triplets(X):
-    """ Guess if input are features and sample triplets then. """
-    if isinstance(X, np.ndarray) and (
-            not np.issubdtype(X.dtype, np.uint) or X.ndim != 2 or X.shape[1] != 3):
-        n = X.size
-        new_X = make_random_triplets(X, size=n, result_format='list-order', random_state=1)
-        print("to triplets", X.shape, X.dtype, new_X.shape, new_X.dtype)
-        return new_X
-    else:
-        print("are triplets", np.asarray(X).shape)
-        return X
+
+##########
+# Monkey patching to transform featurized input to triplets
+orig_enforce_estimator_tags_X = sklearn.utils.estimator_checks._enforce_estimator_tags_X
+orig_enforce_estimator_tags_y = sklearn.utils.estimator_checks._enforce_estimator_tags_y
 
 
-@contextmanager
-def wrap_triplet_estimator(estimator):
-    """ Replace feature input estimator input by triplets in context.
-
-    Wraps fit and predict methods on context enter.
-    After context exit, original methods are restored.
-    """
-    orig_fit = estimator.__class__.fit
-    orig_predict = estimator.__class__.predict
-
-    estimator.__class__.fit = lambda self, X, y=None: orig_fit(self, _features_to_triplets(X))
-    estimator.__class__.predict = lambda self, X: orig_predict(self, _features_to_triplets(X))
-    yield estimator
-
-    # Context exit
-    estimator.__class__.fit = orig_fit
-    estimator.__class__.predict = orig_predict
+def _enforce_estimator_tags_X(estimator, X, kernel=linear_kernel):
+    X = orig_enforce_estimator_tags_X(estimator, X, kernel)
+    if _safe_tags(estimator, key="triplets"):
+        n = X.shape[0]
+        if len(X) == 1:  # make_random_triplets expects at least 3 objects
+            X = np.r_[X, X, X]
+        X = make_random_triplets(X, size=n, result_format='list-order')
+    return X
 
 
-SKIP_CHECKS = [
-    'check_estimators_nan_inf',
-    'check_estimator_sparse_data',
-    'check_estimators_pickle',
-    'check_pipeline_consistency',
-    'check_methods_subset_invariance',
-    'check_transformer_general',
-    'check_transformer_data_not_an_array',
-    'check_n_features_in',
-    'check_fit2d_1sample',
-    'check_fit2d_predict1d',
-    'check_fit_score_takes_y',
-    'check_estimators_empty_data_messages',
-    'check_methods_sample_order_invariance',
-]
+def _enforce_estimator_tags_y(estimator, y):
+    y = orig_enforce_estimator_tags_y(estimator, y)
+    if _safe_tags(estimator, key="triplets"):
+        #y = np.where(y == y.flat[0], 1, -1)
+        n = y.shape[0]
+        y = np.ones(n)
+    return y
+
+sklearn.utils.estimator_checks._enforce_estimator_tags_X = _enforce_estimator_tags_X
+sklearn.utils.estimator_checks._enforce_estimator_tags_y = _enforce_estimator_tags_y
+###########
 
 
 @pytest.mark.sklearn
@@ -81,8 +68,4 @@ SKIP_CHECKS = [
     ALL_TRIPLET_EMBEDDING_ESTIMATORS
 )
 def test_all_estimators(estimator, check):
-    if check.func.__name__ in SKIP_CHECKS:
-        pytest.skip("cblearn ordinal embedding estimator's are not fully compatible to sklearn estimators.")
-
-    with wrap_triplet_estimator(estimator) as wrapped_estimator:
-        check(wrapped_estimator)
+    check(estimator)

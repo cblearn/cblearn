@@ -83,9 +83,10 @@ class MLDS(BaseEstimator, TripletEmbeddingMixin):
             This estimator
         """
         random_state = check_random_state(self.random_state)
-        n_objects = X.max() + 1
 
         triplets, answer = utils.check_query_response(X, y, result_format='list-boolean')
+        self.n_features_in_ = 3
+        n_objects = triplets.max() + 1
         quads = triplets[:, [1, 0, 0, 2]]
         if self.method.lower() == 'glm':
             X01, rows = np.zeros((len(quads), n_objects)), np.arange(len(triplets))
