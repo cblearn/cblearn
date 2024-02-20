@@ -149,6 +149,10 @@ def query_from_columns(data: Union[np.ndarray, "pandas.DataFrame"],  # noqa: F82
         ...                           response_columns='Response', response_map={1: True, 0: False})
         >>> q.tolist(), r.tolist()
         ([[0, 3, 4], [4, 2, 3], [1, 4, 4]], [True, False, False])
+        >>> q, r = query_from_columns(frame, [('alpha1', 'tau1'), ('alpha2', 'tau2'), ('alpha3', 'tau3')],
+        ...                           response_columns='Response')
+        >>> q.tolist(), r.tolist()
+        ([[0, 3, 4], [4, 2, 3], [1, 4, 4]], [1, 0, 0])
 
         The indices can be used to get the object attributes from the dataframe.
         This might be helpful in visulizations and for debugging.
