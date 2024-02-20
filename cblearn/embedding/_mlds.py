@@ -82,6 +82,7 @@ class MLDS(BaseEstimator, TripletEmbeddingMixin):
         Returns:
             This estimator
         """
+        self.fit_X_ = utils.check_query(X, result_format='list-order')  # for data validation in .transform
         random_state = check_random_state(self.random_state)
 
         triplets, answer = utils.check_query_response(X, y, result_format='list-boolean')

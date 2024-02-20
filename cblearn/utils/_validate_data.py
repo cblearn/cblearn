@@ -10,6 +10,27 @@ from ._data_format import QueryFormat, ResponseFormat, Format
 from ._typing import Query
 
 
+def isin_query(queries: np.ndarray, test_queries: np.ndarray) -> np.ndarray:
+    """ Calculates queries in test_queries (row-wise).
+
+        Returns a boolean array of the same shape as queries that is True where an query of queries is in test_queries and False otherwise.
+
+    Args:
+        queries: Input array
+        test_queries: The query array to test against.
+    Returns:
+        isin: same length as queries.
+    """
+    queries = check_array(queries)
+    test_queries = check_array(test_queries)
+    if queries.shape[1] != test_queries.shape[1]:
+        raise ValueError(f"Expects equal number of columns, got {queries.shape[1]} != {test_queries.shape[1]}")
+    dtype = [(f'f{i}', int) for i in range(queries.shape[1])]
+    test_queries_struct = np.core.records.fromarrays(test_queries.T, dtype=dtype)
+    queries_struct = np.core.records.fromarrays(queries.T, dtype=dtype)
+    is_in = np.isin(queries_struct, test_queries_struct)
+    return is_in
+
 
 def _check_list_query_response(query, response, **kwargs):
     if response is None:
@@ -61,7 +82,7 @@ def check_bool_list_query_response(query, response, standard: bool = True):
     __, input_response_format = data_format(query, response)
 
     if input_response_format is ResponseFormat.BOOLEAN:
-        bool_response = response
+        bool_response = response.astype(bool)
     elif input_response_format is ResponseFormat.COUNT:
         if np.any(response == 0):
             raise ValueError("Undecided responses (0) cannot be represented as order or bool.")

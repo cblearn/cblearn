@@ -12,6 +12,7 @@ This guide describes how to contribute code or documentation.
 
 
 .. _developer_install:
+
 ------------
 Installation
 ------------
@@ -84,10 +85,21 @@ These tests are skipped by default but can be run by adding the ``--remote-data`
 Scikit-learn estimator tests
 ----------------------------
 ``scikit-learn`` provides a test suite that should ensure the compatibility of estimators.
-We use this test suite to test our estimators, too, by monkey-patching the ``check_estimator`` function
-to create triplets instead of featurized data.
-The estimator classes that should be tested with triplet data should return
+The estimator classes that require triplet data should return
 `'triplets'=True` in the ``_get_tags`` method.
+Based on this tag, our test suite extends the sklearn estimator test to handle comparison-based estimators.
+This modification is not unusual; sklearn internally modifies the data and skips individual tests silently based on different tags (e.g. *pairwise*).
+
+The modifications are:
+
+    - Monkey-patching of ``check_estimator`` function to create triplets instead of featurized data.
+    - Skipping ``check_methods_subset_invariance`` and ``check_methods_sample_order_invariance``
+
+        These tests require a 1-to-1 relationship for X -> .transform(X).
+        This will never be true for our estimators (n-to-m).
+        The alternative to skipping them here would be the 'non_deterministic' tag,
+        which would trigger sklearn to skip these but also additional tests.
+
 
 All sklearn estimator tests can be skipped with ``pytest -m "not sklearn``.
 

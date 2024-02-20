@@ -150,3 +150,11 @@ def test_check_query_response_UNDECIDED():
     print(answers)
     np.testing.assert_equal(triplets, triplets_numeric_undecided)
     np.testing.assert_equal(answers, answers_numeric_undecided)
+
+
+def test_isin_query():
+    fit_X = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    new_X = np.array([[4, 5, 6], [1, 2, 3], [2, 2, 3], [4, 5, 6]])
+
+    isin = utils.isin_query(new_X, fit_X)
+    np.testing.assert_array_equal(isin, [True, True, False, True])
