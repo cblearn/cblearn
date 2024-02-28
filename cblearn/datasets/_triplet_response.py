@@ -26,11 +26,8 @@ def _count_unique_items(query):
     and integer items:
     https://stackoverflow.com/a/48473125
     """
-    n = query.max()+1
-    a_off = query + n * (np.arange(query.shape[0])[:, None])
-    min_length = query.shape[0] * n
-    bincounts = np.bincount(a_off.ravel(), minlength=min_length).reshape(-1, n)
-    return (bincounts != 0).sum(1)
+    sorted_query = np.sort(query, axis=1)
+    return (sorted_query[:, 1:] != sorted_query[:, :-1]).sum(axis=1) + 1
 
 
 def noisy_triplet_response(triplets: utils.Query, embedding: np.ndarray, result_format: Optional[str] = None,
@@ -91,8 +88,9 @@ def noisy_triplet_response(triplets: utils.Query, embedding: np.ndarray, result_
         raise ValueError("Triplets require 3 columns.")
     if (triplets < 0).any() or (triplets >= embedding.shape[0]).any():
         raise ValueError("Triplet indices must be within the range of the embedding.")
-    if (_count_unique_items(triplets) != 3).any():
-        raise ValueError("Triplets must contain unique indices.")
+    non_unique_rows = _count_unique_items(triplets) != 3
+    if (non_unique_rows).any():
+        raise ValueError(f"Triplets must contain unique indices, got {triplets[non_unique_rows]}.")
 
     if isinstance(noise, str):
         random_state = check_random_state(random_state)
