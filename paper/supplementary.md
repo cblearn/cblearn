@@ -30,7 +30,7 @@ The GPU implementations are slower on the tested datasets and for *SOE* and *GNM
 ![\label{fig:deltaerror-per-algorithm_cblearn-all}](./images/deltaerror-per-algorithm_cblearn-all.pdf){width=45%}
 ![\label{fig:deltatime-per-algorithm_cblearn-all}](images/deltatime-per-algorithm_cblearn-all.pdf){width=45%}
 \begin{figure}
-\caption{The triplet error and runtime per estimator, relative to the overall performance on the respective datasets. A smaller error indicates that more triplets of the dataset could be represented accurately in the 2D embedding. Grey lines show individual runs on the different datasets; the colored lines indicate the respective median performance.} 
+\caption{The triplet error and runtime per estimator, relative to the overall performance on the respective datasets. A smaller error indicates that more triplets of the dataset could be represented accurately in the 2D embedding. Small lines show individual runs on the different datasets; the thick lines indicate the respective median performance.} 
     \label{fig:performance-per-algorithm_cblearn}
 \end{figure}
 
