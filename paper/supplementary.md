@@ -11,10 +11,10 @@ date: 22 September 2023
 
 # Empirical evaluation
 
-We generated embeddings of comparison-based datasets to measure runtime and triplet accuracy as a small empirical evaluation of our ordinal embedding implementations.
+We generated embeddings of comparison-based datasets to measure runtime and triplet error as a small empirical evaluation of our ordinal embedding implementations.
 We compared various CPU and GPU implementations in `cblearn` with third-party implementations in R [`loe` @terada_local_2014], and *MATLAB* [@van_der_maaten_stochastic_2012].
 In contrast to synthetic benchmarks [e.g., @vankadara_insights_2020], we used the real-world datasets
-that can be accessed through *cblearn*, converted to triplets.
+that can be accessed through *cblearn*, converted to triplets. The embeddings were arbitrarily chosen to be 2D.
 Every algorithm runs once per dataset on a compute node (8-core of Intel\textregistered Xeon \textregistered Gold 6240; 96GB RAM; NVIDIA 2080ti); just a few runs did not yield results due to resource demanding implementations or bugs: our *FORTE* implementation exceeded the memory limit on the *imagenet-v2* dataset, the third-party implementation of *tSTE* timed out on *things* and *imagenet-v2* datasets. The third-party *SOE* implementation reached a limit on dataset size on *imagenet-v2*. Probably due to numerical issues, our *CKL-GPU* implementation did not crash but returned non-numerical values on the *musician* dataset.
 
 The benchmarking scripts and results are publicly available in a separate repository[^1].
@@ -24,13 +24,13 @@ The benchmarking scripts and results are publicly available in a separate reposi
 ## Is there a "best" estimator?
 
 
-Comparing all ordinal embedding estimators in `cblearn`, *SOE* shows accurate and fast results; *CKL*, *GNMDS*, and *tSTE* were performing about equally well (\autoref{fig:performance-per-algorithm_cblearn}).
-The GPU implementations are slower on the tested datasets, presumably because they had some initial computational overhead.
+Comparing all ordinal embedding estimators in `cblearn`, *SOE*, *CKL*, *GNMDS*, and *tSTE* were performing about equally well in both runtime and accuracy (\autoref{fig:performance-per-algorithm_cblearn}).
+The GPU implementations are slower on the tested datasets and for *SOE* and *GNMDS* noticeably less accurate.
 
 ![\label{fig:deltaerror-per-algorithm_cblearn-all}](./images/deltaerror-per-algorithm_cblearn-all.pdf){width=45%}
 ![\label{fig:deltatime-per-algorithm_cblearn-all}](images/deltatime-per-algorithm_cblearn-all.pdf){width=45%}
 \begin{figure}
-\caption{The triplet error and runtime improvement per estimator. The improvement is relative to the average accuracy or runtime (at 0), calculated over all shown estimators. Compared to this average, a positive accuracy improvement means the algorithm can represent more triplets, while a positive runtime improvement means the algorithm is faster. Likewise, negative improvement indicates fewer triplets and lower speed, respectively.}
+\caption{The triplet error and runtime per estimator, relative to the overall performance on the respective datasets. A smaller error indicates that more triplets of the dataset could be represented accurately in the 2D embedding. Grey lines show individual runs on the different datasets; the colored lines indicate the respective median performance.} 
     \label{fig:performance-per-algorithm_cblearn}
 \end{figure}
 
