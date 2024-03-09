@@ -29,7 +29,16 @@ Loaders
     datasets.fetch_vogue_cover_similarity
     datasets.fetch_things_similarity
     datasets.fetch_similarity_matrix
-    datasets.BaseManifold
+
+
+Synthetic Point Generation
+--------------------------
+
+.. currentmodule:: cblearn
+
+.. autosummary::
+    :toctree: generated/
+
     datasets.LinearSubspace
 
 
@@ -91,6 +100,7 @@ Utility
 
 
 .. _references_embedding_wrapper:
+
 Wrapper
 -------
 

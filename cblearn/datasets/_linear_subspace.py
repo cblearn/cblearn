@@ -12,8 +12,15 @@ class LinearSubspace(BaseManifold):
 
     Linear Subspace is a class for creating a hyperplane of a given
     subspace dimension embedded in a higher dimensional space. It gives
-    a method of generating synthetic ordinal data with intrinsic
-    structure and dimensionality.
+    a method of generating synthetic points with intrinsic
+    structure and dimensionality. The generated points are then meant
+    to be used for generating ordinal data.
+
+    A reason for needing synthetically generated points is that it is
+    often difficult to comprehensively evaluate the performance of
+    ordinal methods on real data. Being able to modify the underlying
+    geometry and structure of the data allows for better
+    experimentation and control in evaluating ordinal methods.
 
     This class inherits from the BaseManifold class. This class creates
     hyperplanes reproducibly using the scipy.stats.ortho_group function
@@ -33,13 +40,15 @@ class LinearSubspace(BaseManifold):
 
     Examples:
         >>> from cblearn.datasets import LinearSubspace, make_random_triplet_indices, triplet_response
+        >>> # Creates a 1-dimensional hyperplane in 3-dimensional space
         >>> manifold = LinearSubspace(subspace_dimension=1, space_dimension=3)
+        >>> # Samples 10 points from the created hyperplane
         >>> points, distances = manifold.sample_points(num_points=10)
         >>> print(points.shape)
         (10, 3)
         >>> print(distances.shape)
         (10, 10)
-        >>> # Generating points with noise
+        >>> # Sampling 10 points with noise
         >>> noisy_points, noisy_distances = manifold.sample_points(10, noise='normal', noise_options={'scale': 0.1})
         >>> # Responding to triplets based on distance matrix
         >>> triplets = make_random_triplet_indices(n_objects=10, size=100)
