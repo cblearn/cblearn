@@ -1,5 +1,4 @@
 """ Function in this file judge triplets, based on ground-truth embedding and possible noise patterns. """
-import enum
 from typing import Dict, Callable, Optional, Union
 
 from sklearn.utils import check_random_state, check_array
@@ -7,16 +6,7 @@ from sklearn.metrics import pairwise
 import numpy as np
 
 from cblearn import utils
-
-
-class NoiseTarget(enum.Enum):
-    POINTS = 'points'
-    DIFFERENCES = 'differences'
-
-
-class Distance(enum.Enum):
-    EUCLIDEAN = 'euclidean'
-    PRECOMPUTED = 'precomputed'
+from cblearn.datasets._datatypes import NoiseTarget, Distance
 
 
 def noisy_triplet_response(triplets: utils.Query, embedding: np.ndarray, result_format: Optional[str] = None,
