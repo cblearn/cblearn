@@ -113,7 +113,7 @@ Second, the whole computation can run on a GPU, if available.
 Third, the stochastic optimization algorithms (we use Adam as the default) are batched,
 which means that during each optimization iteration, just a fraction of comparisons are used. This stochastic approach can significantly speed up the optimization process
 in the case of extensive datasets. For smaller datasets, the ``pytorch`` implementation is not necessarily faster than the ``scipy`` implementation.
-On the contrary, when starting the optimization, there is a particular overhead, as the data has to be transformed to ``pytorch`` tensors, and the automatic differentiation has to be set up.
+On the contrary, when starting the optimization, there is a particular runtime overhead.
 The classic second-order optimizers (which we use in the ``scipy`` backend) converge faster if all data is used in each iteration.
 In addition, installing ``pytorch`` required up to 1GB of hard disk space, which is unnecessary for the ``scipy`` backend.
 
@@ -138,13 +138,13 @@ for example by using a `grid search`_.
 
 .. _`grid search`: https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html
 
-.. figure:: ./adam_lr.png
+.. figure:: ./adam_lr_triplets.png
    :align: center
    :width: 300px
    :alt: Pytorch backend
 
    The Adam optimizer's runtime and error depend highly on the learning rate hyperparameter.
-   Here, we show this dependence on a toy problem of a linear fit to 200 observations and 100 features.
+   Here, we show this dependence with a minimal CKL implementation using PyTorch on the :ref:`Vogue Dataset <nature_vogue_dataset>` (60 objects).
 
 
 -------------------------
