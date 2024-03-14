@@ -10,11 +10,33 @@ from ._data_format import QueryFormat, ResponseFormat, Format
 from ._typing import Query
 
 
-def _check_list_query_response(query, response):
+def isin_query(queries: np.ndarray, test_queries: np.ndarray) -> np.ndarray:
+    """ Calculates queries in test_queries (row-wise).
+
+        Returns a boolean array of the same shape as queries that is True where an query of queries is in test_queries and False otherwise.
+
+    Args:
+        queries: Input array
+        test_queries: The query array to test against.
+    Returns:
+        isin: same length as queries.
+    """
+    queries = check_array(queries)
+    test_queries = check_array(test_queries)
+    if queries.shape[1] != test_queries.shape[1]:
+        raise ValueError(f"Expects equal number of columns, got {queries.shape[1]} != {test_queries.shape[1]}")
+    dtype = [(f'f{i}', int) for i in range(queries.shape[1])]
+    test_queries_struct = np.core.records.fromarrays(test_queries.T, dtype=dtype)
+    queries_struct = np.core.records.fromarrays(queries.T, dtype=dtype)
+    is_in = np.isin(queries_struct, test_queries_struct)
+    return is_in
+
+
+def _check_list_query_response(query, response, **kwargs):
     if response is None:
-        return check_array(query, dtype=np.uint32), None
+        return check_array(query, dtype=np.uint32, **kwargs), None
     else:
-        return check_X_y(query, response, dtype=np.uint32)
+        return check_X_y(query, response, dtype=np.uint32, **kwargs)
 
 
 def _unroll_responses(query: Optional[np.ndarray], response: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
@@ -60,7 +82,7 @@ def check_bool_list_query_response(query, response, standard: bool = True):
     __, input_response_format = data_format(query, response)
 
     if input_response_format is ResponseFormat.BOOLEAN:
-        bool_response = response
+        bool_response = response.astype(bool)
     elif input_response_format is ResponseFormat.COUNT:
         if np.any(response == 0):
             raise ValueError("Undecided responses (0) cannot be represented as order or bool.")
@@ -71,6 +93,7 @@ def check_bool_list_query_response(query, response, standard: bool = True):
 
     if standard:
         query, mask = _standardize_list_query(query)
+        bool_response = np.array(bool_response, copy=True)
         bool_response[mask] = ~bool_response[mask]
 
     return query, bool_response
@@ -78,22 +101,22 @@ def check_bool_list_query_response(query, response, standard: bool = True):
 
 def check_count_list_query_response(query, response, standard: bool = True):
     __, input_response_format = data_format(query, response)
-    query, response = _check_list_query_response(query, response)
+    query, response = _check_list_query_response(query, response, copy=True)
     if input_response_format is ResponseFormat.COUNT:
         query, count_response = _unroll_responses(query, response)
     if input_response_format is ResponseFormat.BOOLEAN:
         count_response = response.astype(int) * 2 - 1
     elif input_response_format is ResponseFormat.ORDER:
         count_response = np.full((query.shape[0],), 1)
-
     if standard:
         query, mask = _standardize_list_query(query)
+        count_response = np.array(count_response, copy=True)
         count_response[mask] *= -1
     return query, count_response
 
 
 def check_order_list_query_response(query, response):
-    query, response = _check_list_query_response(query, response)
+    query, response = _check_list_query_response(query, response, copy=True)
     __, input_response_format = data_format(query, response)
 
     if input_response_format is ResponseFormat.COUNT:
@@ -157,13 +180,16 @@ def check_tensor_query_response(query: Union[sparse.COO, scipy.sparse.spmatrix],
 
     if isinstance(query, scipy.sparse.spmatrix):
         n_objects = query.shape[0]
-        n_dim = int(np.ceil(np.log(np.product(query.shape)) / np.log(n_objects)))
+        n_dim = int(np.ceil(np.log(np.prod(query.shape)) / np.log(n_objects)))
         query = sparse.COO.from_scipy_sparse(query)
     else:
         n_objects = max(query.shape)
         n_dim = len(query.shape)
 
     expected_shape = n_dim * (n_objects,)
+    if query.size != np.prod(expected_shape):
+        raise ValueError(f"Expects sparse matrix reshapeable to {expected_shape}, "
+                         f"got {query.shape}.")
     if len(query.shape) != n_dim or np.any(np.not_equal(query.shape, expected_shape)):
         query = query.reshape(expected_shape)
 
@@ -197,7 +223,7 @@ def check_response(response: np.ndarray, result_format: Optional[Format] = None)
     if result_format[0] is not QueryFormat.LIST or result_format[1] is ResponseFormat.ORDER:
         raise ValueError(f"Expects result format list-boolean or list-count, got {result_format}.")
 
-    dummy_query = np.empty_like(response).reshape(-1, 1)
+    dummy_query = np.zeros_like(response).reshape(-1, 1)
     return check_list_query_response(dummy_query, response, standard=False, result_format=(result_format))[1]
 
 
@@ -277,7 +303,6 @@ def check_query_response(query: Union[Query], response: Optional[np.ndarray] = N
     """
     input_query_format, input_response_format = data_format(query, response)
     output_query_format, output_response_format = check_format(result_format, query, response)
-
     if output_query_format is QueryFormat.TENSOR:
         if input_query_format is QueryFormat.LIST:
             query, response = check_list_query_response(query, response, (QueryFormat.LIST, output_response_format),

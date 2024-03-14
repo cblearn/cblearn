@@ -64,6 +64,7 @@ def data_format(query: Union[Query], response: Optional[np.ndarray] = None
     Raises:
         TypeError: Invalid type of data.
     """
+    query_format = None
     if isinstance(query, (scipy.sparse.spmatrix, sparse.SparseArray)):
         query_format = QueryFormat.TENSOR
     elif isinstance(query, (Sequence, np.ndarray)):
@@ -71,6 +72,15 @@ def data_format(query: Union[Query], response: Optional[np.ndarray] = None
     elif query is None:
         query_format = None
     else:
+        try:
+            # a last resort: can numpy read the object?
+            arr = np.asarray(query)
+            if arr.ndim == 2:
+                query_format = QueryFormat.LIST
+        except ValueError:
+            pass
+
+    if query_format is None:
         raise ValueError(f"Expects query as sequence, array, or sparse array; got {query}")
 
     if response is None:
@@ -80,14 +90,18 @@ def data_format(query: Union[Query], response: Optional[np.ndarray] = None
             return query_format, ResponseFormat.ORDER
         else:
             return query_format, None
-    elif isinstance(response, (Sequence, np.ndarray)):
-        response_dtype = np.asarray(response).dtype
     else:
-        return query_format, None
+        try:
+            resp_arr = np.asarray(response)
+        except ValueError:
+            raise ValueError(f"Expects response as None or array-like, got {response}")
+        response_dtype = resp_arr.dtype
+        if np.isin(resp_arr, [0, 1]).all():
+            response_dtype = bool
 
     if response_dtype == bool:
         return query_format, ResponseFormat.BOOLEAN
     elif np.issubdtype(response_dtype, np.number):
         return query_format, ResponseFormat.COUNT
     else:
-        raise ValueError(f"Expects response dtype bool or numeric, got {response_dtype}")
+        raise ValueError(f"Unknown label type: Expects response as bool or numeric, got {response_dtype}")

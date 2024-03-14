@@ -121,7 +121,9 @@ class SOE(BaseEstimator, TripletEmbeddingMixin):
         Returns:
             self.
         """
+        self.fit_X_ = utils.check_query(X, result_format='list-order')  # for data validation in .transform
         queries = utils.check_query_response(X, y, result_format='list-order')
+        self.n_features_in_ = 3
         if not n_objects:
             n_objects = queries.max() + 1
         random_state = check_random_state(self.random_state)
