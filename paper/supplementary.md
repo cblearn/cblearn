@@ -12,10 +12,10 @@ date: 22 September 2023
 # Empirical evaluation
 
 We generated embeddings of comparison-based datasets to measure runtime and triplet error as a small empirical evaluation of our ordinal embedding implementations.
-We compared various CPU and GPU implementations in `cblearn` with third-party implementations in R [`loe` @terada_local_2014], and *MATLAB* [@van_der_maaten_stochastic_2012].
+We compared various CPU and GPU implementations in `cblearn` with third-party implementations in *R* [`loe` @terada_local_2014], and *MATLAB* [@van_der_maaten_stochastic_2012].
 In contrast to synthetic benchmarks [e.g., @vankadara_insights_2020], we used the real-world datasets
 that can be accessed through *cblearn*, converted to triplets. The embeddings were arbitrarily chosen to be 2D.
-Every algorithm runs once per dataset on a compute node (8-core of Intel\textregistered Xeon \textregistered Gold 6240; 96GB RAM; NVIDIA 2080ti); just a few runs did not yield results due to resource demanding implementations or bugs: our *FORTE* implementation exceeded the memory limit on the *imagenet-v2* dataset, the third-party implementation of *tSTE* timed out on *things* and *imagenet-v2* datasets. The third-party *SOE* implementation reached a limit on dataset size on *imagenet-v2*. Probably due to numerical issues, our *CKL-GPU* implementation did not crash but returned non-numerical values on the *musician* dataset.
+Every algorithm runs once per dataset on a compute node (8 cores of a Intel\textregistered Xeon \textregistered Gold 6240; 96GB RAM; NVIDIA RTX 2080ti) with a run-time limit of 24 hours. Some runs did fail by exceeding those constraints: our *FORTE* implementation failed by an out of memory error on the *imagenet-v2* dataset. The *MATLAB* implementation of *tSTE* timed out on *things* and *imagenet-v2* datasets. The *R* implementation of *SOE* on the *imagenet-v2* dataset by an "unsupported long vector" error, caused by the large size of the requested embedding.
 
 The benchmarking scripts and results are publicly available in a separate repository[^1].
 
@@ -30,7 +30,8 @@ The GPU implementations are slower on the tested datasets and for *SOE* and *GNM
 ![\label{fig:deltaerror-per-algorithm_cblearn-all}](./images/deltaerror-per-algorithm_cblearn-all.pdf){width=45%}
 ![\label{fig:deltatime-per-algorithm_cblearn-all}](images/deltatime-per-algorithm_cblearn-all.pdf){width=45%}
 \begin{figure}
-\caption{The triplet error and runtime per estimator, relative to the overall performance on the respective datasets. A smaller error indicates that more triplets of the dataset could be represented accurately in the 2D embedding. Small lines show individual runs on the different datasets; the thick lines indicate the respective median performance.} 
+\caption{The triplet error and runtime per estimator and dataset, relative to the mean error or the fastest run. Thin lines show runs on the different datasets; the thick lines indicate the respective median. With the exception of *STE*, all CPU algorithms are able to embed the triplets similarly well. There are just minor differences in the runtime of the CPU implementations. The GPU implementations are usually significantly slower on the data sets used.  
+} 
     \label{fig:performance-per-algorithm_cblearn}
 \end{figure}
 
@@ -59,17 +60,14 @@ An additional challenge of stochastic optimizers like *Adam* [@kingma2014adam] i
 
 ## How does `cblearn` compare to other implementations?
 
-In a small comparison, our implementations were $50-100\%$ faster with approximately the same accuracy as reference implementations (\autoref{fig:performance-per-algorithm_library}).
-We compared our CPU implementations of *SOE*, *STE*
-and *tSTE* with the corresponding reference implementations in R , `loe` [@terada_local_2014], and *MATLAB* [@van_der_maaten_stochastic_2012]. Additionally, the latter offers an *CKL* implementation to compare with.
-Please note that despite our care, runtime comparisons of different interpreters offer room for some confounding effects.
-The results shown should nevertheless indicate a trend.
+In a small comparison, our implementations run multiple times faster with approximately the same accuracy as reference implementations (\autoref{fig:performance-per-algorithm_library}).
+We compared our CPU implementations of *SOE* the corresponding reference implementations in R , `loe` [@terada_local_2014], and our implementation of *CKL*, *GNMDS*, *STE*, *tSTE* with the *MATLAB* of @van_der_maaten_stochastic_2012.
+This comparison is not exhaustive, but it shows that our implementations are competitive with the reference implementations in terms of accuracy and runtime. Of course, we cannot separate the factors of algorithm implementation and runtime environment. 
 
 ![\label{fig:deltaerror-per-algorithm_library}](./images/deltaerror-per-algorithm_library.pdf){width=45%}
 ![\label{fig:deltatime-per-algorithm_library}](images/deltatime-per-algorithm_library.pdf){width=45%}
 \begin{figure}[!ht]
-    \caption{The triplet error and runtime improvement per estimator. Improvement
-    is calculated against the average performance per dataset of all estimators in the plot.}
+    \caption{The triplet error and runtime per estimator and dataset, relative to the mean error and the fastest run. Thin lines show runs on the different datasets; the thick lines indicate the respective median. The triplet error is broadly similar for all implementations, but *cblearn* is many times faster for all algorithms.}
     \label{fig:performance-per-algorithm_library}
 \end{figure}
 
