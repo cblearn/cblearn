@@ -19,8 +19,8 @@ class LinearSubspace(BaseManifold):
     A reason for needing synthetically generated points is that it is
     often difficult to comprehensively evaluate the performance of
     ordinal methods on real data. Being able to modify the underlying
-    geometry and structure of the data allows for better
-    experimentation and control in evaluating ordinal methods.
+    geometry and structure of the data allows for better experimentation
+    and control in evaluating ordinal methods.
 
     This class inherits from the BaseManifold class. This class creates
     hyperplanes reproducibly using the scipy.stats.ortho_group function
@@ -28,8 +28,9 @@ class LinearSubspace(BaseManifold):
     hyperplane using a given sampling function and add noise to the
     points using a given noise function.
 
-    .. note:: Subspace dimension must be less than or equal to space
-    dimension and space dimension must be greater than 1.
+    .. note::
+        Subspace dimension must be less than or equal to space
+        dimension and space dimension must be greater than 1.
 
     Attributes:
         subspace_dimension: Dimension of the subspace
@@ -53,7 +54,9 @@ class LinearSubspace(BaseManifold):
         >>> # Responding to triplets based on distance matrix
         >>> triplets = make_random_triplet_indices(n_objects=10, size=100)
         >>> response = triplet_response(triplets, distances, distance='precomputed')
+
     """
+
     def __init__(self, subspace_dimension: int, space_dimension: int,
                  random_state: Union[None, int, np.random.RandomState] = None):
         """
