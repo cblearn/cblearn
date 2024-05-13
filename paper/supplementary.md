@@ -38,24 +38,22 @@ The GPU implementations are slower on the tested datasets and for *SOE* and *GNM
 ## When should GPU implementations be preferred?
 
 In terms of accuracy and runtime, our GPU (or `pytorch`) implementations could not outperform the CPU (or `scipy`) pendants on the tested datasets. However, \autoref{fig:performance-per-algorithm_cblearn} shows the GPU runtime grows slower with the number of triplets, such that they potentially outperform CPU implementations with large datasets of $10^7$ triplets and more. In some cases, the GPU implementations show the overall best accuracy.
-An additional advantage of GPU implementations is that they require no explicit gradient definition, which simplifies the implementation of new algorithms.
+An additional advantage of the `pytorch` backend that we use to run estimators on the GPU  is automated differentiation. The `pytorch` optimization routine requires no explicit gradient definition which simplifies rapid prototyping of novel algorithm implementations.
 
 ![The runtime increases almost linearly with the number of triplets. However, GPU implementations have a flatter slope and thus can compensate for the initial time overhead on large datasets.
     \label{fig:time-per-triplets_gpu}](images/time-per-triplets_gpu.pdf){width=50%}
 
 There are various explanations for the speed disadvantage of our pytorch implementations. On the one hand, it may be due to the overhead of converting between numpy and pytorch and calculating the gradient (AutoGrad). On the other hand, it can also be due to the optimizer or the selected hyperparameters. 
-To get a first impression of these factors, we have built minimal examples of the CKL algorithm [@tamuz_adaptively_2011] and estimated 2D embeddings of the Vogue Cover dataset [@heikinheimo2013crowd]. \autoref{fig:torch-speedtest} shows the runtimes and triplet accuracies on a standard laptop. The small markers show runs with different initialization and the bold markers the respective means. The CKL implementation of `cblearn` is approximately three times slower than the minimal version, probably due to data validation and conversion overheads. If the gradient is not provided directly but calculated automatically with PyTorch's AutoGrad functions, the minimal example runs ~9 times slower. The most severe impact has changing the optimization algorithm to stochastic optimization (*Adam*, lr=10).  However, it can be assumed in accordance with the results in previous sections, that this overhead is compensated with increasing dataset size. 
+To get a first impression of these factors, we have built minimal examples of the CKL algorithm [@tamuz_adaptively_2011] and estimated 2D embeddings of the Vogue Cover dataset [@heikinheimo2013crowd]. \autoref{fig:torch-speedtest} shows the runtimes and triplet accuracies on a standard laptop. The small markers show runs with different initialization and the bold markers the respective median performance. The CKL implementation of `cblearn` is approximately three times slower than the minimal version, probably due to data validation and conversion overheads. If the gradient is not provided directly but calculated automatically with PyTorch's AutoGrad functions, the minimal example runs ~9 times slower. The most severe impact has changing the optimization algorithm to stochastic optimization (*Adam*, lr=10).  However, it can be assumed in accordance with the results in previous sections, that this overhead is compensated with increasing dataset size. 
 
-![The runtime and error for different optimization methods in minimal CKL implementations. `cblearn`'s CKL implementation is shown for reference.\label{fig:torch-speedtest}](
-    images/torch_speedtest_triplets.pdf
-){width=50%}
+![The runtime and error for different optimization methods in minimal CKL implementations. `cblearn`'s CKL implementation is shown for reference.
+\label{fig:torch-speedtest}](images/torch_speedtest_triplets.pdf){width=50%}
 
 An additional challenge of stochastic optimizers like *Adam* [@kingma2014adam] is their sensitivity to hyperparameter choices. This sensitivity is demonstrated in \autoref{fig:adam_lr}, where the learning rate of *Adam* is varied for the toy example. Especially runtime largely depends on the learning rate, while the error is less sensitive to it. Likewise, the performance of `pytorch` ordinal embedding implementations could be improved by using more sophisticated tuning of optimizer parameters.
 
 
-![The runtime and error for different learning rates of the *Adam* optimizer in a minimal example with CKL estimating a 2D embedding of 60 objects.\label{fig:adam_lr}]
-    images/adam_lr_triplets.pdf
-){width=50%}
+![The runtime and error for different learning rates of the *Adam* optimizer in a minimal example with CKL estimating a 2D embedding of 60 objects.
+\label{fig:adam_lr}](images/adam_lr_triplets.pdf){width=50%}
 
 
 ## How does `cblearn` compare to other implementations?
