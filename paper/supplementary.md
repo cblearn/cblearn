@@ -67,7 +67,7 @@ This comparison is not exhaustive, but it shows that our implementations are com
 ![\label{fig:deltaerror-per-algorithm_library}](./images/deltaerror-per-algorithm_library.pdf){width=45%}
 ![\label{fig:deltatime-per-algorithm_library}](images/deltatime-per-algorithm_library.pdf){width=45%}
 \begin{figure}[!ht]
-    \caption{The triplet error and runtime per estimator and dataset, relative to the mean error and the fastest run. Thin lines show runs on the different datasets; the thick lines indicate the respective median. The triplet error is broadly similar for all implementations, but *cblearn* is many times faster for all algorithms.}
+    \caption{The triplet error and runtime per estimator and dataset, relative to the mean error and the fastest run. Thin lines show runs on the different datasets; the thick lines indicate the respective median. The triplet error is approximately similar for all implementations but *STE*. For all algorithms, `cblearn` provides the fastest implementation.}
     \label{fig:performance-per-algorithm_library}
 \end{figure}
 
