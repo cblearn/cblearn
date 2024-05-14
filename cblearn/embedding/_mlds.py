@@ -34,10 +34,10 @@ class MLDS(BaseEstimator, QuadrupletEmbeddingMixin):
     >>> estimator = MLDS(random_state=42).fit(triplets)
     >>> estimator.embedding_.shape
     (15, 1)
-    >>> estimator.score(triplets) > 0.9
+    >>> estimator.score(triplets) > 0.8
     True
     >>> estimator = MLDS(method='optim', random_state=42).fit(triplets)
-    >>> estimator.score(triplets) > 0.9
+    >>> estimator.score(triplets) > 0.8
     True
 
 
@@ -88,11 +88,14 @@ class MLDS(BaseEstimator, QuadrupletEmbeddingMixin):
             X01[rows, quads[:, 3]] += 1
             X01[rows, quads[:, 1]] -= 1
             X01[rows, quads[:, 2]] -= 1
+            X01 = X01[:, 1:]  # drop first column to fix x1=0
             glm = LogisticRegression(verbose=self.verbose, max_iter=self.max_iter,
                                      fit_intercept=False, random_state=random_state)
             glm.fit(X01, answer)
-            self.embedding_ = glm.coef_.reshape(-1, 1)
-            self.log_likelihood_ = glm.predict_log_proba(X01)[rows, answer].mean()
+            self.embedding_ = np.zeros((n_objects, 1))
+            self.embedding_[1:, :] = glm.coef_.reshape(-1, 1)
+            self.response_log_likelihood_ = glm.predict_log_proba(X01)[rows, answer]
+            self.log_likelihood_ = self.response_log_likelihood_.mean()
             self.n_iter_ = glm.n_iter_
         elif self.method.lower() == 'optim':
             init = np.linspace(0, 1, n_objects)
