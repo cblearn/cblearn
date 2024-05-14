@@ -1,3 +1,5 @@
+name: Build paper and supplementary PDF from markdown
+
 on:
   push:
     paths:
