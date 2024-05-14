@@ -89,8 +89,8 @@ Additionally, our package provides preprocessing functions to convert different 
 
 ## Algorithms implemented for CPU and GPU
 
-In the current version `0.1.2`, `cblearn` implements an extensive palette of ordinal embedding algorithms and a clustering algorithm (\autoref{tablealgorithms}); additional algorithms can be contributed easily within the modular design.
-Most algorithm implementations use `scipy` to be fast and lightweight. Inspired by the work of @vankadara_insights_2020, we added GPU implementations using *pytorch*, which use the stochastic optimization routines known from deep-learning algorithms.
+In the current version `0.2.0`, `cblearn` implements an extensive palette of ordinal embedding algorithms and a clustering algorithm (\autoref{tablealgorithms}); additional algorithms can be contributed easily within the modular design.
+Most algorithm implementations use the scientific ecosystem around `scipy` [@virtanenSciPyFundamentalAlgorithms2020;@harris_array_2020] to be fast and lightweight. Inspired by the work of @vankadara_insights_2020, we added GPU implementations with `torch` [@paszke2019pytorch;@anselPyTorchFasterMachine2024], which use automatic differentiation  and stochastic optimization routines known from deep-learning algorithms.
 These GPU implementations can be used with large datasets and rapidly adapted thanks to automated differentiation.
 
 : Algorithm implementations in `cblearn`. Most of these come in multiple variants: Different backends for small datasets on CPU or large datasets on GPU, or varied objective functions. \label{tablealgorithms}
