@@ -43,15 +43,18 @@ The most frequently applied algorithms, however, are the so-called ordinal embed
 [e.g., @agarwal_generalized_2007; @tamuz_adaptively_2011; @van_der_maaten_stochastic_2012; @terada_local_2014;
 @amid2015; @anderton2019scaling; @ghosh2019landmark].
 Ordinal embedding algorithms estimate a metric representation, such that the distances between embedded objects reflect the similarity comparisons.
-These embedding algorithms have recently come into fashion in psychology and cognitive science to objectively quantify the perceived similarity of various stimuli
+These embedding algorithms have recently come into fashion in psychology and cognitive science  to quantify the perceived similarity of
+various stimuli objectively 
 [e.g., @haghiri_estimation_2020; @wills_toward_2009; @roads_obtaining_2019].
 
 
 
 # Statement of need
 
-This work presents `cblearn`, an open-source Python package for comparison-based learning. In contrast to related packages,
-`cblearn` provides not just a specific algorithm but an ecosystem for comparison-based data with access to multiple real-world datasets and a collection of algorithm implementations.
+This work presents `cblearn`, an open-source Python package for comparison-based learning. Unlike related packages,
+`cblearn` goes beyond specific algorithm implementations to provide an ecosystem for
+for comparison-based data with access to several real-world datasets
+and a collection of algorithm implementations.
 `cblearn` is fast and user-friendly for applications but flexible for research on new algorithms and methods.
 The package integrates well into the scientific Python ecosystem; for example, third-party functions for cross-validation or hyperparameter tuning of `scikit-learn` estimators can typically be used with `cblearn` estimators.
 Although our package is relatively new, it has already been used for algorithm development [@mandal2023revenue] and data analysis in several studies [@schonmann_using_2022; @kunstle_estimating_2022; @van_assen_identifying_2022; @zhao2023perceiving; @sauer2023seeing; @huber2024tracing].
@@ -89,11 +92,11 @@ Additionally, our package provides preprocessing functions to convert different 
 
 ## Algorithms implemented for CPU and GPU
 
-In the current version `0.2.0`, `cblearn` implements an extensive palette of ordinal embedding algorithms and a clustering algorithm (\autoref{tablealgorithms}); additional algorithms can be contributed easily within the modular design.
+In the current version `0.2.0`, `cblearn` implements an extensive palette of ordinal embedding algorithms and a clustering algorithm (\autoref{tablealgorithms}); additional algorithms can be contributed easily to the modular design.
 Most algorithm implementations are built with the scientific ecosystem around `scipy` [@virtanenSciPyFundamentalAlgorithms2020;@harris_array_2020] to be fast and lightweight. Inspired by the work of @vankadara_insights_2020, we added GPU implementations with `torch` [@paszke2019pytorch;@anselPyTorchFasterMachine2024] that use automatic differentiation and stochastic optimization routines known from deep learning methods.
 These GPU implementations can be used with large datasets and rapidly adapted thanks to automated differentiation.
 
-: Algorithm implementations in `cblearn`. Most of these come in multiple variants: Different backends for small datasets on CPU or large datasets on GPU, or varied objective functions. \label{tablealgorithms}
+: Algorithm implementations in `cblearn`. Most of these come in multiple variants: Different backends for small datasets on CPU and large datasets on GPU as well as variations of objective functions. \label{tablealgorithms}
 
 |Algorithm | Reference |
 |:---------|:---------------|

@@ -15,7 +15,7 @@ We generated embeddings of comparison-based datasets to measure runtime and trip
 We compared various CPU and GPU implementations in `cblearn` with third-party implementations in *R* [`loe` @terada_local_2014], and *MATLAB* [@van_der_maaten_stochastic_2012].
 In contrast to synthetic benchmarks [e.g., @vankadara_insights_2020], we used the real-world datasets
 that can be accessed through `cblearn`, converted to triplets. The embeddings were arbitrarily chosen to be 2D.
-Every algorithm runs once per dataset on a compute node (8 cores CPU; 96GB RAM; NVIDIA RTX 2080ti) with a run-time limit of 24 hours. Some runs did fail by exceeding those constraints: our FORTE implementation failed by an out of memory error on the `imagenet-v2` dataset. The *MATLAB* implementation of tSTE timed out on `things` and `imagenet-v2` datasets. The *R* implementation of SOE on the `imagenet-v2` dataset by an "unsupported long vector" error, caused by the large size of the requested embedding.
+Every algorithm runs once per dataset on a compute node (8 CPU cores; 96GB RAM; NVIDIA RTX 2080ti) with a run-time limit of 24 hours. Some runs did fail by exceeding those constraints: our FORTE implementation failed by an out of memory error on the `imagenet-v2` dataset. The *MATLAB* implementation of tSTE timed out on `things` and `imagenet-v2` datasets. The *R* implementation of SOE on the `imagenet-v2` dataset by an "unsupported long vector" error, caused by the large size of the requested embedding.
 
 The benchmarking scripts and results are publicly available in a separate repository[^1].
 
