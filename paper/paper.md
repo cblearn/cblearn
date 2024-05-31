@@ -88,7 +88,7 @@ There is no Iris, CIFAR, or ImageNet in comparison-based learning---the communit
 These datasets---typically comparisons between images or words---consist of human responses.
 Additionally, our package provides preprocessing functions to convert different comparisons to triplets or quadruplets, which many algorithms expect.
 
-![Real-world datasets that can be accessed with `cblearn` cover many object and triplet numbers. Please find a detailed description and references to the dataset authors in our package documentation. \label{fig:datasets}](images/datasets.pdf){ width=35% }
+![Real-world datasets that can be accessed with `cblearn` cover many objects and triplet numbers. Please find a detailed description and references to the dataset in our package documentation. \label{fig:datasets}](images/datasets.pdf){ width=35% }
 
 ## Algorithms implemented for CPU and GPU
 
@@ -100,20 +100,20 @@ These GPU implementations can be used with large datasets and rapidly adapted th
 
 |Algorithm | Reference |
 |:---------|:---------------|
-|Crowd Kernel Learning | @tamuz_adaptively_2011 |
-|Fast Ordinal Triplet Embedding | @jain_finite_2016 |
-|Generalized Non-metric MDS | @agarwal_generalized_2007 |
-|Maximum-likelihood Difference Scaling | @maloney_maximum_2003 |
-|Soft Ordinal Embedding  | @terada_local_2014 |
-|Ordinal Embedding Neural Network | @vankadara_insights_2020 |
-|Stochastic Triplet Embedding | @van_der_maaten_stochastic_2012 |
-|ComparisonHC (clustering) | @perrot_near-optimal_2020 |
+|Crowd Kernel Learning | [@tamuz_adaptively_2011] |
+|Fast Ordinal Triplet Embedding | [@jain_finite_2016] |
+|Generalized Non-metric MDS | [@agarwal_generalized_2007] |
+|Maximum-likelihood Difference Scaling | [@maloney_maximum_2003] |
+|Soft Ordinal Embedding  | [@terada_local_2014] |
+|Ordinal Embedding Neural Network | [@vankadara_insights_2020] |
+|Stochastic Triplet Embedding | [@van_der_maaten_stochastic_2012] |
+|ComparisonHC (clustering) | [@perrot_near-optimal_2020] |
 
 
 ## User-friendly and compatible API
 One of Python's greatest strengths is the scientific ecosystem, into which `cblearn` integrates. Our package does not only make use of this ecosystem internally but adopts their API conventions–––every user of `scikit-learn` [@pedregosa_scikit-learn_2011;@buitinck_api_2013] is already familiar with the API  of `cblearn`:
-Estimator objects use the well-known `scikit-learn` methods `.fit(X, y)`,`.transform(X)`, and `.predict(X)`. This convention allows the use of many routines from the `scikit-learn` ecosystem with `cblearn`'s estimators while representing comparisons as `numpy` arrays [@harris_array_2020].
-Interested readers can find a code example in the [Supplementary Material](https://github.com/cblearn/cblearn/blob/main/paper/supplementary.pdf), which shows in just four lines how to fetch a real-world dataset, preprocess the data, estimate an embedding, and cross-validate the fit. More examples are available in the package's documentation.
+Estimator objects use the well-known `scikit-learn` methods `.fit(X, y)`, `.transform(X)`, and `.predict(X)`. This convention allows the use of many routines from the `scikit-learn` ecosystem with `cblearn`'s estimators while representing comparisons as `numpy` arrays [@harris_array_2020].
+Interested readers can find a code example in the [Supplementary Material](https://github.com/cblearn/cblearn/blob/joss/paper/supplementary.pdf), which shows in just four lines how to fetch a real-world dataset, preprocess the data, estimate an embedding, and cross-validate the fit. More examples are available in the package's documentation.
 
 # Related work and empirical comparison
 
@@ -123,7 +123,7 @@ Just a few of these implementations, for example `loe` [@terada_local_2014] or `
 Related packages with collections of comparison-based learning algorithms  have a focus on metric learning [`metric-learn` with a high compatibility to scikit-learn, @metric-learn] and crowd-sourced data collection, using active ordinal embedding algorithms [e.g., `NEXT`, @NIPS2015_89ae0fe2 and `salmon`, @Sievert2023]. Our package `cblearn`, on the other hand, focuses on providing comparison data and interoperable estimator implementations of the remaining areas of comparison-based learning. 
 
 A small empirical comparison to third-party packages reveals that `cblearn`'s algorithm implementations
-typically are accurate and fast. Details are described in [Supplementary Material](https://github.com/cblearn/cblearn/blob/main/paper/supplementary.pdf).
+typically are accurate and fast. Details are described in [Supplementary Material](https://github.com/cblearn/cblearn/blob/joss/paper/supplementary.pdf).
 A more comprehensive evaluation of various ordinal embedding algorithms per se, focusing on large data sets, can be found in @vankadara_insights_2020.
 
 # Acknowledgements
