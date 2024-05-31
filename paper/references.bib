@@ -53,7 +53,7 @@
 	shorttitle = {Insights into {Ordinal} {Embedding} {Algorithms}},
 	abstract = {The objective of ordinal embedding is to find a Euclidean representation of a set of abstract items, using only answers to triplet comparisons of the form "Is item \$i\$ closer to the item \$j\$ or item \$k\$?". In recent years, numerous algorithms have been proposed to solve this problem. However, there does not exist a fair and thorough assessment of these embedding methods and therefore several key questions remain unanswered: Which algorithms scale better with increasing sample size or dimension? Which ones perform better when the embedding dimension is small or few triplet comparisons are available? In our paper, we address these questions and provide the first comprehensive and systematic empirical evaluation of existing algorithms as well as a new neural network approach. In the large triplet regime, we find that simple, relatively unknown, non-convex methods consistently outperform all other algorithms, including elaborate approaches based on neural networks or landmark approaches. This finding can be explained by our insight that many of the non-convex optimization approaches do not suffer from local optima. In the low triplet regime, our neural network approach is either competitive or significantly outperforms all the other methods. Our comprehensive assessment is enabled by our unified library of popular embedding algorithms that leverages GPU resources and allows for fast and accurate embeddings of millions of data points.},
 	journal = {arXiv:1912.01666 [cs, stat]},
-	author = {Vankadara, Leena Chennuru and Haghiri, Siavash and Lohaus, Michael and Wahab, Faiz Ul and von Luxburg, Ulrike},
+	author = {Vankadara, Leena Chennuru and Haghiri, Siavash and Lohaus, Michael and Wahab, Faiz Ul and Luxburg, Ulrike},
 	year = {2021},
 	keywords = {Computer Science - Machine Learning, Statistics - Machine Learning},
 	doi = {10.48550/arXiv.1912.01666}
@@ -78,7 +78,7 @@
 	abstract = {Vision researchers are interested in mapping complex physical stimuli to perceptual dimensions. Such a mapping can be constructed using multidimensional psychophysical scaling or ordinaljt4 embedding methods. Both methods infer coordinates that agree as much as possible with the observer’s judgments so that perceived similarity corresponds with distance in the inferred space. However, a fundamental problem of all methods that construct scalings in multiple dimensions is that the inferred representation can only reflect perception if the scale has the correct dimension. Here we propose a statistical procedure to overcome this limitation. The critical elements of our procedure are i) measuring the scale’s quality by the number of correctly predicted triplets and ii) performing a statistical test to assess if adding another dimension to the scale improves triplet accuracy significantly. We validate our procedure through extensive simulations. In addition, we study the properties and limitations of our procedure using “real” data from various behavioral datasets from psychophysical experiments. We conclude that our procedure can reliably identify (a lower bound on) the number of perceptual dimensions for a given dataset.},
 	number = {13},
 	journal = {Journal of Vision},
-	author = {Künstle, David-Elias and von Luxburg, Ulrike and Wichmann, Felix A.},
+	author = {Künstle, David-Elias and Luxburg, Ulrike and Wichmann, Felix A.},
 	year = {2022},
 	pages = {5},
 	doi = {10.1167/jov.22.13.5}
@@ -193,7 +193,7 @@
 	abstract = {In this article, we address the problem of measuring and analyzing sensation, the subjective magnitude of one’s experience. We do this in the context of the method of triads: The sensation of the stimulus is evaluated via relative judgments of the following form: “Is stimulus {\textbackslash}(S\_i{\textbackslash}) more similar to stimulus {\textbackslash}(S\_j{\textbackslash}) or to stimulus {\textbackslash}(S\_k{\textbackslash})?” We propose to use ordinal embedding methods from machine learning to estimate the scaling function from the relative judgments. We review two relevant and well-known methods in psychophysics that are partially applicable in our setting: nonmetric multidimensional scaling (NMDS) and the method of maximum likelihood difference scaling (MLDS). Considering various scaling functions, we perform an extensive set of simulations to demonstrate the performance of the ordinal embedding methods. We show that in contrast to existing approaches, our ordinal embedding approach allows, first, to obtain reasonable scaling functions from comparatively few relative judgments and, second, to estimate multidimensional perceptual scales. In addition to the simulations, we analyze data from two real psychophysics experiments using ordinal embedding methods. Our results show that in the one-dimensional perceptual scale, our ordinal embedding approach works as well as MLDS, while in higher dimensions, only our ordinal embedding methods can produce a desirable scaling function. To make our methods widely accessible, we provide an R-implementation and general rules of thumb on how to use ordinal embedding in the context of psychophysics.},
 	number = {9},
 	journal = {Journal of Vision},
-	author = {Haghiri, Siavash and Wichmann, Felix A. and von Luxburg, Ulrike},
+	author = {Haghiri, Siavash and Wichmann, Felix A. and Luxburg, Ulrike},
 	year = {2020},
 	pages = {14},
 	doi = {10.1167/jov.20.9.14},
@@ -383,7 +383,7 @@
 	title = {Foundations of {Comparison}-{Based} {Hierarchical} {Clustering}},
 	abstract = {We address the classical problem of hierarchical clustering, but in a framework where one does not have access to a representation of the objects or their pairwise similarities. Instead, we assume that only a set of comparisons between objects is available, that is, statements of the form objects i and j are more similar than objects k and l.'' Such a scenario is commonly encountered in crowdsourcing applications. The focus of this work is to develop comparison-based hierarchical clustering algorithms that do not rely on the principles of ordinal embedding. We show that single and complete linkage are inherently comparison-based and we develop variants of average linkage. We provide statistical guarantees for the different methods under a planted hierarchical partition model. We also empirically demonstrate the performance of the proposed approaches on several datasets.},
 	booktitle = {Advances in {Neural} {Information} {Processing} {Systems} (NeurIPS)},
-	author = {Ghoshdastidar, Debarghya and Perrot, Michaël and von Luxburg, Ulrike},
+	author = {Ghoshdastidar, Debarghya and Perrot, Michaël and Luxburg, Ulrike},
 	year = {2019},
 }
 
