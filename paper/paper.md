@@ -57,7 +57,7 @@ for comparison-based data with access to several real-world datasets
 and a collection of algorithm implementations.
 `cblearn` is fast and user-friendly for applications but flexible for research on new algorithms and methods.
 The package integrates well into the scientific Python ecosystem; for example, third-party functions for cross-validation or hyperparameter tuning of `scikit-learn` estimators can typically be used with `cblearn` estimators.
-Although our package is relatively new, it has already been used for algorithm development [@mandal2023revenue] and data analysis in several studies [@schonmann_using_2022; @kunstle_estimating_2022; @van_assen_identifying_2022; @zhao2023perceiving; @sauer2023seeing; @huber2024tracing].
+Although our package is relatively new, it has already been used for algorithm development [@mandal2023revenue] and data analysis in several studies [@schonmann_using_2022; @kunstle_estimating_2022; @van_assen_identifying_2022; @zhao2023perceiving; @fsauerObjectiveMeasurementApproach2024; @huber2024tracing].
 
 We designed `cblearn` as a modular package with functions
 for processing and converting the comparison data in all its varieties (`cblearn.preprocessing`, `cblearn.utils`, `cblearn.metrics`), routines to generate artificial or load real-world datasets (`cblearn.datasets`), and algorithms for ordinal embedding and clustering (`cblearn.embedding`, `cblearn.cluster`).
