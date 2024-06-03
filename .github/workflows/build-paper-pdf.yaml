@@ -1,4 +1,4 @@
-name: Build paper and supplementary PDF from markdown
+name: Build paper
 
 on:
   push:
