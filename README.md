@@ -8,15 +8,8 @@
 [![Test status](https://github.com/cblearn/cblearn/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/cblearn/cblearn/actions/workflows/test.yml)
 [![Test Coverage](https://codecov.io/gh/cblearn/cblearn/branch/master/graph/badge.svg?token=P9JRT6OK6O)](https://codecov.io/gh/cblearn/cblearn)
 
-Comparison-based learning algorithms are the machine learning algorithms to use when the training data contains similarity comparisons ("A and B are more similar than C and D") instead of data points. 
+Comparison-based learning methods are machine learning algorithms using similarity comparisons ("A and B are more similar than C and D") instead of featurized data. 
 
-Triplet comparisons from human observers help model the perceived similarity of objects.
-These human triplets are collected in studies that ask questions such as 
-"Which of the following bands looks most like Queen?" or 
-"Which color is most similar to the reference?
-
-This library provides an easy-to-use interface for comparison-based learning algorithms.
-It works hand in hand with scikit-learn:
 
 ```python
 from sklearn.datasets import load_iris
