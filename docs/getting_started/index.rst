@@ -80,7 +80,7 @@ each specifying if point A is closer to point B or C, and fits an ordinal embedd
 model to the triplets.
 This ordinal embedding model is then used to predict the relative distances between the points.
 
-.. literalinclude:: ./quickstart.py
+.. literalinclude:: quickstart.py
    :language: python
    :linenos:
 

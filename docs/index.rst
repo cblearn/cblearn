@@ -12,7 +12,7 @@ is are ordinal comparisons of datapoint similarities.
 These comparisons often come from human experiments in the form of triplets (A, B, C)
 where A is more similar to B than to C, or from related tasks such as the odd-one-out.
 
-.. figure:: img/comparison_tasks.svg
+.. figure:: comparison_tasks.svg
    :align: center
    :class: with-border
 
@@ -30,7 +30,7 @@ As such, the package is used by researchers in machine learning to evaluate and
 develop new learning algorithms and by researchers in cognitive science to
 model perceived similarity in humans.
 
-.. figure:: img/car_embedding.jpg
+.. figure:: car_embedding.jpg
    :align: center
    :width: 75%
    :class: with-border
