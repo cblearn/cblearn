@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to cblearn's documentation!
-===================================
+cblearn documentation
+=====================
 
 `cblearn` is a Python package for comparison-based machine learning,
 which is a type of machine learning where the only available information
@@ -12,7 +12,7 @@ is are ordinal comparisons of datapoint similarities.
 These comparisons often come from human experiments in the form of triplets (A, B, C)
 where A is more similar to B than to C, or from related tasks such as the odd-one-out.
 
-.. figure:: comparison_tasks.svg
+.. figure:: comparison_tasks.png
    :align: center
    :class: with-border
 

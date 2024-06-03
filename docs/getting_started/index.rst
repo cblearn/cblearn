@@ -53,8 +53,8 @@ Some of those extra dependencies need non-Python packages to be installed first.
 
 torch
     Most estimators provide an (optional) implementation using ``pytorch`` to run large datasets on CPU and GPU.
-    This requires the ``pytorch`` package to be installed `manually <https://pytorch.org/get-started/locally/>`_
-    or by adding the ``torch``` option to the install command.
+    This requires the ```pytorch`` <https://pytorch.org/get-started/locally/>`_ package to be installed manually
+    or by adding the ``torch`` extras option to the install command.
     Note that ``pytorch`` might need about 1GB of disk space.
 
 wrapper
@@ -101,4 +101,4 @@ once enough are available.
 The triplet generator's `result_format` option specifies the expected data format of the triplets, as triplets can be represented in different ways.
 This example uses the `list-order` format, a list of triplets, containing the indices of an anchor, near, and far point.
 Learn more about data formats and other aspects of the library in the :ref:`user_guide`.
-Alternatively, you can find more code in the :ref:`examples`` or get an overview of the :ref:`api`.
+Alternatively, you can find more code in the :ref:`examples` or get an overview of the :ref:`api`.

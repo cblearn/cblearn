@@ -18,8 +18,14 @@ sys.path.insert(0, os.path.abspath('..'))
 # -- Project information -----------------------------------------------------
 
 project = 'cblearn'
-author = 'David-Elias Künstle & Ulrike von Luxburg'
-copyright = f'2023, {author}'
+author = 'David-Elias Künstle, Ulrike von Luxburg, & Contributors'
+copyright = f'2024, {author}'
+html_theme_options = {
+   "logo": {
+      "image_light": "logo-light.png",
+      "image_dark": "logo-dark.png",
+   }
+}
 
 # -- General configuration ---------------------------------------------------
 
@@ -34,7 +40,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.mathjax',
     'sphinx.ext.napoleon',
-    'sphinx_rtd_theme',
+    'pydata_sphinx_theme',
     'sphinx_gallery.gen_gallery',
 ]
 
@@ -78,7 +84,7 @@ rst_prolog = """"""
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'pydata_sphinx_theme'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

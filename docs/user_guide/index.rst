@@ -138,7 +138,7 @@ for example by using a `grid search`_.
 
 .. _`grid search`: https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html
 
-.. figure:: ./adam_lr_triplets.png
+.. figure:: ./adam_lr_triplet.png
    :align: center
    :width: 300px
    :alt: Pytorch backend
