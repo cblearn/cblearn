@@ -32,14 +32,12 @@ embedding = estimator.fit_transform(triplets)
 print(f"The embedding has shape {embedding.shape}.")
 ```
 
-Please try the [Examples](https://cblearn.readthedocs.io/en/stable/generated_examples/index.html).
-
 ## Getting Started
 
-Install cblearn as described [here](https://cblearn.readthedocs.io/en/stable/install.html) and try the [examples](https://cblearn.readthedocs.io/en/stable/generated_examples/index.html).
+* [Installation & Quickstart](https://cblearn.readthedocs.io/en/stable/getting_started.html)
+* [Examples](https://cblearn.readthedocs.io/en/stable/generated_examples/index.html).
+* [User Guide](https://cblearn.readthedocs.io/en/stable/user_guide/index.html).
 
-Find a theoretical introduction to comparison-based learning, the datatypes, 
-algorithms, and datasets in the [User Guide](https://cblearn.readthedocs.io/en/stable/user_guide/index.html).
 
 ## Contribute
 
