@@ -118,7 +118,9 @@ Interested readers can find a code example in the [Supplementary Material](https
 Most comparison-based learning algorithms were implemented independently as part of a research paper [e.g., @ghoshdastidar_foundations_2019; @hebartRevealingMultidimensionalMental2020; @van_der_maaten_stochastic_2012; @roads_obtaining_2019];
 Just a few of these implementations, for example `loe` [@terada_local_2014] or `psiz` [@roads_obtaining_2019], come in the form of software packages.
 
-Related packages with collections of comparison-based learning algorithms  have a focus on metric learning [`metric-learn` with a high compatibility to scikit-learn, @metric-learn] and crowd-sourced data collection using active ordinal embedding algorithms [e.g., `NEXT` and `salmon`, @NIPS2015_89ae0fe2, @Sievert2023]. Our package `cblearn`, on the other hand, focuses on providing comparison data and interoperable estimator implementations of the remaining areas of comparison-based learning. 
+Related packages with collections of comparison-based learning algorithms  have a focus on metric learning and crowd-sourced data collection. `metric-learn` [@metric-learn] provides a collection of methods to determine the distance metric from similarity data, including triplets and quadruplets, in a `scikit-learn` compatible API. Data collection packages
+like `NEXT` [@NIPS2015_89ae0fe2] and `salmon` [@Sievert2023] provide active ordinal embedding algorithms to select the most informative comparisons in an experiment efficiently. 
+Our package `cblearn`, on the other hand, focuses on providing comparison data and interoperable estimator implementations of the remaining areas of comparison-based learning. 
 
 A small empirical comparison to third-party packages reveals that `cblearn`'s algorithm implementations
 typically are accurate and fast. Details are described in [Supplementary Material](https://github.com/cblearn/cblearn/blob/joss/paper/supplementary.pdf).
