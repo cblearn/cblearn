@@ -1,5 +1,5 @@
 <h1 align="center">
-<img src="https://raw.githubusercontent.com/cblearn/cblearn/main/docs/logo-light.svg" width="300">
+<img src="https://raw.githubusercontent.com/cblearn/cblearn/main/docs/logo-light.png" width="300">
 </h1><br>
 
 ## Comparison-based Machine Learning in Python
