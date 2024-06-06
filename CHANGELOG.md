@@ -7,7 +7,8 @@
 - Feature: JOSS paper
 - Feature: Quickstart guide in documentation
 - Feature: Data point sampling from manifolds.
-- Improvement: Extended documentation 
+- Improvement: Extended documentation
+- Improvement: cblearn logo and new style in documentation
 - Improvement: Filter invalid responses in datasets
 - Improvement: Full compatibility to sklearn estimator tests
   
