@@ -34,7 +34,7 @@ print(f"The embedding has shape {embedding.shape}.")
 
 ## Getting Started
 
-* [Installation & Quickstart](https://cblearn.readthedocs.io/en/stable/getting_started/index.html.html)
+* [Installation & Quickstart](https://cblearn.readthedocs.io/en/stable/getting_started/index.html)
 * [Examples](https://cblearn.readthedocs.io/en/stable/generated_examples/index.html).
 * [User Guide](https://cblearn.readthedocs.io/en/stable/user_guide/index.html).
 
