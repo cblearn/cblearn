@@ -34,7 +34,7 @@ print(f"The embedding has shape {embedding.shape}.")
 
 ## Getting Started
 
-* [Installation & Quickstart](https://cblearn.readthedocs.io/en/stable/getting_started.html)
+* [Installation & Quickstart](https://cblearn.readthedocs.io/en/stable/getting_started/index.html.html)
 * [Examples](https://cblearn.readthedocs.io/en/stable/generated_examples/index.html).
 * [User Guide](https://cblearn.readthedocs.io/en/stable/user_guide/index.html).
 
@@ -49,7 +49,7 @@ Please see our [Contributor Guide](https://cblearn.readthedocs.io/en/stable/cont
 There are more Python packages for comparison-based learning:
 
 - [metric-learn](http://contrib.scikit-learn.org/metric-learn) is a collection of algorithms for metric learning. The *weakly supervised* algorithms learn from triplets and quadruplets.
-- [salmon](https://docs.stsievert.com/salmon/) is a package to collect triplets efficiently in crowd-sourced experiments. Therefore it implements ordinal embedding algorithms and sampling strategies to actively query the most informative comparisons.
+- [salmon](https://docs.stsievert.com/salmon/) is a package for efficiently collecting triplets in crowd-sourced experiments. The package implements ordinal embedding algorithms and sampling strategies to query the most informative comparisons actively.
 
 ## Authors and Acknowledgement
 *cblearn* was initiated by current and former members of the [Theory of Machine Learning group](http://www.tml.cs.uni-tuebingen.de/index.php) of Prof. Dr. Ulrike von Luxburg at the University of Tübingen.
@@ -60,5 +60,6 @@ This work has been supported by the Machine Learning Cluster of Excellence, fund
 
 ## License
 
-This library is free under the [MIT License](https://github.com/cblearn/cblearn/blob/master/LICENSE) conditions.
-Please cite this library appropriately if it contributes to your scientific publication. We would also appreciate a short email (optionally) to see how our library is being used. 
+This library is free to use, share, and adapt under the [MIT License](https://github.com/cblearn/cblearn/blob/master/LICENSE) conditions.
+
+If you publish work that uses this library, please cite our JOSS paper.
