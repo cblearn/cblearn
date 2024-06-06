@@ -9,6 +9,17 @@ from cblearn import utils
 from cblearn.datasets._datatypes import NoiseTarget, Distance
 
 
+def _count_unique_items(query):
+    """ Count unique items per row in a 2D array.
+
+    Efficient approach even for large number of rows
+    and integer items:
+    https://stackoverflow.com/a/48473125
+    """
+    sorted_query = np.sort(query, axis=1)
+    return (sorted_query[:, 1:] != sorted_query[:, :-1]).sum(axis=1) + 1
+
+
 def noisy_triplet_response(triplets: utils.Query, embedding: np.ndarray, result_format: Optional[str] = None,
                            noise: Union[None, str, Callable] = None, noise_options: Dict = {},
                            noise_target: Union[str, NoiseTarget] = 'differences',
@@ -63,6 +74,14 @@ def noisy_triplet_response(triplets: utils.Query, embedding: np.ndarray, result_
     result_format = utils.check_format(result_format, triplets, None)
     triplets: np.ndarray = utils.check_query(triplets, result_format=utils.QueryFormat.LIST)
     embedding = check_array(embedding)
+    if triplets.shape[1] != 3:
+        raise ValueError("Triplets require 3 columns.")
+    if (triplets < 0).any() or (triplets >= embedding.shape[0]).any():
+        raise ValueError("Triplet indices must be within the range of the embedding.")
+    non_unique_rows = _count_unique_items(triplets) != 3
+    if (non_unique_rows).any():
+        raise ValueError(f"Triplets must contain unique indices, got {triplets[non_unique_rows]}.")
+
     if isinstance(noise, str):
         random_state = check_random_state(random_state)
         noise_fun: Callable = getattr(random_state, noise)

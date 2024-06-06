@@ -12,8 +12,8 @@ class DummyOrdinalEmbedding():
     def transform(self, *args, **kwargs):
         return self.embedding
 
-    def predict(self, triplets):
-        result = datasets.triplet_response(triplets, self.embedding)
+    def predict(self, triplets, result_format=None):
+        result = datasets.triplet_response(triplets, self.embedding, result_format=result_format)
         if isinstance(result, tuple):
             return result[1]
         else:
@@ -55,5 +55,5 @@ def test_triplet_scorer():
     triplets, answers = datasets.triplet_response(triplets, embedding, result_format='list-boolean')
 
     estimator = DummyOrdinalEmbedding(embedding)
-    assert metrics.QueryScorer(estimator, triplets, answers) == 1
-    assert metrics.QueryScorer(estimator, triplets, ~answers) == 0
+    assert metrics.query_accuracy_scorer(estimator, triplets, answers) == 1
+    assert metrics.query_accuracy_scorer(estimator, triplets, ~answers) == 0

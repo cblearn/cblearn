@@ -1,3 +1,5 @@
+.. _contributor_guide:
+
 =================
 Contributor Guide
 =================
@@ -9,11 +11,42 @@ This guide describes how to contribute code or documentation.
 .. _Github issues: https://github.com/dekuenstle/cblearn/issues
 
 
----------------
-Getting Started
----------------
+.. _developer_install:
 
-We assume you downloaded and installed ``cblearn`` as described in :ref:`developer_install`.
+------------
+Installation
+------------
+
+Contributors should not install the package from PyPI but from the Github repository
+to get the latest version and to be able to manipulate the code.
+First download the repository and install the project in developer mode with
+developer dependencies.
+
+.. code-block:: bash
+
+    $ git clone git@github.com/cblearn/cblearn.git
+    $ cd cblearn
+    $ pip install -e.[tests,docs]
+
+The ``-e`` option installs the package in developer mode such that changes in the code are considered directly without re-installation.
+
+tests
+    To run the unit tests, the ``pytest`` package is required, which
+    can be installed by adding the ``tests`` option to the install command.
+
+docs
+    Building these docs requires the ``sphinx`` package, which can be installed by adding the `docs` option to the install command.
+
+
+Now you can run the tests and build the documentation:
+
+.. code-block:: bash
+
+    $ python -m pytest --remote-data  # should run all tests; this can take a while.
+
+    $ cd docs
+    $ make html  # should generate docs/_build/html/index.html
+
 
 The project directory contains the code directory ``cblearn/`` and the documentation ``docs/``.
 In addition, the folder contains a readme, license, multiple configuration files, and an examples folder.
@@ -52,13 +85,21 @@ These tests are skipped by default but can be run by adding the ``--remote-data`
 Scikit-learn estimator tests
 ----------------------------
 ``scikit-learn`` provides a test suite that should ensure the compatibility of estimators.
-We use this test suite to test our estimators, too, but have to skip some tests because they use artificial data incompatible
-to comparison data. Typically, ``cblearn`` estimators are compatible with ``scikit-learn`` estimators
-if comparisons are represented as ``numpy`` arrays. From an API perspective,
-comparison arrays look like discrete features and class labels; however, not all discrete features and class labels are valid comparisons.
+The estimator classes that require triplet data should return
+`'triplets'=True` in the ``_get_tags`` method.
+Based on this tag, our test suite extends the sklearn estimator test to handle comparison-based estimators.
+This modification is not unusual; sklearn internally modifies the data and skips individual tests silently based on different tags (e.g. *pairwise*).
 
-In the future scikit-learn might simplify the usage of custom data generation routines during the compatibility tests.
-Otherwise, we might replace those incompatible tests with our own.
+The modifications are:
+
+    - Monkey-patching of ``check_estimator`` function to create triplets instead of featurized data.
+    - Skipping ``check_methods_subset_invariance`` and ``check_methods_sample_order_invariance``
+
+        These tests require a 1-to-1 relationship for X -> .transform(X).
+        This will never be true for our estimators (n-to-m).
+        The alternative to skipping them here would be the 'non_deterministic' tag,
+        which would trigger sklearn to skip these but also additional tests.
+
 
 All sklearn estimator tests can be skipped with ``pytest -m "not sklearn``.
 

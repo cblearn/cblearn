@@ -20,14 +20,20 @@ logger = logging.getLogger(__name__)
 
 def fetch_musician_similarity(data_home: Optional[os.PathLike] = None, download_if_missing: bool = True,
                               shuffle: bool = True, random_state: Optional[np.random.RandomState] = None,
-                              return_triplets: bool = False) -> Union[Bunch, np.ndarray]:
+                              return_triplets: bool = False,
+                              valid_triplets: bool = True) -> Union[Bunch, np.ndarray]:
     """ Load the MusicSeer musician similarity dataset (triplets).
 
     ===================   =====================
-    Triplets                            131.970
+    Triplets                            118.263
     Objects (Artists)                       448
     Dimensionality                      unknown
     ===================   =====================
+
+    .. warning::
+        This dataset contains triplets of musicians, which are not unique.
+        I.e. for some triplets (i, j, k), i==j, j==k, or i==k is possible.
+        This function by default filters out these triplets, but this can be disabled by setting `valid_triplets=False`.
 
     See :ref:`musician_similarity_dataset` for a detailed description.
 
@@ -42,6 +48,8 @@ def fetch_musician_similarity(data_home: Optional[os.PathLike] = None, download_
             Initialization for shuffle random generator
         return_triplets : boolean, default=False.
             If True, returns numpy array instead of a Bunch object.
+        valid_triplets: boolean, default=True.
+            If True, only valid triplets are returned. I.e. triplets where i!=j!=k.
 
     Returns:
         dataset : :class:`~sklearn.utils.Bunch`
@@ -102,6 +110,11 @@ def fetch_musician_similarity(data_home: Optional[os.PathLike] = None, download_
 
     triplet_filter = musicians_data['other'] != ''   # remove bi-tuples.
     triplet_ids = np.c_[musicians_data['target'], musicians_data['chosen'], musicians_data['other']]
+    if valid_triplets:
+        triplet_filter = (triplet_filter
+                          & (triplet_ids[:, 0] != triplet_ids[:, 1])
+                          & (triplet_ids[:, 1] != triplet_ids[:, 2])
+                          & (triplet_ids[:, 0] != triplet_ids[:, 2]))
     triplet_ids = triplet_ids[triplet_filter].astype(int)
 
     all_ids, triplets = np.unique(triplet_ids, return_inverse=True)
