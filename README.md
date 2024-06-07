@@ -17,10 +17,9 @@ from sklearn.model_selection import cross_val_score
 
 from cblearn.datasets import make_random_triplets
 from cblearn.embedding import SOE
-from cblearn.metrics import QueryScorer
 
 X = load_iris().data
-triplets = make_random_triplets(X, result_format="list-order", size=1000)
+triplets = make_random_triplets(X, result_format="list-order", size=2000)
 
 estimator = SOE(n_components=2)
 # Measure the fit with scikit-learn's cross-validation
