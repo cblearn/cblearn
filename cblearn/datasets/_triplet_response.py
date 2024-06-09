@@ -7,8 +7,6 @@ import numpy as np
 
 from cblearn import utils
 from cblearn.datasets._datatypes import NoiseTarget, Distance
-<<<<<<< HEAD
-=======
 
 
 def _count_unique_items(query):
@@ -20,7 +18,6 @@ def _count_unique_items(query):
     """
     sorted_query = np.sort(query, axis=1)
     return (sorted_query[:, 1:] != sorted_query[:, :-1]).sum(axis=1) + 1
->>>>>>> 3ef91813e56d1c3e4198276aa959f3cac2d97105
 
 
 def noisy_triplet_response(triplets: utils.Query, embedding: np.ndarray, result_format: Optional[str] = None,

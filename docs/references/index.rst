@@ -39,14 +39,9 @@ Synthetic Point Generation
 .. autosummary::
     :toctree: generated/
 
-<<<<<<< HEAD
+    datasets.LinearSubspace
     datasets.Line
-    datasets.LinearSubspace
-    
-=======
-    datasets.LinearSubspace
 
->>>>>>> 3ef91813e56d1c3e4198276aa959f3cac2d97105
 
 Simulations
 -----------

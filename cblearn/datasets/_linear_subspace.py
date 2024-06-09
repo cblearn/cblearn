@@ -4,6 +4,7 @@ from scipy.stats import ortho_group
 from sklearn.utils import check_random_state
 from typing import Union, Dict, Callable
 from scipy.spatial.distance import pdist, squareform
+from cblearn.datasets import make_random_triplet_indices
 
 
 class LinearSubspace(BaseManifold):
@@ -57,8 +58,9 @@ class LinearSubspace(BaseManifold):
 
     """
 
-    def __init__(self, subspace_dimension: int, space_dimension: int,
-                 random_state: Union[None, int, np.random.RandomState] = None):
+    def __init__(
+        self, subspace_dimension: int, space_dimension: int, random_state: Union[None, int, np.random.RandomState] = None
+    ):
         """
         Initialize the manifold
 
@@ -72,27 +74,24 @@ class LinearSubspace(BaseManifold):
                           np.random.
         """
         if not isinstance(subspace_dimension, int):
-            raise ValueError('Subspace dimension must be an integer')
+            raise ValueError("Subspace dimension must be an integer")
         if subspace_dimension < 1:
-            raise ValueError('Subspace dimension cannot be less than 1')
+            raise ValueError("Subspace dimension cannot be less than 1")
         if not isinstance(space_dimension, int):
-            raise ValueError('Space dimension must be an integer')
+            raise ValueError("Space dimension must be an integer")
         if subspace_dimension > space_dimension:
-            raise ValueError('Subspace dimension cannot be greater than'
-                             ' dimension')
+            raise ValueError("Subspace dimension cannot be greater than" " dimension")
         if space_dimension <= 1:
-            raise ValueError('Space dimension cannot be less than 2')
+            raise ValueError("Space dimension cannot be less than 2")
         self.subspace_dimension = subspace_dimension
         self.space_dimension = space_dimension
         random_state = check_random_state(random_state)
         self.manifold_state = random_state
         self.created = False
-        super().__init__(subspace_dimension=subspace_dimension,
-                         space_dimension=space_dimension,
-                         random_state=random_state)
+        super().__init__(subspace_dimension=subspace_dimension, space_dimension=space_dimension, random_state=random_state)
 
     def _create_manifold(self):
-        """ Creates the hyperplane """
+        """Creates the hyperplane"""
         # Source:
         # https://stackoverflow.com/questions/69036765/sampling-random-points-from-linear-subspaces-of-a-given-radius-in-arbitary-dimen
         if self.subspace_dimension == 1:
@@ -102,18 +101,20 @@ class LinearSubspace(BaseManifold):
         else:
             scipy_random_generator = ortho_group
             scipy_random_generator.random_state = self.manifold_state
-            basis = scipy_random_generator.rvs(dim=self.space_dimension)[
-                :self.subspace_dimension]
+            basis = scipy_random_generator.rvs(dim=self.space_dimension)[: self.subspace_dimension]
         self.basis = basis
         self.created = True
 
-    def sample_points(self, num_points: int,
-                      sampling_function: Union[str, Callable] = 'normal',
-                      sampling_options: Dict = {'scale': 1},
-                      noise: Union[None, str, Callable] = None,
-                      noise_options: Dict = {},
-                      random_state: Union[None, int, np.random.RandomState] = None,
-                      return_distances: bool = True):
+    def sample_points(
+        self,
+        num_points: int,
+        sampling_function: Union[str, Callable] = "normal",
+        sampling_options: Dict = {"scale": 1},
+        noise: Union[None, str, Callable] = None,
+        noise_options: Dict = {},
+        random_state: Union[None, int, np.random.RandomState] = None,
+        return_distances: bool = True,
+    ):
         """
         Sample points from the hyperplane and add noise if requested
 
@@ -160,17 +161,15 @@ class LinearSubspace(BaseManifold):
             sampling_fun: Callable = getattr(random_state, sampling_function)
         elif callable(sampling_function):
             sampling_fun = sampling_function
+        else:
+            sampling_fun = sampling_function
 
         # Sample Coefficients
         if self.subspace_dimension == 1:
-            coefficients = sampling_fun(
-                size=(num_points, 1), **sampling_options)
-            points = np.matmul(coefficients.reshape(-1, 1),
-                               self.basis[0].reshape(1, -1)) + self.basis[1]
+            coefficients = sampling_fun(size=(num_points, 1), **sampling_options)
+            points = np.matmul(coefficients.reshape(-1, 1), self.basis[0].reshape(1, -1)) + self.basis[1]
         else:
-            coefficients = sampling_fun(
-                size=(num_points, self.subspace_dimension),
-                **sampling_options)
+            coefficients = sampling_fun(size=(num_points, self.subspace_dimension), **sampling_options)
             points = np.matmul(coefficients, self.basis)
 
         # Add noise if requested
@@ -182,6 +181,47 @@ class LinearSubspace(BaseManifold):
             return points, self.get_canonical_distance_matrix(points)
         else:
             return points
+
+    def sample_triplets(
+        self,
+        num_points: int,
+        num_triplets: int,
+        sampling_function: Union[str, Callable] = "normal",
+        sampling_options: Dict = {"scale": 1},
+        noise: Union[None, str, Callable] = None,
+        noise_options: Dict = {},
+        random_state: Union[None, int, np.random.RandomState] = None,
+    ):
+        """
+        Sample points with noise and generate triplet indices.
+
+        Args:
+            num_points: Number of points to sample
+            sampling_function: The sampling function to use.
+            sampling_options: The options to pass to the sampling function.
+            noise: The noise function to use.
+            noise_options: The options to pass to the noise function.
+            random_state: The seed of the pseudo random number generator to use when sampling.
+            triplet_size: Number of triplets to generate
+
+        Returns:
+            noisy_points: Sampled points with noise
+            noisy_distances: Distance matrix of the noisy points
+            triplets: Generated triplet indices
+        """
+        # Sample points with noise
+        noisy_points, noisy_distances = self.sample_points(
+            num_points,
+            sampling_function=sampling_function,
+            sampling_options=sampling_options,
+            noise=noise,
+            noise_options=noise_options,
+            random_state=random_state,
+        )
+        # Generate triplet indices
+        triplets = make_random_triplet_indices(n_objects=num_points, size=num_triplets, random_state=random_state)
+
+        return noisy_points, noisy_distances, triplets
 
     def get_canonical_distance_matrix(self, points: np.ndarray):
         """

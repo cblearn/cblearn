@@ -3,6 +3,7 @@ import numpy as np
 from sklearn.utils import check_random_state
 from scipy.spatial.distance import pdist, squareform
 from typing import Union, Dict, Callable
+from cblearn.datasets import make_random_triplet_indices
 
 
 class Line(BaseManifold):
@@ -46,6 +47,7 @@ class Line(BaseManifold):
         >>> triplets = make_random_triplet_indices(n_objects=10, size=100)
         >>> response = triplet_response(triplets, distances, distance='precomputed')
     """
+
     def __init__(self, space_dimension: int, random_state: Union[None, int, np.random.RandomState] = None):
         """
         Initialize the Line
@@ -58,16 +60,14 @@ class Line(BaseManifold):
                           np.random.
         """
         if not isinstance(space_dimension, int):
-            raise ValueError('Space dimension must be an integer')
+            raise ValueError("Space dimension must be an integer")
         if space_dimension < 1:
-            raise ValueError('Space dimension cannot be less than 1')
+            raise ValueError("Space dimension cannot be less than 1")
         self.space_dimension = space_dimension
         self.random_state = check_random_state(random_state)
         self.origin = None
         self.direction = None
-        super().__init__(subspace_dimension=1,
-                         space_dimension=space_dimension,
-                         random_state=self.random_state)
+        super().__init__(subspace_dimension=1, space_dimension=space_dimension, random_state=self.random_state)
 
     def _create_manifold(self):
         """Create the random line"""
@@ -75,13 +75,16 @@ class Line(BaseManifold):
         self.direction = self.random_state.randn(self.space_dimension)  # Random direction vector
         self.direction /= np.linalg.norm(self.direction)  # Normalize direction vector
 
-    def sample_points(self, num_points: int,
-                      sampling_function: Union[str, Callable] = 'normal',
-                      sampling_options: Dict = {'scale': 1},
-                      noise: Union[None, str, Callable] = None,
-                      noise_options: Dict = {},
-                      random_state: Union[None, int, np.random.RandomState] = None,
-                      return_distances: bool = True) -> np.ndarray:
+    def sample_points(
+        self,
+        num_points: int,
+        sampling_function: Union[str, Callable] = "normal",
+        sampling_options: Dict = {"scale": 1},
+        noise: Union[None, str, Callable] = None,
+        noise_options: Dict = {},
+        random_state: Union[None, int, np.random.RandomState] = None,
+        return_distances: bool = True,
+    ) -> np.ndarray:
         """
         Sample points from the line
 
@@ -151,6 +154,49 @@ class Line(BaseManifold):
             return points, self.get_canonical_distance_matrix(points)
         else:
             return points
+
+    def sample_triplets(
+        self,
+        num_points: int,
+        num_triplets: int,
+        sampling_function: Union[str, Callable] = "normal",
+        sampling_options: Dict = {"scale": 1},
+        noise: Union[None, str, Callable] = None,
+        noise_options: Dict = {},
+        random_state: Union[None, int, np.random.RandomState] = None,
+    ) -> np.ndarray:
+        """
+        Sample points triplets directly from the manifold without repeats.
+        Utility function to reduce boilerplate code.
+
+        Args:
+            num_points: Number of points to sample
+            sampling_function: The sampling function to use.
+            sampling_options: The options to pass to the sampling function.
+            noise: The noise function to use.
+            noise_options: The options to pass to the noise function.
+            random_state: The seed of the pseudo random number generator to use when sampling.
+            triplet_size: Number of triplets to generate
+
+        Returns:
+            noisy_points: Sampled points with noise
+            noisy_distances: Distance matrix of the noisy points
+            triplets: Generated triplet indices
+        """
+        # Sample points with noise
+        noisy_points, noisy_distances = self.sample_points(
+            num_points,
+            sampling_function=sampling_function,
+            sampling_options=sampling_options,
+            noise=noise,
+            noise_options=noise_options,
+            random_state=random_state,
+        )
+
+        # Generate triplet indices
+        triplets = make_random_triplet_indices(n_objects=num_points, size=num_triplets, random_state=random_state)
+
+        return noisy_points, noisy_distances, triplets
 
     def get_canonical_distance_matrix(self, points: np.ndarray) -> np.ndarray:
         """
