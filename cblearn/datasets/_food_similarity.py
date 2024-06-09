@@ -27,7 +27,7 @@ def fetch_food_similarity(data_home: Optional[os.PathLike] = None, download_if_m
     .. warning::
         This function downloads the file without verifying the ssl signature to circumvent an outdated certificate of the dataset hosts.
         However, after downloading the function verifies the file checksum before loading the file to minimize the risk of man-in-the-middle attacks.
-    
+
     ===================   =====================
     Triplets                             190376
     Objects                                 100
@@ -83,12 +83,14 @@ def fetch_food_similarity(data_home: Optional[os.PathLike] = None, download_if_m
             archive_path = _base._fetch_remote(ARCHIVE, dirname=data_home)
         finally:
             ssl._create_default_https_context = ssl_default
-            
+
         with zipfile.ZipFile(archive_path) as zf:
             with zf.open('food100-dataset/all-triplets.csv', 'r') as f:
                 triplets = np.loadtxt(f, dtype=str, delimiter=';')
+                triplets = np.char.strip(triplets)  # trim whitespace
 
-            image_names = np.asarray([name[len('food100-dataset/'):] for name in zf.namelist()
+            image_names = np.asarray([name[len('food100-dataset/'):]
+                                      for name in zf.namelist()
                                       if name.startswith('food100-dataset/images/')
                                       and name.endswith('.jpg')])
 

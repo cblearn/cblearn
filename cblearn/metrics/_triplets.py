@@ -58,12 +58,17 @@ def query_accuracy(true_response: utils.Response, pred_response: utils.Response)
 
 
 def query_error(true_response: utils.Response, pred_response: utils.Response) -> float:
+    """ Error measured by 1 - query accuracy.`
+
+    See :py:func:`cblearn.metrics.query_accuracy` for more information."""
     return 1 - query_accuracy(true_response, pred_response)
 
 
-def _scorer(true_response, query):
-    query, pred_response = utils.check_query_response(query, result_format='list-boolean')
-    return query_accuracy(true_response, pred_response)
+def query_accuracy_scorer(clf, X, y):
+    """Scorer function for query accuracy, compatible with sklearn's scorer API.
 
-
-QueryScorer = metrics.make_scorer(_scorer)
+    See :py:func:`cblearn.metrics.query_accuracy` for more information.
+    """
+    X, y = utils.check_query_response(X, y, result_format='list-count')
+    y_pred = clf.predict(X, result_format='list-count')
+    return query_accuracy(y, y_pred)

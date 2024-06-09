@@ -1,7 +1,7 @@
 # This workflow will install Python dependencies, run tests and lint with a variety of Python versions
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: Lint and test code, test documentation build
+name: Test
 
 on:
   push:
@@ -35,7 +35,7 @@ jobs:
         #    see .flake8 config file for selected/ignored rules.
         #    warnings can be found in the action logs
 
-  docs: 
+  docs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -55,21 +55,26 @@ jobs:
   test:
     strategy:
       matrix:
-        python-version: 
+        python-version:
           - "3.9"
           - "3.10"
           - "3.11"
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Setup Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
         cache: pip
         cache-dependency-path: setup.cfg
     - name: Setup R
       uses: r-lib/actions/setup-r@v2
+    - name: Install R dependencies
+      run: |
+        # 2024-05-14: loe is not available from CRAN, we have to fallback to the archive.
+        wget https://cran.r-project.org/src/contrib/Archive/loe/loe_1.1.tar.gz
+        R CMD INSTALL ./loe_1.1.tar.gz
     - name: Install package with dependencies
       run: |
         python3 -m pip install --upgrade pip
@@ -79,10 +84,9 @@ jobs:
       run: |
         pytest cblearn --cov=cblearn --cov-report=xml --remote-data
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v4
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         file: ./coverage.xml
         flags: unittests
         env_vars: OS,PYTHON
-      

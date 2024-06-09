@@ -104,7 +104,10 @@ class OENN(BaseEstimator, TripletEmbeddingMixin):
         Returns:
             self.
         """
+        self.fit_X_ = utils.check_query(X, result_format='list-order')  # for data validation in .transform
         triplets = utils.check_query_response(X, y, result_format='list-order')
+        self.n_features_in_ = 3
+
         random_state = check_random_state(self.random_state)
         if n_objects is None:
             n_objects = triplets.max() + 1

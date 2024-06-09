@@ -9,10 +9,10 @@ def test_fetch_musician_similarity(tmp_path):
     data_home = tmp_path / 'cblearn_datasets'
     bunch = fetch_musician_similarity(data_home=data_home, shuffle=False)
 
-    assert bunch.data.shape == (131_970, 3)
-    assert bunch.judgement_id.shape == (131_970, )
-    assert bunch.user.shape == (131_970, )
-    assert bunch.survey_or_game.shape == (131_970, )
+    assert bunch.data.shape == (118_263, 3)
+    assert bunch.judgement_id.shape == (118_263, )
+    assert bunch.user.shape == (118_263, )
+    assert bunch.survey_or_game.shape == (118_263, )
     assert bunch.artist_name.shape == (448, )
     assert bunch.artist_id.shape == (448, )
     assert bunch.artist_name[bunch.data][0, 0] == 'queen'

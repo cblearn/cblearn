@@ -17,5 +17,8 @@ from ._triplet_response import triplet_response
 from ._triplet_response import noisy_triplet_response
 
 from ._linear_subspace import LinearSubspace
+<<<<<<< HEAD
 from ._line import Line
+=======
+>>>>>>> 3ef91813e56d1c3e4198276aa959f3cac2d97105
 from ._base import BaseManifold
