@@ -34,15 +34,14 @@ class Line(BaseManifold):
 
     Examples:
         >>> from cblearn.datasets import Line, make_random_triplet_indices, triplet_response
-        >>> line = Line(space_dimension=3, random_state=42)
-        >>> points = line.sample_points(num_points=10)
-        >>> distances = line.get_canonical_distance_matrix(points)
+        >>> line = Line(space_dimension=3, random_state=40)
+        >>> points, distances = line.sample_points(num_points=10)
         >>> print(points.shape)
         (10, 3)
         >>> print(distances.shape)
         (10, 10)
         >>> # Sampling 10 points with noise
-        >>> noisy_points, noisy_distances = manifold.sample_points(10, noise='normal', noise_options={'scale': 0.1})
+        >>> noisy_points, noisy_distances = line.sample_points(10, noise='normal', noise_options={'scale': 0.1})
         >>> # Responding to triplets based on distance matrix
         >>> triplets = make_random_triplet_indices(n_objects=10, size=100)
         >>> response = triplet_response(triplets, distances, distance='precomputed')
