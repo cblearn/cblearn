@@ -106,7 +106,6 @@ def test_sampling_function(space_dimension, noise, random_state):
 
 # # Test distances or not
 
-
 @pytest.mark.parametrize("space_dimension, return_distances", [(2, False), (2, False), (4, False), (3, False), (10, False)])
 def test_sample_points_return_no_distances(space_dimension, return_distances):
     manifold = Line(space_dimension=space_dimension, random_state=1)

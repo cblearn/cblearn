@@ -161,8 +161,6 @@ class LinearSubspace(BaseManifold):
             sampling_fun: Callable = getattr(random_state, sampling_function)
         elif callable(sampling_function):
             sampling_fun = sampling_function
-        else:
-            sampling_fun = sampling_function
 
         # Sample Coefficients
         if self.subspace_dimension == 1:

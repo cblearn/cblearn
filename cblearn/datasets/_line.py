@@ -125,13 +125,8 @@ class Line(BaseManifold):
             sampling_fun: Callable = getattr(self.random_state, sampling_function)
         elif callable(sampling_function):
             sampling_fun = sampling_function
-        else:
-            sampling_fun = None
 
-        if sampling_fun is None:
-            t_values = self.random_state.rand(num_points)
-        else:
-            t_values = sampling_fun(size=num_points, **sampling_options)
+        t_values = sampling_fun(size=num_points, **sampling_options)
 
         # Vectorized calculation of points
         points = self.origin + np.expand_dims(t_values, axis=-1) * self.direction
@@ -142,8 +137,6 @@ class Line(BaseManifold):
                 noise_fun: Callable = getattr(self.random_state, noise)
             elif callable(noise):
                 noise_fun = noise
-            else:
-                noise_fun = None
 
             if noise_fun is not None:
                 noise = noise_fun(size=points.shape, **noise_options)
