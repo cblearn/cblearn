@@ -33,7 +33,7 @@ class Line(BaseManifold):
         random_state: Random state for reproducibility of the line
 
     Examples:
-        >>> from your_module import Line
+        >>> from cblearn.datasets import Line, make_random_triplet_indices, triplet_response
         >>> line = Line(space_dimension=3, random_state=42)
         >>> points = line.sample_points(num_points=10)
         >>> distances = line.get_canonical_distance_matrix(points)
