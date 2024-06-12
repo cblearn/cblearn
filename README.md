@@ -3,6 +3,7 @@
 </h1><br>
 
 ## Comparison-based Machine Learning in Python
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.06139/status.svg)](https://doi.org/10.21105/joss.06139)
 [![PyPI version](https://img.shields.io/pypi/v/cblearn.svg)](https://pypi.python.org/pypi/cblearn)
 [![Documentation](https://readthedocs.org/projects/cblearn/badge/?version=stable)](https://cblearn.readthedocs.io/en/stable/?badge=stable)
 [![Test status](https://github.com/cblearn/cblearn/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/cblearn/cblearn/actions/workflows/test.yml)
@@ -62,3 +63,16 @@ This work has been supported by the Machine Learning Cluster of Excellence, fund
 This library is free to use, share, and adapt under the [MIT License](https://github.com/cblearn/cblearn/blob/master/LICENSE) conditions.
 
 If you publish work that uses this library, please cite our JOSS paper.
+
+```
+@article{Künstle2024, 
+    doi = {10.21105/joss.06139}, 
+    url = {https://doi.org/10.21105/joss.06139}, 
+    year = {2024}, 
+    publisher = {The Open Journal}, 
+    volume = {9}, number = {98}, pages = {6139}, 
+    author = {David-Elias Künstle and Ulrike von Luxburg}, 
+    title = {cblearn: Comparison-based Machine Learning in Python}, 
+    journal = {Journal of Open Source Software} 
+} 
+```
