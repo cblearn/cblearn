@@ -66,6 +66,8 @@ This library is free to use, share, and adapt under the [MIT License](https://gi
 
 Please cite our [JOSS paper](https://joss.theoj.org/papers/10.21105/joss.06139#) if you publish work using `cblearn`:
 
+**Künstle et al., (2024). cblearn: Comparison-based Machine Learning in Python. Journal of Open Source Software, 9(98), 6139, https://doi.org/10.21105/joss.06139**
+
 ```
 @article{Künstle2024, 
     doi = {10.21105/joss.06139}, 
