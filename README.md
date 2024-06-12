@@ -62,7 +62,9 @@ This work has been supported by the Machine Learning Cluster of Excellence, fund
 
 This library is free to use, share, and adapt under the [MIT License](https://github.com/cblearn/cblearn/blob/master/LICENSE) conditions.
 
-If you publish work that uses this library, please cite our JOSS paper.
+## Citation
+
+Please cite our [JOSS paper](https://joss.theoj.org/papers/10.21105/joss.06139#) if you publish work using `cblearn`:
 
 ```
 @article{Künstle2024, 
