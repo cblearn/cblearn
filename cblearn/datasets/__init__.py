@@ -15,3 +15,6 @@ from ._triplet_indices import make_all_triplet_indices
 from ._triplet_indices import make_random_triplet_indices
 from ._triplet_response import triplet_response
 from ._triplet_response import noisy_triplet_response
+
+from ._linear_subspace import LinearSubspace
+from ._base import BaseManifold

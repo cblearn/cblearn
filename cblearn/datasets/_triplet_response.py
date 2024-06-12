@@ -1,5 +1,4 @@
 """ Function in this file judge triplets, based on ground-truth embedding and possible noise patterns. """
-import enum
 from typing import Dict, Callable, Optional, Union
 
 from sklearn.utils import check_random_state, check_array
@@ -7,16 +6,18 @@ from sklearn.metrics import pairwise
 import numpy as np
 
 from cblearn import utils
+from cblearn.datasets._datatypes import NoiseTarget, Distance
 
 
-class NoiseTarget(enum.Enum):
-    POINTS = 'points'
-    DIFFERENCES = 'differences'
+def _count_unique_items(query):
+    """ Count unique items per row in a 2D array.
 
-
-class Distance(enum.Enum):
-    EUCLIDEAN = 'euclidean'
-    PRECOMPUTED = 'precomputed'
+    Efficient approach even for large number of rows
+    and integer items:
+    https://stackoverflow.com/a/48473125
+    """
+    sorted_query = np.sort(query, axis=1)
+    return (sorted_query[:, 1:] != sorted_query[:, :-1]).sum(axis=1) + 1
 
 
 def _count_unique_items(query):

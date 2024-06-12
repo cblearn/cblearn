@@ -31,6 +31,17 @@ Loaders
     datasets.fetch_similarity_matrix
 
 
+Synthetic Point Generation
+--------------------------
+
+.. currentmodule:: cblearn
+
+.. autosummary::
+    :toctree: generated/
+
+    datasets.LinearSubspace
+
+
 Simulations
 -----------
 
