@@ -10,3 +10,9 @@ testpaths = [
 markers = [
     "sklearn: mark tests for sklearn compatibility.",
 ]
+[tool.coverage.report]
+exclude_also = [
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "@(abc\\.)?abstractmethod",
+    ]

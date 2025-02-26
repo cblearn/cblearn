@@ -20,21 +20,28 @@ class BaseManifold(ABC):
         """
         Create the manifold
         """
-        pass
+        raise NotImplementedError
 
     @abstractmethod
-    def sample_points(self, **kwargs):
+    def sample_points(self, num_points: int, **kwargs):
         """
         Sample points from the manifold
         """
-        pass
+        raise NotImplementedError
+
+    @abstractmethod
+    def sample_triplets(self, num_points: int, num_triplets: int, **kwargs):
+        """
+        Sample triplets from the manifold directly
+        """
+        raise NotImplementedError
 
     @abstractmethod
     def get_canonical_distance_matrix(self, **kwargs):
         """
         Get the distance matrix of the points sampled
         """
-        pass
+        raise NotImplementedError
 
     def get_params(self):
         """
@@ -43,8 +50,9 @@ class BaseManifold(ABC):
         Returns:
             The parameters of the manifold
         """
-        return {attr: getattr(self, attr) for attr in dir(self) if not callable(
-            getattr(self, attr)) and not attr.startswith('_')}
+        return {
+            attr: getattr(self, attr) for attr in dir(self) if not callable(getattr(self, attr)) and not attr.startswith("_")
+        }
 
     def set_params(self, params):
         """
