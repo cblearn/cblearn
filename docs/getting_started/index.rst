@@ -101,4 +101,4 @@ once enough are available.
 The triplet generator's `result_format` option specifies the expected data format of the triplets, as triplets can be represented in different ways.
 This example uses the `list-order` format, a list of triplets, containing the indices of an anchor, near, and far point.
 Learn more about data formats and other aspects of the library in the :ref:`user_guide`.
-Alternatively, you can find more code in the :ref:`examples` or get an overview of the :ref:`api`.
+Alternatively, you can find more code in the :ref:`examples` or get an overview of the :ref:`api_ref`.

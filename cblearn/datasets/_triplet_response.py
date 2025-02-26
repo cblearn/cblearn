@@ -20,6 +20,17 @@ def _count_unique_items(query):
     return (sorted_query[:, 1:] != sorted_query[:, :-1]).sum(axis=1) + 1
 
 
+def _count_unique_items(query):
+    """ Count unique items per row in a 2D array.
+
+    Efficient approach even for large number of rows
+    and integer items:
+    https://stackoverflow.com/a/48473125
+    """
+    sorted_query = np.sort(query, axis=1)
+    return (sorted_query[:, 1:] != sorted_query[:, :-1]).sum(axis=1) + 1
+
+
 def noisy_triplet_response(triplets: utils.Query, embedding: np.ndarray, result_format: Optional[str] = None,
                            noise: Union[None, str, Callable] = None, noise_options: Dict = {},
                            noise_target: Union[str, NoiseTarget] = 'differences',

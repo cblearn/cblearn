@@ -23,6 +23,25 @@ where A is more similar to B than to C, or from related tasks such as the odd-on
    Both, the ranking and odd-one-out tasks can be converted to triplet comparisons and
    analyzed with the same algorithms.
 
+Our `JOSS paper`_ provides a detailed introduction to comparison-based learning including references to related works.
+Please refer to the paper if you use this package in scientific work.
+
+.. code-block:: bibtex
+
+    @article{Künstle2024,
+        doi = {10.21105/joss.06139},
+        url = {https://doi.org/10.21105/joss.06139},
+        year = {2024},
+        publisher = {The Open Journal},
+        volume = {9}, number = {98}, pages = {6139},
+        author = {David-Elias Künstle and Ulrike von Luxburg},
+        title = {cblearn: Comparison-based Machine Learning in Python},
+        journal = {Journal of Open Source Software}
+    }
+
+.. _GitHub issue tracker: https://github.com/cblearn/cblearn/issues
+.. _JOSS paper: https://joss.theoj.org/papers/10.21105/joss.06139#
+
 **cblearn provides a set of tools to read, convert, and manipulate comparison-based datasets**.
 It also provides a set of comparison-based models, including the ordinal embedding and clustering,
 that can be used as part of a scikit-learn pipeline.
@@ -42,10 +61,6 @@ model perceived similarity in humans.
 New users should start in the :ref:`getting_started` section.
 Bugs and feature requests are welcome on the `GitHub issue tracker`_.
 If you would like to contribute to the code or documentation, please check the :ref:`contributor_guide`.
-
-.. _GitHub issue tracker: https://github.com/cblearn/cblearn/issues
-
-
 
 
 
