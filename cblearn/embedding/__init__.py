@@ -6,3 +6,4 @@ from cblearn.embedding._ste import STE, TSTE
 from cblearn.embedding._oenn import OENN
 from cblearn.embedding._mlds import MLDS
 from cblearn.embedding._dims import DimensionEstimationResult, estimate_dimensionality_cv
+from cblearn.embedding._lore import LORE

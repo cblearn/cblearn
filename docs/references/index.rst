@@ -86,6 +86,7 @@ Low-level Dataset Utility
     embedding.TSTE
     embedding.OENN
     embedding.MLDS
+    embedding.LORE
 
 Utility
 -------
