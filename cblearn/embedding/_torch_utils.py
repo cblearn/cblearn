@@ -4,7 +4,36 @@ import numpy as np
 import scipy
 
 
+def _torch_device_is_available(device) -> bool:
+    """ Check if a parsed torch device is supported and usable in this installation.
+
+        Args:
+            device: A torch.device object.
+        Returns:
+            True, if the device is a cpu or an existing cuda device.
+    """
+    import torch
+
+    if device.type == "cpu":
+        return True
+    elif device.type == "cuda":
+        return torch.cuda.is_available() and (device.index is None
+                                              or device.index < torch.cuda.device_count())
+    else:
+        return False
+
+
 def torch_device(device: str) -> str:
+    """ Resolve the device string to a device available in this torch installation.
+
+        Args:
+            device: "auto" to use "cuda" if available and "cpu" otherwise,
+                    or an explicit torch device name such as "cpu", "cuda" or "cuda:1".
+        Returns:
+            The name of the device to compute on.
+        Raises:
+            ValueError: If the device is not a valid torch device or is not available.
+    """
     import torch
 
     if device == "auto":
@@ -12,6 +41,17 @@ def torch_device(device: str) -> str:
             return "cuda"
         else:
             return "cpu"
+
+    try:
+        parsed_device = torch.device(device)
+    except (RuntimeError, TypeError, ValueError) as error:
+        raise ValueError(f"Expects device to be 'auto' or a torch device name, got '{device}'.") from error
+
+    if not _torch_device_is_available(parsed_device):
+        raise ValueError(f"Expects device to be 'auto', 'cpu' or an available 'cuda' device, "
+                         f"got '{device}'.")
+
+    return device
 
 
 def torch_minimize_kernel(method, objective, init, **kwargs):
