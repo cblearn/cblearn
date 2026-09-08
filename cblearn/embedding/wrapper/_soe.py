@@ -71,6 +71,7 @@ class SOE(TripletEmbeddingMixin, RWrapperMixin, BaseEstimator):
         Returns:
             self.
         """
+        self._validate_n_components()
         loe = self.import_r_package('loe')
         random_state = check_random_state(self.random_state)
         self.seed_r(random_state)
