@@ -6,6 +6,7 @@ from scipy import stats
 import numpy as np
 
 from cblearn import utils
+from cblearn.embedding._base import check_n_components
 
 
 @dataclass
@@ -135,6 +136,32 @@ def _sequential_crossval_ttest(test_scores_cv, n_splits, alpha):
             'alpha': alpha, 'alpha_corrected': result[3], 'step': np.arange(n_steps)}
 
 
+def check_test_dimensions(test_dimensions) -> np.ndarray:
+    """ Validate the dimensions tested by estimate_dimensionality_cv.
+
+    Args:
+        test_dimensions: The dimensions to test, as a monotonically increasing
+                         list of at least two positive integers.
+    Returns:
+        The validated dimensions as an integer array.
+    Raises:
+        ValueError: If test_dimensions is not a monotonically increasing list
+                    of at least two positive integers.
+    """
+    dimensions = np.asarray(test_dimensions)
+    if dimensions.ndim != 1 or dimensions.shape[0] < 2:
+        raise ValueError("Expects test_dimensions to be a list of at least two dimensions, "
+                         f"got {test_dimensions!r}.")
+    # Iterate the input, not the array, because np.asarray casts mixed types
+    # and would report the wrong entry (e.g. the 1 of [1, 2, 3.5] becomes 1.0).
+    for index, dimension in enumerate(test_dimensions):
+        check_n_components(dimension, name=f"test_dimensions[{index}]")
+    if np.diff(dimensions).min() < 1:
+        raise ValueError("Expects test_dimensions to be monotonically increasing, "
+                         f"got {test_dimensions!r}.")
+    return dimensions
+
+
 def estimate_dimensionality_cv(estimator, queries, responses=None,
                                test_dimensions: list = [1, 2, 3], n_splits=10, n_repeats=1,
                                refit=True, alpha=0.05, param_name="n_components", n_jobs=-1, random_state=None):
@@ -151,7 +178,8 @@ def estimate_dimensionality_cv(estimator, queries, responses=None,
           estimator: The embedding estimator to use.
           queries: The triplet queries to embed.
           responses: Optional responses, if not encoded in triplets.
-          test_dimensions: The dimensions to test as a monotonic increasing list.
+          test_dimensions: The dimensions to test, as a monotonically increasing
+                           list of at least two positive integers.
           n_splits: The number of splits to use for cross-validation.
           n_repeats: The number of repeatitions of each cross-validation split.
                      Use 1 for fast results, but 10 or more for more reliable results.
@@ -163,6 +191,10 @@ def estimate_dimensionality_cv(estimator, queries, responses=None,
 
         Returns:
           result: A result object with the estimated dimension and other information.
+
+        Raises:
+          ValueError: If test_dimensions is not a monotonically increasing list
+                      of at least two positive integers.
 
         Examples:
 
@@ -188,8 +220,7 @@ def estimate_dimensionality_cv(estimator, queries, responses=None,
                 using triplet accuracy and hypothesis testing.
                 Journal of Vision, 22(13), 5. https://doi.org/10.1167/jov.22.13.5
     """
-    if np.diff(test_dimensions).min() < 1:
-        raise ValueError("test_dimensions must be monotonically increasing")
+    test_dimensions = check_test_dimensions(test_dimensions)
 
     queries = utils.check_query_response(queries, responses, result_format='list-order')
     cv_folds = RepeatedKFold(n_repeats=n_repeats, n_splits=n_splits, random_state=random_state)
