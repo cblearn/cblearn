@@ -99,6 +99,7 @@ def test_estimate_dimensionality_cv_recovers_dimension(triplets):
     result = estimate_dimensionality_cv(SOE(n_init=1), triplets, test_dimensions=[1, 2, 3],
                                         n_splits=5, n_jobs=1, random_state=42)
     assert result.estimated_dimension == 2
+    assert isinstance(result.estimated_dimension, int)  # Python int, not np.int64
     np.testing.assert_array_equal(result.dimensions, [1, 2, 3])
 
 

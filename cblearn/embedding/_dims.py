@@ -231,10 +231,10 @@ def estimate_dimensionality_cv(estimator, queries, responses=None,
     stat_results = _sequential_crossval_ttest(test_scores.T, n_splits, alpha=alpha)
     for ix, reject in enumerate(stat_results['reject']):
         if not reject:
-            estimated_dimension = test_dimensions[ix]
+            estimated_dimension = int(test_dimensions[ix])
             break
     else:
-        estimated_dimension = test_dimensions[-1]
+        estimated_dimension = int(test_dimensions[-1])
 
     if refit:
         estimator.set_params(**{param_name: estimated_dimension})
