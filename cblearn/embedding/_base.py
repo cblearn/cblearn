@@ -50,10 +50,6 @@ class TripletEmbeddingMixin(TransformerMixin):
     def _validate_n_components(self) -> int:
         """ Validate the estimator's embedding dimensionality.
 
-        The estimators call this at the beginning of .fit, not in __init__:
-        scikit-learn requires that __init__ stores its parameters unaltered
-        and raises no errors (check_do_not_raise_errors_in_init_or_set_params).
-
         Returns:
             The validated dimensionality as a Python integer.
         Raises:
