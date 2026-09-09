@@ -52,8 +52,6 @@ class MLDS(TripletEmbeddingMixin, RWrapperMixin, BaseEstimator):
             random_state: The seed of the pseudo random number generator used to initialize the optimization.
             method: Optimizer method, either 'glm' or 'optim'.
         """
-        # Note: n_components is validated in .fit, not here, because 
-        # scikit-learn requires that __init__ stores the parameters unaltered.
         self.n_components = n_components
         self.random_state = random_state
         self.method = method
