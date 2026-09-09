@@ -4,16 +4,20 @@ import joblib
 import os
 from typing import Optional, Union
 import zipfile
-import ssl
 
 import numpy as np
 from sklearn.datasets import _base
 from sklearn.utils import check_random_state, Bunch
 
 
+# The dataset was originally distributed from
+# http://vision.cornell.edu/se3/wp-content/uploads/2014/09/food100-dataset.zip
+# but that host, vision.cornell.edu, no longer serves the archive. 
+# The URL below is an OSF mirror (https://osf.io/tqpmw/) of a copy
+# recovered from the Internet Archive, byte-identical to the original.
 ARCHIVE = _base.RemoteFileMetadata(
     filename='food100-dataset.zip',
-    url='http://vision.cornell.edu/se3/wp-content/uploads/2014/09/food100-dataset.zip',
+    url='https://osf.io/download/6aa16bb1813a28b1e43f09bb/',
     checksum=('18f5e210174dfdbf6a7b4ed7538cf8ba53fd65e0cbe193519231b8ab4ea8fc62'))
 
 logger = logging.getLogger(__name__)
@@ -23,10 +27,6 @@ def fetch_food_similarity(data_home: Optional[os.PathLike] = None, download_if_m
                           shuffle: bool = True, random_state: Optional[np.random.RandomState] = None,
                           return_triplets: bool = False) -> Union[Bunch, np.ndarray]:
     """ Load the Food-100 food similarity dataset (triplets).
-
-    .. warning::
-        This function downloads the file without verifying the ssl signature to circumvent an outdated certificate of the dataset hosts.
-        However, after downloading the function verifies the file checksum before loading the file to minimize the risk of man-in-the-middle attacks.
 
     ===================   =====================
     Triplets                             190376
@@ -77,12 +77,7 @@ def fetch_food_similarity(data_home: Optional[os.PathLike] = None, download_if_m
 
         logger.info('Downloading food similarity from {} to {}'.format(ARCHIVE.url, data_home))
 
-        try:
-            ssl_default = ssl._create_default_https_context
-            ssl._create_default_https_context = ssl._create_unverified_context
-            archive_path = _base._fetch_remote(ARCHIVE, dirname=data_home)
-        finally:
-            ssl._create_default_https_context = ssl_default
+        archive_path = _base._fetch_remote(ARCHIVE, dirname=data_home)
 
         with zipfile.ZipFile(archive_path) as zf:
             with zf.open('food100-dataset/all-triplets.csv', 'r') as f:

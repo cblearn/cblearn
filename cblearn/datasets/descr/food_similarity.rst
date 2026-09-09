@@ -9,7 +9,7 @@ The crowd workers were presented a target and multiple other of the 100 food ima
 They selected a fixed number of other images, which taste more similar to the target than the remaining.
 Per user selection, multiple triplet constraints were created.
 
-.. _The food dataset contains triplets: https://vision.cornell.edu/se3/projects/cost-effective-hits/
+.. _The food dataset contains triplets: https://web.archive.org/web/20250605221918/https://vision.cornell.edu/se3/projects/cost-effective-hits/
 
 **Data Set Characteristics:**
 
@@ -20,6 +20,14 @@ Per user selection, multiple triplet constraints were created.
     ===================   =====================
 
 This dataset can be downloaded using the :func:`cblearn.datasets.fetch_food_similarity`.
+
+.. note::
+    The original download host, vision.cornell.edu, is no longer online, so the link
+    above points to an archived copy of the project page.
+    :func:`cblearn.datasets.fetch_food_similarity` downloads the dataset from an
+    `OSF mirror <https://osf.io/tqpmw/>`_ of the original archive instead.
+    The mirrored file is byte-identical to the original, which its unchanged
+    checksum confirms.
 
 .. License statement from the original homepage
 

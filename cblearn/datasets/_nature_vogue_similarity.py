@@ -10,17 +10,17 @@ from sklearn.datasets import _base
 from sklearn.utils import check_random_state, Bunch
 from cblearn.preprocessing import query_from_columns
 
+# The dataset was originally distributed from
+# http://anttiukkonen.com/nature_and_vogue_triplets.zip
+# but that URL no longer works. The URL below is an OSF mirror
+# (https://osf.io/tqpmw/) of a copy recovered from the Internet Archive,
+# byte-identical to the original.
 ARCHIVE = _base.RemoteFileMetadata(
     filename='nature_and_vogue_triplets.zip',
-    url='http://anttiukkonen.com/nature_and_vogue_triplets.zip',
+    url='https://osf.io/download/6aa16bbfb7c3003e08af94fa/',
     checksum=('db4718bb742a2492dee87e94daead3070b2afa3a9174aa717be336940e47e3cc'))
 
 logger = logging.getLogger(__name__)
-
-# The download host anttiukkonen.com returns 404 for nature_and_vogue_triplets.zip,
-# so these examples cannot run even with --remote-data. Skip them until a new
-# source for the dataset is found.
-__doctest_skip__ = ['fetch_nature_scene_similarity', 'fetch_vogue_cover_similarity']
 
 
 def fetch_nature_scene_similarity(data_home: Optional[os.PathLike] = None, download_if_missing: bool = True,
