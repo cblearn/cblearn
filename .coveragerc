@@ -1,14 +1,9 @@
 [run]
 cover_pylib = false
-# The download hosts of _nature_vogue_similarity and _food_similarity are gone,
-# so their fetch code cannot run in CI and cannot be covered. They are excluded
-# until a new source is found or the datasets are removed.
 omit =
     */site-packages/*
     */tests/*
     */_version.py
-    */datasets/_nature_vogue_similarity.py
-    */datasets/_food_similarity.py
 
 [report]
 exclude_lines =
