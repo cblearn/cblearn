@@ -2,6 +2,26 @@
 
 ## Upcoming
 
+## 0.4
+
+- Feature: `embedding.LORE`, a low-rank ordinal embedding that estimates the intrinsic dimensionality
+- Feature: Support for Python 3.12 and 3.13
+- Improvement: Compatibility with scikit-learn 1.6 and newer, which replaced the estimator tag dictionary
+  by the `__sklearn_tags__` API. scikit-learn 1.6 is now the minimum supported version.
+- Improvement: Readable errors for invalid embedding dimensions, raised in `fit` instead of `__init__`,
+  as required by scikit-learn
+- Improvement: Validation of `test_dimensions` in `embedding.estimate_dimensionality_cv`
+- Improvement: The food, nature and vogue datasets are downloaded from OSF mirrors,
+  since the original hosts no longer serve the archives
+- Improvement: Externally hosted archives are pinned to fixed files or commits,
+  so that their checksums no longer change on every upstream push
+- Fix: Gradient of the STE embedding, which weighted each triplet by P * (1 - P) instead of (1 - P)
+- Fix: `estimate_dimensionality_cv` returns the estimated dimension as a Python int
+- Fix: `utils.torch_device` returns and validates an explicit device instead of None
+- Fix: Sparse input is detected with `scipy.sparse.issparse`, so that the newer sparray classes are recognized
+- Fix: The numpy converter for rpy2 is registered directly, since `numpy2ri.activate` raises in rpy2 3.5.12 and newer
+- Others: Extended unit tests and coverage, seeded triplet sampling in the test suite
+
 ## 0.3
 
 - Feature: JOSS paper
