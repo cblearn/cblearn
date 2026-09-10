@@ -8,7 +8,7 @@ There are multiple ways to contribute to this project.
 You can report bugs in this library or propose new ideas via `Github issues`_.
 This guide describes how to contribute code or documentation.
 
-.. _Github issues: https://github.com/dekuenstle/cblearn/issues
+.. _Github issues: https://github.com/cblearn/cblearn/issues
 
 
 .. _developer_install:
@@ -151,7 +151,7 @@ Usually, after some iterations, your changes will be merged into the ``main`` br
 
     If you state a pull request, your changes will be published under `this open source license`_.
 
-.. _this open source license: https://github.com/dekuenstle/cblearn/blob/master/LICENSE
+.. _this open source license: https://github.com/cblearn/cblearn/blob/main/LICENSE
 
 
 Versions should be semantic and follow PIP440_: The version indicates ``major.minor.fix``;
