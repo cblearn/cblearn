@@ -1,3 +1,4 @@
+import numbers
 from typing import Optional
 import warnings
 
@@ -8,6 +9,25 @@ from sklearn.utils.validation import check_is_fitted
 from cblearn import datasets
 from cblearn import utils
 from cblearn import metrics
+
+
+def check_n_components(n_components, name: str = "n_components") -> int:
+    """ Validate the dimensionality of an embedding.
+
+    Args:
+        n_components: The number of embedding dimensions.
+        name: The parameter name to use in the error message.
+    Returns:
+        The validated dimensionality as a Python integer.
+    Raises:
+        ValueError: If n_components is not a positive integer.
+    """
+    if isinstance(n_components, bool) or not isinstance(n_components, numbers.Integral):
+        raise ValueError(f"Expects {name} to be a positive integer, "
+                         f"got {n_components!r} of type {type(n_components).__name__}.")
+    if n_components < 1:
+        raise ValueError(f"Expects {name} to be a positive integer, got {n_components}.")
+    return int(n_components)
 
 
 class TripletEmbeddingMixin(TransformerMixin):
@@ -26,6 +46,16 @@ class TripletEmbeddingMixin(TransformerMixin):
         tags.target_tags.positive_only = True  # was requires_positive_y
         tags.transformer_tags.preserves_dtype = []  # .transform does not preserve dtype
         return tags
+
+    def _validate_n_components(self) -> int:
+        """ Validate the estimator's embedding dimensionality.
+
+        Returns:
+            The validated dimensionality as a Python integer.
+        Raises:
+            ValueError: If self.n_components is not a positive integer.
+        """
+        return check_n_components(self.n_components)
 
     def transform(self, X: Optional[utils.Query]):
         """ Transform the input data into the learned embedding.

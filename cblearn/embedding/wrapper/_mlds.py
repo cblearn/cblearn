@@ -52,8 +52,6 @@ class MLDS(TripletEmbeddingMixin, RWrapperMixin, BaseEstimator):
             random_state: The seed of the pseudo random number generator used to initialize the optimization.
             method: Optimizer method, either 'glm' or 'optim'.
         """
-        if n_components != 1:
-            raise ValueError(f"MLDS expects n_components=1, got {n_components}")
         self.n_components = n_components
         self.random_state = random_state
         self.method = method
@@ -68,6 +66,8 @@ class MLDS(TripletEmbeddingMixin, RWrapperMixin, BaseEstimator):
         Returns:
             This estimator
         """
+        if self._validate_n_components() != 1:
+            raise ValueError(f"MLDS expects n_components=1, got {self.n_components}")
         mlds = self.import_r_package('MLDS', robject_translations={"logLik.mlds": "logLik_mlds"})
         random_state = check_random_state(self.random_state)
         self.seed_r(random_state)

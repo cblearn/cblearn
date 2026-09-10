@@ -83,7 +83,7 @@ class MLDS(TripletEmbeddingMixin, BaseEstimator):
         Returns:
             This estimator
         """
-        if self.n_components != 1:
+        if self._validate_n_components() != 1:
             raise ValueError(f"MLDS expects n_components=1, got {self.n_components}")
         self.fit_X_ = utils.check_query(X, result_format='list-order')  # for data validation in .transform
         random_state = check_random_state(self.random_state)
