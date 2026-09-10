@@ -7,7 +7,7 @@
 [![PyPI version](https://img.shields.io/pypi/v/cblearn.svg)](https://pypi.python.org/pypi/cblearn)
 [![Documentation](https://readthedocs.org/projects/cblearn/badge/?version=stable)](https://cblearn.readthedocs.io/en/stable/?badge=stable)
 [![Test status](https://github.com/cblearn/cblearn/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/cblearn/cblearn/actions/workflows/test.yml)
-[![Test Coverage](https://codecov.io/gh/cblearn/cblearn/branch/master/graph/badge.svg?token=P9JRT6OK6O)](https://codecov.io/gh/cblearn/cblearn)
+[![Test Coverage](https://codecov.io/gh/cblearn/cblearn/branch/main/graph/badge.svg?token=P9JRT6OK6O)](https://codecov.io/gh/cblearn/cblearn)
 
 Comparison-based learning methods are machine learning algorithms using similarity comparisons ("A and B are more similar than C and D") instead of featurized data. 
 
@@ -52,15 +52,21 @@ There are more Python packages for comparison-based learning:
 - [salmon](https://docs.stsievert.com/salmon/) is a package for efficiently collecting triplets in crowd-sourced experiments. The package implements ordinal embedding algorithms and sampling strategies to query the most informative comparisons actively.
 
 ## Authors and Acknowledgement
+
 *cblearn* was initiated by current and former members of the [Theory of Machine Learning group](http://www.tml.cs.uni-tuebingen.de/index.php) of Prof. Dr. Ulrike von Luxburg at the University of Tübingen.
-The leading developer is [David-Elias Künstle](http://www.tml.cs.uni-tuebingen.de/team/kuenstle/index.php).
+
+**Author:** [David-Elias Künstle](http://www.tml.cs.uni-tuebingen.de/team/kuenstle/index.php)
+
+**Maintainers:** [Guillermo Aguilar](https://github.com/guillermoaguilar), [Vivek Anand](https://github.com/Vivdaddy)
+
+**Contributors:** [Conzel](https://github.com/Conzel), [mperrot](https://github.com/mperrot), [Mojtaba Barzegari](https://github.com/mbarzegary)
 
 We want to thank all the contributors here on GitHub.
-This work has been supported by the Machine Learning Cluster of Excellence, funded by EXC number 2064/1 – Project number 390727645. The authors would like to thank the International Max Planck Research School for Intelligent Systems (IMPRS-IS) for supporting David-Elias Künstle. 
+This work has been supported by the Machine Learning Cluster of Excellence, funded by EXC number 2064/1 - Project number 390727645. The authors would like to thank the International Max Planck Research School for Intelligent Systems (IMPRS-IS) for supporting David-Elias Künstle.
 
 ## License
 
-This library is free to use, share, and adapt under the [MIT License](https://github.com/cblearn/cblearn/blob/master/LICENSE) conditions.
+This library is free to use, share, and adapt under the [MIT License](https://github.com/cblearn/cblearn/blob/main/LICENSE) conditions.
 
 ## Citation
 
