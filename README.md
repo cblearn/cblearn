@@ -59,7 +59,7 @@ There are more Python packages for comparison-based learning:
 
 **Maintainers:** [Guillermo Aguilar](https://github.com/guillermoaguilar), [Vivek Anand](https://github.com/Vivdaddy)
 
-**Contributors:** [Conzel](https://github.com/Conzel), [mperrot](https://github.com/mperrot), [Mojtaba Barzegari](https://github.com/mbarzegary)
+**Contributors:** [Alexander Conzelmann](https://github.com/Conzel), [Michaël Perrot](https://github.com/mperrot), [Mojtaba Barzegari](https://github.com/mbarzegary)
 
 We want to thank all the contributors here on GitHub.
 This work has been supported by the Machine Learning Cluster of Excellence, funded by EXC number 2064/1 - Project number 390727645. The authors would like to thank the International Max Planck Research School for Intelligent Systems (IMPRS-IS) for supporting David-Elias Künstle.
