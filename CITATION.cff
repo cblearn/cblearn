@@ -27,11 +27,17 @@ authors:
     family-names: Luxburg
     affiliation: "University of Tübingen, Germany"
 contact:
+  - given-names: David-Elias
+    family-names: Künstle
+    email: david-elias.kuenstle@uni-tuebingen.de
+    orcid: "https://orcid.org/0000-0001-5507-3731"
+    affiliation: "University of Tübingen, Germany"
   - given-names: Guillermo
     family-names: Aguilar
     email: gmo.aguilar.c@gmail.com
   - given-names: Vivek
     family-names: Anand
+    email: vivekanand@gatech.edu
 preferred-citation:
   type: article
   title: "cblearn: Comparison-based Machine Learning in Python"
